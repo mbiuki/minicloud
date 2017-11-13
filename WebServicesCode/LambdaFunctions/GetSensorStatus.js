@@ -3,18 +3,30 @@ console.log('Loading function');
 let doc = require('dynamodb-doc');
 let dynamo = new doc.DynamoDB();
 let sensorTable = "SensorTable";
+const acceptedSensors = ["led", "lock", "motion"];
+
+function returnResult(callback, statusCode, body) {
+	callback(null, {
+		statusCode: statusCode,
+		body: JSON.stringify(body)
+	});
+}
 
 exports.handler = (event, context, callback) => {
 	console.log('Received event:', JSON.stringify(event, null, 2));
 
-	if (!event.sensorId) {
-		if (!event.pathParameters.proxy) {
-			callback(null, {
-				statusCode: 200,
-				body: JSON.stringify({})
-			});
-		}
+	if (event.pathParameters && event.pathParameters.proxy) {
 		event.sensorId = event.pathParameters.proxy;
+	}
+
+	if (!event.sensorId) {
+		returnResult(callback, 400, "Missing Sensor ID in Path");
+		return;
+	}
+
+	if (acceptedSensors.indexOf(event.sensorId) < 0) {
+		returnResult(callback, 400, "Not an accepted sensor to modify status");
+		return;
 	}
 
 	// Default time range if not provided (last 5 mins)
@@ -52,16 +64,10 @@ exports.handler = (event, context, callback) => {
 	dynamo.query(params, function(err, data) {
 		if (err) {
 			console.log(err, err.stack);
-			callback(null, {
-				statusCode: 200,
-				body: JSON.stringify({})
-			});
+			returnResult(callback, 400, err);
 		} else {
 			console.log(data);
-			callback(null, {
-				statusCode: 200,
-				body: JSON.stringify(data)
-			});
+			returnResult(callback, 400, data);
 		}
 	});
 };
