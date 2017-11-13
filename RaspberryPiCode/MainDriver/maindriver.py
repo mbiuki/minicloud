@@ -17,7 +17,7 @@ def motionCallback(client, userdata, message):
     print("from topic: ")
     print(message.topic)
     payload = json.loads(message.payload)
-    if payload["motion"] == '1':
+    if payload["status"] == '1':
         camera.capture('pic' + str(randint(0, 100)) + ".png")
     print("--------------\n\n")
 
@@ -27,7 +27,7 @@ def ledCallback(client, userdata, message):
     print("from topic: ")
     print(message.topic)
     payload = json.loads(message.payload)
-    if payload["led"] == '1':
+    if payload["status"] == '1':
         print("LED ON")
         GPIO.output(18,GPIO.HIGH)
     else:
@@ -116,10 +116,10 @@ time.sleep(2)
 while True:
     pir.wait_for_motion()
     motionMessage = getBaseMessage()
-    motionMessage["motion"] = '1'
+    motionMessage["status"] = '1'
     myAWSIoTMQTTClient.publish(motionTopic, json.dumps(motionMessage), 1)
     
     pir.wait_for_no_motion()
     noMotionMessage = getBaseMessage()
-    noMotionMessage["motion"] = '0'
+    noMotionMessage["status"] = '0'
     myAWSIoTMQTTClient.publish(motionTopic, json.dumps(noMotionMessage), 1)
