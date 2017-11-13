@@ -1,34 +1,33 @@
-'''
-/*
- * Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- *  http://aws.amazon.com/apache2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- */
- '''
-
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
+from gpiozero import MotionSensor
+from picamera import PiCamera
+from random import randint
 import logging
+import datetime
 import time
 import argparse
+import json
 import RPi.GPIO as GPIO
-import time
+
 
 # Custom MQTT message callback
-def customCallback(client, userdata, message):
+def motionCallback(client, userdata, message):
     print("Received a new message: ")
     print(message.payload)
     print("from topic: ")
     print(message.topic)
-    if(int(message.payload) % 2 == 0):
+    payload = json.loads(message.payload)
+    if payload["motion"] == '1':
+        camera.capture('pic' + str(randint(0, 100)) + ".png")
+    print("--------------\n\n")
+
+def ledCallback(client, userdata, message):
+    print("Received a new message: ")
+    print(message.payload)
+    print("from topic: ")
+    print(message.topic)
+    payload = json.loads(message.payload)
+    if payload["led"] == '1':
         print("LED ON")
         GPIO.output(18,GPIO.HIGH)
     else:
@@ -36,6 +35,11 @@ def customCallback(client, userdata, message):
         GPIO.output(18,GPIO.LOW)
     print("--------------\n\n")
 
+def getBaseMessage():
+    message = {}
+    message["timeStampEpoch"] = int(time.time() * 1000)
+    message["timeStampIso"] = datetime.datetime.isoformat(datetime.datetime.now())
+    return message
 
 # Read in command-line parameters
 parser = argparse.ArgumentParser()
@@ -47,7 +51,6 @@ parser.add_argument("-w", "--websocket", action="store_true", dest="useWebsocket
                     help="Use MQTT over WebSocket")
 parser.add_argument("-id", "--clientId", action="store", dest="clientId", default="basicPubSub",
                     help="Targeted client id")
-parser.add_argument("-t", "--topic", action="store", dest="topic", default="sdk/test/Python", help="Targeted topic")
 args = parser.parse_args()
 host = args.host
 rootCAPath = args.rootCAPath
@@ -55,7 +58,8 @@ certificatePath = args.certificatePath
 privateKeyPath = args.privateKeyPath
 useWebsocket = args.useWebsocket
 clientId = args.clientId
-topic = args.topic
+motionTopic = "sensor/motion/payload"
+ledTopic = "sensor/led/payload"
 
 if args.useWebsocket and args.certificatePath and args.privateKeyPath:
     parser.error("X.509 cert authentication and WebSocket are mutual exclusive. Please pick one.")
@@ -78,6 +82,12 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(18,GPIO.OUT)
 
+# Init Motion Sensor
+pir = MotionSensor(4)
+
+# Init Camera
+camera = PiCamera()
+
 # Init AWSIoTMQTTClient
 myAWSIoTMQTTClient = None
 if useWebsocket:
@@ -98,12 +108,18 @@ myAWSIoTMQTTClient.configureMQTTOperationTimeout(5)  # 5 sec
 
 # Connect and subscribe to AWS IoT
 myAWSIoTMQTTClient.connect()
-myAWSIoTMQTTClient.subscribe(topic, 1, customCallback)
+myAWSIoTMQTTClient.subscribe(motionTopic, 1, motionCallback)
+myAWSIoTMQTTClient.subscribe(ledTopic, 1, ledCallback)
 time.sleep(2)
 
-# Publish to the same topic in a loop forever
-loopCount = 0
+# Constantly check for motion, and no motion and publish 
 while True:
-    myAWSIoTMQTTClient.publish(topic, str(loopCount), 1)
-    loopCount += 1
-    time.sleep(5)
+    pir.wait_for_motion()
+    motionMessage = getBaseMessage()
+    motionMessage["motion"] = '1'
+    myAWSIoTMQTTClient.publish(motionTopic, json.dumps(motionMessage), 1)
+    
+    pir.wait_for_no_motion()
+    noMotionMessage = getBaseMessage()
+    noMotionMessage["motion"] = '0'
+    myAWSIoTMQTTClient.publish(motionTopic, json.dumps(noMotionMessage), 1)
