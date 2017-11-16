@@ -7,6 +7,7 @@ import datetime
 import time
 import argparse
 import json
+import boto3
 import RPi.GPIO as GPIO
 
 
@@ -18,7 +19,23 @@ def motionCallback(client, userdata, message):
     print(message.topic)
     payload = json.loads(message.payload)
     if payload["status"] == '1':
-        camera.capture('pic' + str(randint(0, 100)) + ".png")
+        imagePath = datetime.datetime.now().isoformat() + ".png"
+        camera.capture(imagePath)
+        image = open(imagePath, "rb")
+        
+        # Upload camera image to S3, and grab the url
+        s3Resource.Bucket('minicloud-images').put_object(Key=imagePath, Body=image)
+        url = s3Client.generate_presigned_url('get_object',
+                                Params={
+                                    'Bucket': 'minicloud-images',
+                                    'Key': imagePath
+                                }
+        )                                      
+        print(url)
+        
+        # Send the image url in an IoT Publish
+        myAWSIoTMQTTClient.publishAsync("sensor/camera/image", json.dumps({"url":url}), 1)
+        
     print("--------------\n\n")
 
 def ledCallback(client, userdata, message):
@@ -38,7 +55,7 @@ def ledCallback(client, userdata, message):
 def getBaseMessage():
     message = {}
     message["timeStampEpoch"] = int(time.time() * 1000)
-    message["timeStampIso"] = datetime.datetime.isoformat(datetime.datetime.now())
+    message["timeStampIso"] = datetime.datetime.now().isoformat()
     return message
 
 # Read in command-line parameters
@@ -87,6 +104,10 @@ pir = MotionSensor(4)
 
 # Init Camera
 camera = PiCamera()
+
+# Init S3
+s3Resource = boto3.resource('s3')
+s3Client = boto3.client('s3')
 
 # Init AWSIoTMQTTClient
 myAWSIoTMQTTClient = None
