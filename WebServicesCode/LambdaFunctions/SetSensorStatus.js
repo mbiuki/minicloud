@@ -24,12 +24,15 @@ exports.handler = (event, context, callback) => {
 		return;
 	}
 
-	if (event.queryStringParameters && event.queryStringParameters.status) {
-		event.status = event.queryStringParameters.status;
+	if (event.body) {
+	    let body = JSON.parse(event.body);
+	    if (body.status) {
+		    event.status = body.status;
+	    }
 	}
 
-	if (!event.status) {
-		returnResult(callback, 400, "Missing Status Query Parameter");
+	if (event.status === null || event.status === undefined) {
+		returnResult(callback, 400, "Missing Status in Body");
 		return;
 	}
 	
@@ -42,12 +45,12 @@ exports.handler = (event, context, callback) => {
 	let date = new Date();
 	payload.timeStampEpoch = date.getTime();
 	payload.timeStampIso = date.toISOString();
-	payload.status = event.status
+	payload.status = event.status;
 
 	const params = {
 		topic: 'sensor/' + event.sensorId + '/payload',
 		payload: JSON.stringify(payload)
-	}
+	};
 
 	iotData.publish(params, (err, res) => {
 		if (err) {

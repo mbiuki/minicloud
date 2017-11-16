@@ -3,7 +3,7 @@ console.log('Loading function');
 let doc = require('dynamodb-doc');
 let dynamo = new doc.DynamoDB();
 let sensorTable = "SensorTable";
-const acceptedSensors = ["led", "lock", "motion"];
+const acceptedSensors = ["led", "lock", "motion", "temperature"];
 
 function returnResult(callback, statusCode, body) {
 	callback(null, {
@@ -25,7 +25,7 @@ exports.handler = (event, context, callback) => {
 	}
 
 	if (acceptedSensors.indexOf(event.sensorId) < 0) {
-		returnResult(callback, 400, "Not an accepted sensor to modify status");
+		returnResult(callback, 400, "Not an accepted sensor to get status");
 		return;
 	}
 
