@@ -50,7 +50,7 @@
             <!--/.container-fluid -->
         </nav>
 
-
+        <!-- geolocation (not necessary) -->
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="panel-title">
@@ -74,21 +74,21 @@
                 </center>
             </div>
         </div>
+        <!-- geolocation ends -->
 
-        <!--    -->
-
+        <!-- display sensor data in the graph -->
         <div class="row">
             <div class="col-md-4 portfolio-item">
                 <h3>
-                    <a href="#">turing</a>
+                    <a href="#">Lock</a>
                 </h3>
                 <p></p>
 
-                <!-- turing Battery Charge  -->
+                <!-- Lock status graph  -->
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Battery Charge</h3>
+                        <h3 class="panel-title">Lock Status</h3>
                     </div>
                     <div class="panel-body">
 
@@ -109,18 +109,18 @@
 
             <div class="col-md-4 portfolio-item">
                 <h3>
-                    <a href="#">hopper</a>
+                    <a href="#">Motion Sensor</a>
                 </h3>
                 <p></p>
 
 
-                <!-- hopper Battery Charge  -->
+                <!-- PIR status graphs  -->
                 <div class="panel panel-default">
 
                     <rd-loading ng-show="showSpinkit"> </rd-loading>
 
                     <div class="panel-heading">
-                        <h3 class="panel-title">Battery Charge</h3>
+                        <h3 class="panel-title">PIR status</h3>
                     </div>
                     <div class="panel-body">
                         <div ng-show="showSpinkit_tables">
@@ -138,15 +138,15 @@
 
             <div class="col-md-4 portfolio-item">
                 <h3>
-                    <a href="#">knuth</a>
+                    <a href="#">Temperature Sensor</a>
                 </h3>
                 <p></p>
 
 
-                <!-- knuth Battery Charge  -->
+                <!-- temperature profile -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Battery Charge</h3>
+                        <h3 class="panel-title">Temperature profile</h3>
                     </div>
                     <div class="panel-body">
                         <div ng-show="showSpinkit_tables">
@@ -163,8 +163,16 @@
             </div>
 
         </div>
-        <!-- row  Discharge-->
 
+
+
+        <!-- part that we don't really need-->
+        <!-- part that we don't really need-->
+        <!-- part that we don't really need-->
+        <!-- part that we don't really need-->
+        <!-- we only need one graph for each sensor-->
+        <!-- we need another section to take care of displaying photo -->
+        <!-- row  Discharge-->
         <div class="row">
             <!-- Discharge turing  -->
             <div class="col-md-4 portfolio-item">
@@ -297,43 +305,42 @@
 
         </div>
         <!-- row  -->
+        <!-- part that we don't really need-->
+        <!-- part that we don't really need-->
+        <!-- part that we don't really need-->
+        <!-- part that we don't really need-->
 
 
 
 
-    </div>
 
-    <div class="row">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">  <i class="fa fa-cog fa-spin" style="font-size:24px"></i> Devices Data</h3>
-            </div>
-            <div class="panel-body">
-                <div class="table-responsive" icon="fa-cog fa-spin" title="Devices Information">
-                    <table ng-table="tableParams" class="table table-striped" show-filter="false">
-                        <tr>
-                            <th>Device Id</th>
-                            <th>Battery Charge</th>
-                            <th>Battery Discharge Rate</th>
-                            <th>Timestamp</th>
-                        </tr>
-                        <tr ng-repeat="item in $data">
-                            <td> {{item.deviceId}}</td>
-                            <td> {{item.batteryCharge}}</td>
-                            <td> {{item.batteryDischargeRate}}</td>
-                            <td> {{item.timeStamp}}</td>
-                        </tr>
-                    </table>
+    <!-- if time permitted, reduce the width -->
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">  <i class="fa fa-cog fa-spin" style="font-size:24px"></i> Devices Data</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive" icon="fa-cog fa-spin" title="Devices Information">
+                        <table ng-table="tableParams" class="table table-striped" show-filter="false">
+                            <tr>
+                                <th>Device</th>
+                                <th>Sensor Status</th>
+                                <th>Sensor Data</th>
+                                <th>Timestamp</th>
+                            </tr>
+                            <tr ng-repeat="item in $data">
+                                <td> {{item.deviceId}}</td>
+                                <td> {{item.batteryCharge}}</td> <!-- feed data from sensor output -->
+                                <td> {{item.batteryDischargeRate}}</td>
+                                <td> {{item.timeStamp}}</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
     </div>
-
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <center>
-                <h3> AWS IoT Getting Started <img alt="AWS" height="40" src="http://awsmedia.s3.amazonaws.com/AWS_Logo_PoweredBy_127px.png">    </h3></center>
-        </div>
-    </div>
     <!-- /container -->
+</div>
