@@ -1,6 +1,6 @@
 /* Enter Device Status Endpoit URL here */
 
-var devices_endpoint_url = 'https://oo4jsirdng.execute-api.us-west-2.amazonaws.com/prod';
+var devices_endpoint_url = 'https://3v5mhdfdne.execute-api.us-west-2.amazonaws.com/prod/';
 
 
 // This file covers 3 devices, a real program should be designed to handle any number of devices
@@ -30,105 +30,105 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
 
         $http({
             method: "GET",
-            url: devices_endpoint_url + '/turing',
+            url: devices_endpoint_url + 'status/lock',
         }).success(function (data) {
-            var maxlat;
-            var maxlon;
+            //var maxlat;
+            //var maxlon;
             var maxDeviceId;
             var maxtimeStamp = 0;
 
             var hum = JSON.stringify(data);
             for (i = 0; i < data.Items.length; i++) {
-                var lat = JSON.stringify(data.Items[i].payload.location.lat);
-                var lon = JSON.stringify(data.Items[i].payload.location.lon);
+                //var lat = JSON.stringify(data.Items[i].payload.location.lat);
+                //var lon = JSON.stringify(data.Items[i].payload.location.lon);
                 var timeStamp = JSON.stringify(data.Items[i].payload.timeStampEpoch);
                 var deviceId = JSON.stringify(data.Items[i].payload.deviceId);
                 if (timeStamp > maxtimeStamp) {
-                    maxlat = lat;
-                    maxlon = lon;
+                    //maxlat = lat;
+                    //maxlon = lon;
                     maxDeviceId = deviceId
                     maxtimeStamp = timeStamp
                 }
             }
-            console.log("maxlat " + maxlat + " maxtimeStamp " + maxtimeStamp);
+            console.log(/*"maxlat " + maxlat +*/ " maxtimeStamp " + maxtimeStamp);
             $scope.dataVar.push({
-                "latitude": maxlat,
-                "longitude": maxlon,
+                //"latitude": maxlat,
+                //"longitude": maxlon,
                 "svgPath": icon,
                 "color": "#CC0000",
                 "scale": 0.5,
                 "label": maxDeviceId,
                 "labelShiftY": 2,
                 //"zoomLevel": 5,
-                "title": "Latitude: " + maxlat + " Longitude: " + maxlon,
+                //"title": "Latitude: " + maxlat + " Longitude: " + maxlon,
                 "description": maxDeviceId
             });
             // Code for Get call start
             $http({
                 method: "GET",
-                url: devices_endpoint_url + '/hopper',
+                url: devices_endpoint_url + 'status/motion',
             }).success(function (data) {
 
 
                 var hum = JSON.stringify(data);
                 maxtimeStamp = 0;
                 for (i = 0; i < data.Items.length; i++) {
-                    var lat = JSON.stringify(data.Items[i].payload.location.lat);
-                    var lon = JSON.stringify(data.Items[i].payload.location.lon);
+                    //var lat = JSON.stringify(data.Items[i].payload.location.lat);
+                    //var lon = JSON.stringify(data.Items[i].payload.location.lon);
                     var timeStamp = JSON.stringify(data.Items[i].payload.timeStampEpoch);
                     var deviceId = JSON.stringify(data.Items[i].payload.deviceId);
                     if (timeStamp > maxtimeStamp) {
-                        maxlat = lat;
-                        maxlon = lon;
+                        //maxlat = lat;
+                        //maxlon = lon;
                         maxDeviceId = deviceId
                         maxtimeStamp = timeStamp
                     }
                 }
-                console.log("maxlat " + maxlat + " maxtimeStamp " + maxtimeStamp);
+                console.log(/* "maxlat " + maxlat + */ " maxtimeStamp " + maxtimeStamp);
                 $scope.dataVar.push({
-                    "latitude": maxlat,
-                    "longitude": maxlon,
+                    //"latitude": maxlat,
+                    //"longitude": maxlon,
                     "svgPath": icon,
                     "color": "#CC0000",
                     "scale": 0.5,
                     "label": maxDeviceId,
                     "labelShiftY": 2,
                     //"zoomLevel": 5,
-                    "title": "Latitude: " + maxlat + " Longitude: " + maxlon,
+                    //"title": "Latitude: " + maxlat + " Longitude: " + maxlon,
                     "description": maxDeviceId
                 });
 
                 // Code for Get call start
                 $http({
                     method: "GET",
-                    url: devices_endpoint_url + '/knuth',
+                    url: devices_endpoint_url + 'status/temperature',
                 }).success(function (data) {
 
                     //console.log("data"+JSON.stringify(data));
                     var hum = JSON.stringify(data);
                     maxtimeStamp = 0;
                     for (i = 0; i < data.Items.length; i++) {
-                        var lat = JSON.stringify(data.Items[i].payload.location.lat);
-                        var lon = JSON.stringify(data.Items[i].payload.location.lon);
+                        //var lat = JSON.stringify(data.Items[i].payload.location.lat);
+                        //var lon = JSON.stringify(data.Items[i].payload.location.lon);
                         var deviceId = JSON.stringify(data.Items[i].payload.deviceId);
                         if (timeStamp > maxtimeStamp) {
-                            maxlat = lat;
-                            maxlon = lon;
+                            //maxlat = lat;
+                            //maxlon = lon;
                             maxDeviceId = deviceId
                             maxtimeStamp = timeStamp
                         }
                     }
-                    console.log("maxlat " + maxlat + " maxtimeStamp " + maxtimeStamp);
+                    console.log(/* "maxlat " + maxlat + */ " maxtimeStamp " + maxtimeStamp);
                     $scope.dataVar.push({
-                        "latitude": maxlat,
-                        "longitude": maxlon,
+                        //"latitude": maxlat,
+                        //"longitude": maxlon,
                         "svgPath": icon2,
                         "color": "#0000ff",
                         "scale": 0.5,
                         "label": maxDeviceId,
                         "labelShiftY": 2,
                         //"zoomLevel": 5,
-                        "title": "Latitude: " + maxlat + " Longitude: " + maxlon,
+                        //"title": "Latitude: " + maxlat + " Longitude: " + maxlon,
                         "description": maxDeviceId
                     });
                     //getMap($scope.dataVar);
@@ -242,11 +242,11 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
         var payload = json_obj.payload;
         var json_for_table = {};
         json_for_table.deviceId = payload.deviceId;
-        json_for_table.batteryCharge = payload.batteryCharge.toFixed(2);
+        //json_for_table.batteryCharge = payload.batteryCharge.toFixed(2);
         //json_for_table.batteryDischargeRate = payload.batteryDischargeRate.toFixed(2);
-        json_for_table.batteryDischargeRate = Math.round(payload.batteryDischargeRate * 100) / 100;
-        json_for_table.lon = payload.location.lon;
-        json_for_table.lat = payload.location.lat;
+        //json_for_table.batteryDischargeRate = Math.round(payload.batteryDischargeRate * 100) / 100;
+        //json_for_table.lon = payload.location.lon;
+        //json_for_table.lat = payload.location.lat;
 
         json_for_table.timeStampEpoch = payload.timeStampEpoch;
 

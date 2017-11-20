@@ -50,7 +50,7 @@
             <!--/.container-fluid -->
         </nav>
 
-        <!-- geolocation (not necessary) -->
+
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="panel-title">
@@ -74,21 +74,21 @@
                 </center>
             </div>
         </div>
-        <!-- geolocation ends -->
 
-        <!-- display sensor data in the graph -->
+        <!--    -->
+
         <div class="row">
             <div class="col-md-4 portfolio-item">
                 <h3>
-                    <a href="#">Lock</a>
+                    <a href="#">Topic 1: Smart Lock</a>
                 </h3>
                 <p></p>
 
-                <!-- Lock status graph  -->
+                <!-- Smart Lock: Lock  -->
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Lock Status</h3>
+                        <h3 class="panel-title">Lock</h3>
                     </div>
                     <div class="panel-body">
 
@@ -109,18 +109,18 @@
 
             <div class="col-md-4 portfolio-item">
                 <h3>
-                    <a href="#">Motion Sensor</a>
+                    <a href="#">Topic 2: Temperature</a>
                 </h3>
                 <p></p>
 
 
-                <!-- PIR status graphs  -->
+                <!-- Topic 2 temperature  -->
                 <div class="panel panel-default">
 
                     <rd-loading ng-show="showSpinkit"> </rd-loading>
 
                     <div class="panel-heading">
-                        <h3 class="panel-title">PIR status</h3>
+                        <h3 class="panel-title">Temperature</h3>
                     </div>
                     <div class="panel-body">
                         <div ng-show="showSpinkit_tables">
@@ -138,15 +138,15 @@
 
             <div class="col-md-4 portfolio-item">
                 <h3>
-                    <a href="#">Temperature Sensor</a>
+                    <a href="#">Topic 3: None</a>
                 </h3>
                 <p></p>
 
 
-                <!-- temperature profile -->
+                <!-- knuth Battery Charge  -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Temperature profile</h3>
+                        <h3 class="panel-title">Sensor1: None</h3>
                     </div>
                     <div class="panel-body">
                         <div ng-show="showSpinkit_tables">
@@ -163,22 +163,14 @@
             </div>
 
         </div>
-
-
-
-        <!-- part that we don't really need-->
-        <!-- part that we don't really need-->
-        <!-- part that we don't really need-->
-        <!-- part that we don't really need-->
-        <!-- we only need one graph for each sensor-->
-        <!-- we need another section to take care of displaying photo -->
         <!-- row  Discharge-->
+
         <div class="row">
             <!-- Discharge turing  -->
             <div class="col-md-4 portfolio-item">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Battery Discharge</h3>
+                        <h3 class="panel-title">Motion sensor</h3>
                     </div>
                     <div class="panel-body">
                         <div ng-show="showSpinkit_tables">
@@ -198,7 +190,7 @@
             <div class="col-md-4 portfolio-item">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Battery Discharge</h3>
+                        <h3 class="panel-title">Sensor: None</h3>
                     </div>
                     <div class="panel-body">
                         <div ng-show="showSpinkit_tables">
@@ -218,7 +210,7 @@
             <div class="col-md-4 portfolio-item">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Battery Discharge</h3>
+                        <h3 class="panel-title">Sensor: None</h3>
                     </div>
                     <div class="panel-body">
                         <div ng-show="showSpinkit_tables">
@@ -246,7 +238,7 @@
             <div class="col-md-4 portfolio-item">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Sensor Data</h3>
+                        <h3 class="panel-title">Camera Module</h3>
                     </div>
                     <div class="panel-body">
                         <div ng-show="showSpinkit_tables">
@@ -266,7 +258,7 @@
             <div class="col-md-4 portfolio-item">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Sensor Data</h3>
+                        <h3 class="panel-title">Sensor: None</h3>
                     </div>
                     <div class="panel-body">
                         <div ng-show="showSpinkit_tables">
@@ -286,7 +278,7 @@
             <div class="col-md-4 portfolio-item">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Sensor Data</h3>
+                        <h3 class="panel-title">Sensor: None</h3>
                     </div>
                     <div class="panel-body">
                         <div ng-show="showSpinkit_tables">
@@ -305,55 +297,44 @@
 
         </div>
         <!-- row  -->
-        <!-- part that we don't really need-->
-        <!-- part that we don't really need-->
-        <!-- part that we don't really need-->
-        <!-- part that we don't really need-->
 
 
 
-        <!-- a section for image -->
-        <!-- currently we only have a static image -->
-        <div class="row">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">  <i class="fa fa-cog fa-spin" style="font-size:24px"></i> Image from PI3</h3>
-                </div>
-                <div class="panel-body">
-                    <center>
-                        <img src="images/raspberry-pi-logo.png" alt="a static image" style="width:128px;height:160px;">    
-                    </center>
-                </div>
+
+    </div>
+
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">  <i class="fa fa-cog fa-spin" style="font-size:24px"></i> Devices Data</h3>
             </div>
-        </div>
-
-        <!-- if time permitted, reduce the width -->
-        <div class="row">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">  <i class="fa fa-cog fa-spin" style="font-size:24px"></i> Devices Data</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="table-responsive" icon="fa-cog fa-spin" title="Devices Information">
-                        <table ng-table="tableParams" class="table table-striped" show-filter="false">
-                            <tr>
-                                <th>Device</th>
-                                <th>Sensor Status</th>
-                                <th>Sensor Data</th>
-                                <th>Timestamp</th>
-                            </tr>
-                            <tr ng-repeat="item in $data">
-                                <td> {{item.deviceId}}</td>
-                                <td> {{item.batteryCharge}}</td> <!-- feed data from sensor output -->
-                                <td> {{item.batteryDischargeRate}}</td>
-                                <td> {{item.timeStamp}}</td>
-                            </tr>
-                        </table>
-                    </div>
+            <div class="panel-body">
+                <div class="table-responsive" icon="fa-cog fa-spin" title="Devices Information">
+                    <table ng-table="tableParams" class="table table-striped" show-filter="false">
+                        <tr>
+                            <th>Device Id</th>
+                            <th>Lock</th>
+                            <th>Motion Sensor</th>
+                            <th>Camera module</th>
+                            <th>Timestamp</th>
+                        </tr>
+                        <tr ng-repeat="item in $data">
+                            <td> {{item.deviceId}}</td>
+                            <td> {{item.batteryCharge}}</td>
+                            <td> {{item.batteryDischargeRate}}</td>
+                            <td> {{item.timeStamp}}</td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
 
     </div>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <center>
+                <h3> AWS IoT Getting Started <img alt="AWS" height="40" src="http://awsmedia.s3.amazonaws.com/AWS_Logo_PoweredBy_127px.png">    </h3></center>
+        </div>
+    </div>
     <!-- /container -->
-</div>
