@@ -337,13 +337,13 @@
                     <div class="table-responsive" icon="fa-cog fa-spin" title="Devices Information">
                         <table ng-table="tableParams" class="table table-striped" show-filter="false">
                             <tr>
-                                <th>Device</th>
+                                <th>Sensor</th>
                                 <th>Sensor Status</th>
                                 <th>Sensor Data</th>
                                 <th>Timestamp</th>
                             </tr>
-                            <tr ng-repeat="item in $data">
-                                <td> {{item.deviceId}}</td>
+                            <tr ng-repeat="item in $data"> <!-- ng-repeat directive provide data bounding -->
+                                <td> {{item.sensorId}}</td>
                                 <td> {{item.batteryCharge}}</td> <!-- feed data from sensor output -->
                                 <td> {{item.batteryDischargeRate}}</td>
                                 <td> {{item.timeStamp}}</td>

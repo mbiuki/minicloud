@@ -11,7 +11,7 @@ var devices_endpoint_url = 'https://3v5mhdfdne.execute-api.us-west-2.amazonaws.c
 * Angular Part of the code
 */
 
-var appVar = angular.module('ShowMap', ['ngTable']);
+var appVar = angular.module('ShowMap', ['ngTable']); // ['helper module'] for dependency injection. Dynamically include other modules at runtime
 var icon = "M21.25,8.375V28h6.5V8.375H21.25zM12.25,28h6.5V4.125h-6.5V28zM3.25,28h6.5V12.625h-6.5V28z";
 var icon2 = "M3.5,13.277C3.5,6.22,9.22,0.5,16.276,0.5C23.333,0.5,29.053,6.22,29.053,13.277C29.053,14.54,28.867,15.759,28.526,16.914C26.707,24.271,16.219,32.5,16.219,32.5C16.219,32.5,4.37,23.209,3.673,15.542C3.673,15.542,3.704,15.536,3.704,15.536C3.572,14.804,3.5,14.049,3.5,13.277C3.5,13.277,3.5,13.277,3.5,13.277M16.102,16.123C18.989,16.123,21.329,13.782,21.329,10.895C21.329,8.008,18.989,5.668,16.102,5.668C13.216,5.668,10.876,8.008,10.876,10.895C10.876,13.782,13.216,16.123,16.102,16.123C16.102,16.123,16.102,16.123,16.102,16.123";
 
@@ -20,8 +20,8 @@ var chart_count = 0; // counts number of chart items
 var chart_count_max = 80; // This is the threshold when charts start removing items from the left (movig x axis)
 
 
-
-appVar.controller('mapController', function ($scope, $http, $timeout, NgTableParams) {
+// $angular http object  Ajax call
+appVar.controller('mapController', function ($scope, $http, $timeout, NgTableParams) { //define the name of controller and an anonymous function
 
     //anammr func was here
     $scope.func = function () {
@@ -34,7 +34,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
         }).success(function (data) {
             //var maxlat;
             //var maxlon;
-            var maxDeviceId;
+            var maxSensorId;
             var maxtimeStamp = 0;
 
             var hum = JSON.stringify(data);
@@ -42,11 +42,12 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
                 //var lat = JSON.stringify(data.Items[i].payload.location.lat);
                 //var lon = JSON.stringify(data.Items[i].payload.location.lon);
                 var timeStamp = JSON.stringify(data.Items[i].payload.timeStampEpoch);
-                var deviceId = JSON.stringify(data.Items[i].payload.deviceId);
+                var status = JSON.stringify(data.Items[i].payload.status);
+                var sensorId = JSON.stringify(data.Items[i].payload.sensorId); //payload.sensorId is not yet implemented
                 if (timeStamp > maxtimeStamp) {
                     //maxlat = lat;
                     //maxlon = lon;
-                    maxDeviceId = deviceId
+                    maxSensorId = sensorId
                     maxtimeStamp = timeStamp
                 }
             }
@@ -57,11 +58,11 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
                 "svgPath": icon,
                 "color": "#CC0000",
                 "scale": 0.5,
-                "label": maxDeviceId,
+                "label": maxSensorId,
                 "labelShiftY": 2,
                 //"zoomLevel": 5,
                 //"title": "Latitude: " + maxlat + " Longitude: " + maxlon,
-                "description": maxDeviceId
+                "description": maxSensorId
             });
             // Code for Get call start
             $http({
@@ -76,11 +77,12 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
                     //var lat = JSON.stringify(data.Items[i].payload.location.lat);
                     //var lon = JSON.stringify(data.Items[i].payload.location.lon);
                     var timeStamp = JSON.stringify(data.Items[i].payload.timeStampEpoch);
-                    var deviceId = JSON.stringify(data.Items[i].payload.deviceId);
+                    var status = JSON.stringify(data.Items[i].payload.status);
+                    var sensorId = JSON.stringify(data.Items[i].payload.sensorId);
                     if (timeStamp > maxtimeStamp) {
                         //maxlat = lat;
                         //maxlon = lon;
-                        maxDeviceId = deviceId
+                        maxSensorId = sensorId
                         maxtimeStamp = timeStamp
                     }
                 }
@@ -91,11 +93,11 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
                     "svgPath": icon,
                     "color": "#CC0000",
                     "scale": 0.5,
-                    "label": maxDeviceId,
+                    "label": maxSensorId,
                     "labelShiftY": 2,
                     //"zoomLevel": 5,
                     //"title": "Latitude: " + maxlat + " Longitude: " + maxlon,
-                    "description": maxDeviceId
+                    "description": maxSensorId
                 });
 
                 // Code for Get call start
@@ -110,11 +112,13 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
                     for (i = 0; i < data.Items.length; i++) {
                         //var lat = JSON.stringify(data.Items[i].payload.location.lat);
                         //var lon = JSON.stringify(data.Items[i].payload.location.lon);
-                        var deviceId = JSON.stringify(data.Items[i].payload.deviceId);
+                        var timeStamp = JSON.stringify(data.Items[i].payload.timeStampEpoch);
+                        var status = JSON.stringify(data.Items[i].payload.status);
+                        var sensorId = JSON.stringify(data.Items[i].payload.sensorId);
                         if (timeStamp > maxtimeStamp) {
                             //maxlat = lat;
                             //maxlon = lon;
-                            maxDeviceId = deviceId
+                            maxSensorId = sensorId
                             maxtimeStamp = timeStamp
                         }
                     }
@@ -125,11 +129,11 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
                         "svgPath": icon2,
                         "color": "#0000ff",
                         "scale": 0.5,
-                        "label": maxDeviceId,
+                        "label": maxSensorId,
                         "labelShiftY": 2,
                         //"zoomLevel": 5,
                         //"title": "Latitude: " + maxlat + " Longitude: " + maxlon,
-                        "description": maxDeviceId
+                        "description": maxSensorId
                     });
                     //getMap($scope.dataVar);
                 }).error(function (error) {
@@ -152,16 +156,16 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
 
 
 
-    $scope.all_devices = [];
+    $scope.all_sensors = []; // empty array
 
-    $scope.hopper_data = [];
+    $scope.lock_data = [];
 
-    $scope.knuth_data = [];
+    $scope.motion_data = [];
 
-    $scope.turing_data = [];
+    $scope.temperature_data = [];
 
     setInterval(function () {
-        $http.get(devices_endpoint_url)
+        $http.get(devices_endpoint_url+ "/currstatus" )
             .success(function (data, status, headers, config) {
 
 
@@ -170,8 +174,8 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
                 console.log($scope.table_data);
 
 
-                var dataset = {};
-                $scope.tableParams = new NgTableParams({
+                var dataset = {}; // create a empty object
+                $scope.tableParams = new NgTableParams({ // this part is not fully understood (extract data to be displayed on table?)
                     page: 1,
                     count: 3
                 }, {
@@ -193,40 +197,40 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
 
             // Build array for each device
 
-            if (normalize_data.deviceId == 'hopper') {
-                $scope.hopper_data.unshift(normalize_data);
-                console.log('--------------> hopper')
-                console.log($scope.hopper_data);
-                if ($scope.hopper_data.length > 20) {
-                    $scope.hopper_data.pop();
+            if (normalize_data.SensorId == 'lock') {
+                $scope.lock_data.unshift(normalize_data);
+                console.log('--------------> lock')
+                console.log($scope.lock_data);
+                if ($scope.lock_data.length > 20) {
+                    $scope.lock_data.pop();
                 }
 
-            } else if (normalize_data.deviceId == 'knuth') {
-                $scope.knuth_data.unshift(normalize_data);
-                console.log('--------------> knuth')
-                console.log($scope.knuth_data);
-                if ($scope.knuth_data.length > 20) {
-                    $scope.knuth_data.pop();
+            } else if (normalize_data.SensorId == 'motion') {
+                $scope.motion_data.unshift(normalize_data);
+                console.log('--------------> motion')
+                console.log($scope.motion_data);
+                if ($scope.motion_data.length > 20) {
+                    $scope.motion_data.pop();
                 }
-            } else if (normalize_data.deviceId == 'turing') {
-                $scope.turing_data.unshift(normalize_data);
-                console.log('--------------> turing')
-                console.log($scope.turing_data);
-                if ($scope.turing_data.length > 20) {
-                    $scope.turing_data.pop();
+            } else if (normalize_data.SensorId == 'temperature') {
+                $scope.temperature_data.unshift(normalize_data);
+                console.log('--------------> temperature')
+                console.log($scope.temperature_data);
+                if ($scope.temperature_data.length > 20) {
+                    $scope.temperature_data.pop();
                 }
             } else {
-                console.log('Error no such device' + normalize_data.deviceId)
+                console.log('Error no such device' + normalize_data.SensorId)
             };
 
 
-            $scope.all_devices.unshift(normalize_data);
+            $scope.all_sensors.unshift(normalize_data);
 
 
-            if (($scope.all_devices.length) >= 20) {
-                $scope.all_devices.pop();
-                $scope.all_devices.pop();
-                $scope.all_devices.pop(); //was shift
+            if (($scope.all_snesors.length) >= 20) {
+                $scope.all_sensors.pop();
+                $scope.all_sensors.pop();
+                $scope.all_snesors.pop(); //was shift
             }
         });
         return print_obj;
@@ -241,7 +245,8 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
         // get the payload json
         var payload = json_obj.payload;
         var json_for_table = {};
-        json_for_table.deviceId = payload.deviceId;
+        json_for_table.sensorId = payload.sensorId; // need sensorId to be included in payload
+        json_for_table.status = payload.status;
         //json_for_table.batteryCharge = payload.batteryCharge.toFixed(2);
         //json_for_table.batteryDischargeRate = payload.batteryDischargeRate.toFixed(2);
         //json_for_table.batteryDischargeRate = Math.round(payload.batteryDischargeRate * 100) / 100;
@@ -250,7 +255,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
 
         json_for_table.timeStampEpoch = payload.timeStampEpoch;
 
-        json_for_table.sensorReading = payload.sensorReading;
+        //json_for_table.sensorReading = payload.sensorReading;
 
         var iso_time = payload.timeStampIso;
 
