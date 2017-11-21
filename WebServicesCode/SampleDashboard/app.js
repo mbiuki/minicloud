@@ -113,7 +113,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
                         //var lat = JSON.stringify(data.Items[i].payload.location.lat);
                         //var lon = JSON.stringify(data.Items[i].payload.location.lon);
                         var timeStamp = JSON.stringify(data.Items[i].payload.timeStampEpoch);
-                        var status = JSON.stringify(data.Items[i].payload.status);
+                        var status = JSON.stringify(data.Items[i].payload.status); // do we really use status for temperature????
                         var sensorId = JSON.stringify(data.Items[i].payload.sensorId);
                         if (timeStamp > maxtimeStamp) {
                             //maxlat = lat;
@@ -273,7 +273,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
 
 
     // Chart section starts here
-
+    // we probably do not need geochart package
     google.charts.load('current', {
         packages: ['corechart', 'line']
     },'upcoming', {'packages': ['geochart']});
@@ -282,77 +282,50 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
     // google chart addition
 
     function drawMapAndCharts() {
-        var data_chart_turing_battery_charge = new google.visualization.DataTable();
-        var data_chart_turing_battery_Discharge = new google.visualization.DataTable();
-        var data_chart_turing_sensor_data = new google.visualization.DataTable();
 
-        var data_chart_hopper_battery_charge = new google.visualization.DataTable();
-        var data_chart_hopper_battery_Discharge = new google.visualization.DataTable();
-        var data_chart_hopper_sensor_data = new google.visualization.DataTable();
+        var data_chart_lock_status = new google.visualization.DataTable();
 
+        var data_chart_motion_status = new google.visualization.DataTable();
 
-
-        var data_chart_knuth_battery_charge = new google.visualization.DataTable();
-        var data_chart_knuth_battery_Discharge = new google.visualization.DataTable();
-        var data_chart_knuth_sensor_data = new google.visualization.DataTable();
+        var data_chart_temperature_sensor_data = new google.visualization.DataTable();
 
         // set up GeoChart
-        var geo_chart_data = new google.visualization.DataTable();
-        geo_chart_data.addColumn('number', 'Latitude');
-        geo_chart_data.addColumn('number', 'Longitude');
-        geo_chart_data.addColumn('string', 'Device ID');
-        geo_chart_data.addColumn('number', 'Sensor Reading');
+        // we don't need the Geochart
+        //var geo_chart_data = new google.visualization.DataTable();
+        //geo_chart_data.addColumn('number', 'Latitude');
+        //geo_chart_data.addColumn('number', 'Longitude');
+        //geo_chart_data.addColumn('string', 'Device ID');
+        //geo_chart_data.addColumn('number', 'Sensor Reading');
 
         // create dummy points in the "center" of country
-        geo_chart_data.addRows([
-            [39.14, -98.1, 'hopper', data_chart_hopper_sensor_data],
-            [39.14, -98.1, 'knuth', data_chart_knuth_sensor_data],
-            [39.14, -98.1, 'turing', data_chart_turing_sensor_data]
-        ]);
+        //geo_chart_data.addRows([
+        //    [39.14, -98.1, 'hopper', data_chart_hopper_sensor_data],
+        //    [39.14, -98.1, 'knuth', data_chart_knuth_sensor_data],
+        //    [39.14, -98.1, 'turing', data_chart_turing_sensor_data]
+        //]);
 
         // geo_chart_data.removeRows(0,3);
-
+        /*
         var geo_chart_options = {
           region: 'US',
           displayMode: 'markers',
           colorAxis: {colors: ['blue', 'red']}
         };
+        */
 
-        // anamer - changed number to date
-        data_chart_turing_battery_charge.addColumn('date', 'X');
-        data_chart_turing_battery_charge.addColumn('number', 'battery_charge');
+        // add columns for lock
+        data_chart_lock_status.addColumn('date', 'X');
+        data_chart_lock_status.addColumn('number', 'status');
 
-        data_chart_turing_battery_Discharge.addColumn('date', 'X');
-        data_chart_turing_battery_Discharge.addColumn('number', 'battery_Discharge');
+        // add columns for motion sensor
+        data_chart_motion_status.addColumn('date', 'X');
+        data_chart_motion_status.addColumn('number', 'status');
 
-        data_chart_turing_sensor_data.addColumn('date', 'X');
-        data_chart_turing_sensor_data.addColumn('number', 'sensor_data');
+        // add columns for temperature sensor
+        data_chart_temperature_sensor_data.addColumn('date', 'X');
+        data_chart_temperature_sensor_data.addColumn('number', 'sensor_data');
 
-        // hopper
-
-        data_chart_hopper_battery_charge.addColumn('date', 'X');
-        data_chart_hopper_battery_charge.addColumn('number', 'battery_charge');
-
-        data_chart_hopper_battery_Discharge.addColumn('date', 'X');
-        data_chart_hopper_battery_Discharge.addColumn('number', 'battery_Discharge');
-
-        data_chart_hopper_sensor_data.addColumn('date', 'X');
-        data_chart_hopper_sensor_data.addColumn('number', 'sensor_data');
-
-
-        //knuth
-
-        data_chart_knuth_battery_charge.addColumn('date', 'X');
-        data_chart_knuth_battery_charge.addColumn('number', 'battery_charge');
-
-        data_chart_knuth_battery_Discharge.addColumn('date', 'X');
-        data_chart_knuth_battery_Discharge.addColumn('number', 'battery_Discharge');
-
-        data_chart_knuth_sensor_data.addColumn('date', 'X');
-        data_chart_knuth_sensor_data.addColumn('number', 'sensor_data');
-
-
-        var options_charge = {
+        var options_status = {
             hAxis: {
                 title: 'Time'
             },
@@ -362,18 +335,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
             },
             backgroundColor: '#f1f8e9'
         };
-
-        var options_Discharge = {
-            hAxis: {
-                title: 'Time'
-            },
-            vAxis: {},
-            legend: {
-                position: 'none'
-            },
-            backgroundColor: '#f1f8e9'
-        };
-
+        // display option for temperature sensor
         var options_SensorData = {
             hAxis: {
                 title: 'Time'
@@ -385,68 +347,68 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
             backgroundColor: '#f1f8e9'
         };
 
-        var chart_turing_battery_charge = new google.visualization.LineChart(document.getElementById('chart_div_battery_charge_turing'));
-        chart_turing_battery_charge.draw(data_chart_turing_battery_charge, options_charge);
+        var chart_lock_status = new google.visualization.LineChart(document.getElementById('chart_div_lock_status'));
+        chart_lock_status.draw(data_chart_lock_status, options_status);
 
-        var chart_div_battery_discharge_turing =
-            new google.visualization.LineChart(document.getElementById('chart_div_battery_discharge_turing'));
-        chart_div_battery_discharge_turing.draw(data_chart_turing_battery_Discharge, options_Discharge);
+        // var chart_div_battery_discharge_turing =
+        //     new google.visualization.LineChart(document.getElementById('chart_div_battery_discharge_turing'));
+        // chart_div_battery_discharge_turing.draw(data_chart_turing_battery_Discharge, options_Discharge);
 
-        var chart_div_sensor_data_turing =
-            new google.visualization.LineChart(document.getElementById('chart_div_sensor_data_turing'));
-        chart_div_sensor_data_turing.draw(data_chart_turing_sensor_data, options_SensorData);
+        // var chart_div_sensor_data_turing =
+        //     new google.visualization.LineChart(document.getElementById('chart_div_sensor_data_turing'));
+        // chart_div_sensor_data_turing.draw(data_chart_turing_sensor_data, options_SensorData);
 
 
-        // hopper
+        // motion
 
-        var chart_hopper_battery_charge = new google.visualization.LineChart(document.getElementById('chart_div_battery_charge_hopper'));
-        chart_hopper_battery_charge.draw(data_chart_hopper_battery_charge, options_charge);
+        var chart_motion_status = new google.visualization.LineChart(document.getElementById('chart_div_motion_status'));
+        chart_motion_status.draw(data_chart_motion_status, options_status);
 
-        var chart_div_battery_discharge_hopper =
-            new google.visualization.LineChart(document.getElementById('chart_div_battery_discharge_hopper'));
-        chart_div_battery_discharge_hopper.draw(data_chart_hopper_battery_Discharge, options_Discharge);
+        // var chart_div_battery_discharge_hopper =
+        //     new google.visualization.LineChart(document.getElementById('chart_div_battery_discharge_hopper'));
+        // chart_div_battery_discharge_hopper.draw(data_chart_hopper_battery_Discharge, options_Discharge);
 
-        var chart_div_sensor_data_hopper =
-            new google.visualization.LineChart(document.getElementById('chart_div_sensor_data_hopper'));
-        chart_div_sensor_data_hopper.draw(data_chart_hopper_sensor_data, options_SensorData);
+        // var chart_div_sensor_data_hopper =
+        //     new google.visualization.LineChart(document.getElementById('chart_div_sensor_data_hopper'));
+        // chart_div_sensor_data_hopper.draw(data_chart_hopper_sensor_data, options_SensorData);
 
 
         //knuth
-        var chart_knuth_battery_charge = new google.visualization.LineChart(document.getElementById('chart_div_battery_charge_knuth'));
-        chart_knuth_battery_charge.draw(data_chart_knuth_battery_charge, options_charge);
+        var chart_temperature_reading = new google.visualization.LineChart(document.getElementById('chart_div_temperature_reading'));
+        chart_temperature_reading.draw(data_chart_temperature_sensor_data, options_charge);
 
 
-        var chart_div_battery_discharge_knuth =
-            new google.visualization.LineChart(document.getElementById('chart_div_battery_discharge_knuth'));
-        chart_div_battery_discharge_knuth.draw(data_chart_knuth_battery_Discharge, options_Discharge);
+        // var chart_div_battery_discharge_knuth =
+        //     new google.visualization.LineChart(document.getElementById('chart_div_battery_discharge_knuth'));
+        // chart_div_battery_discharge_knuth.draw(data_chart_knuth_battery_Discharge, options_Discharge);
 
 
-        var chart_div_sensor_data_knuth =
-            new google.visualization.LineChart(document.getElementById('chart_div_sensor_data_knuth'));
-        chart_div_sensor_data_knuth.draw(data_chart_knuth_sensor_data, options_SensorData);
+        // var chart_div_sensor_data_knuth =
+        //     new google.visualization.LineChart(document.getElementById('chart_div_sensor_data_knuth'));
+        // chart_div_sensor_data_knuth.draw(data_chart_knuth_sensor_data, options_SensorData);
 
         // write GeoChart
-        var geo_chart = new google.visualization.GeoChart(document.getElementById('mapdiv'));
-        geo_chart.draw(geo_chart_data, geo_chart_options);
+        // var geo_chart = new google.visualization.GeoChart(document.getElementById('mapdiv'));
+        // geo_chart.draw(geo_chart_data, geo_chart_options);
 
         // Update dashboard data with new values.
         setInterval(function () {
 
-                console.log(geo_chart_data.getNumberOfRows());
+                // console.log(geo_chart_data.getNumberOfRows());
 
-                // #### turing #####
-                var y = Math.round($scope.turing_data[0].batteryCharge);
+                // #### lock #####
+                var y = Math.round($scope.lock_data[0].status); //for lock status, we probably does not need math.round
 
-                var x = new Date($scope.turing_data[0].timeStampEpoch);
+                var x = new Date($scope.lock_data[0].timeStampEpoch);
 
 
 
-                data_chart_turing_battery_charge.addRows([[x, y]]);
+                data_chart_lock_status.addRows([[x, y]]);
 
-                chart_turing_battery_charge.draw(data_chart_turing_battery_charge, options_charge);
+                chart_lock_status.draw(data_chart_lock_status, options_status);
 
                 if (chart_count > chart_count_max) {
-                    data_chart_turing_battery_charge.removeRow(0); //slide
+                    data_chart_lock_status.removeRow(0); //slide
 
                 }
 
@@ -454,139 +416,139 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
 
 
                 //  -- Sensor data
-                var y = Math.round($scope.turing_data[0].sensorReading);
+                // var y = Math.round($scope.turing_data[0].sensorReading);
 
-                var x = new Date($scope.turing_data[0].timeStampEpoch);
-
-
-                data_chart_turing_sensor_data.addRows([[x, y]]);
-
-                chart_div_sensor_data_turing.draw(data_chart_turing_sensor_data, options_SensorData);
-
-                if (chart_count > chart_count_max) {
-                    data_chart_turing_sensor_data.removeRow(0); //slide
-
-                }
+                // var x = new Date($scope.turing_data[0].timeStampEpoch);
 
 
-                var y = $scope.turing_data[0].batteryDischargeRate;
+                // data_chart_turing_sensor_data.addRows([[x, y]]);
 
-                var x1 = $scope.turing_data[0].timeStamp;
-                data_chart_turing_battery_Discharge.addRows([[x, y]]);
+                // chart_div_sensor_data_turing.draw(data_chart_turing_sensor_data, options_SensorData);
 
-                chart_div_battery_discharge_turing.draw(data_chart_turing_battery_Discharge, options_Discharge);
-                // super hack to update values in place
-                geo_chart_data.setValue(2, 0, $scope.turing_data[0].lat);
-                geo_chart_data.setValue(2, 1, $scope.turing_data[0].lon);
-                geo_chart_data.setValue(2, 3, $scope.turing_data[0].sensorReading);
-                // geo_chart_data.removeRow(0);
+                // if (chart_count > chart_count_max) {
+                //     data_chart_turing_sensor_data.removeRow(0); //slide
 
-                if (chart_count > chart_count_max) {
-                    data_chart_turing_battery_Discharge.removeRow(0); //slide
-                }
-
-                //////////  hopper  ///////////////////
-
-                var y = Math.round($scope.hopper_data[0].batteryCharge);
-
-                var x1 = $scope.hopper_data[0].timeStamp;
+                // }
 
 
-                data_chart_hopper_battery_charge.addRows([[x, y]]);
+                // var y = $scope.turing_data[0].batteryDischargeRate;
+                // // x1 seems to be useless since it does not affect functionality when I comment out in the original file
+                // var x1 = $scope.turing_data[0].timeStamp; 
+                // data_chart_turing_battery_Discharge.addRows([[x, y]]);
 
-                chart_hopper_battery_charge.draw(data_chart_hopper_battery_charge, options_charge);
+                // chart_div_battery_discharge_turing.draw(data_chart_turing_battery_Discharge, options_Discharge);
+                // // super hack to update values in place
+                // geo_chart_data.setValue(2, 0, $scope.turing_data[0].lat);
+                // geo_chart_data.setValue(2, 1, $scope.turing_data[0].lon);
+                // geo_chart_data.setValue(2, 3, $scope.turing_data[0].sensorReading);
+                // // geo_chart_data.removeRow(0);
+
+                // if (chart_count > chart_count_max) {
+                //     data_chart_turing_battery_Discharge.removeRow(0); //slide
+                // }
+
+                //////////  motion  ///////////////////
+
+                var y = Math.round($scope.motion_data[0].status);
+                var x = new Date($scope.motion_data[0].timeStampEpoch); // may or may not need
+                //var x1 = $scope.hopper_data[0].timeStamp;
+
+
+                data_chart_motion_status.addRows([[x, y]]);
+
+                chart_motion_status.draw(data_chart_motion_status, options_status);
 
                 chart_count = chart_count + 1;
                 if (chart_count > chart_count_max) {
-                    data_chart_hopper_battery_charge.removeRow(0); //slide
+                    data_chart_motion_status.removeRow(0); //slide
                 }
 
 
-                //  -- Sensor data
-                var y = Math.round($scope.hopper_data[0].sensorReading);
+                // //  -- Sensor data
+                // var y = Math.round($scope.hopper_data[0].sensorReading);
 
-                var x = new Date($scope.hopper_data[0].timeStampEpoch);
-
-
-                data_chart_hopper_sensor_data.addRows([[x, y]]);
-
-                chart_div_sensor_data_hopper.draw(data_chart_hopper_sensor_data, options_SensorData);
-
-                if (chart_count > chart_count_max) {
-                    data_chart_hopper_sensor_data.removeRow(0);
-
-                }
+                // var x = new Date($scope.hopper_data[0].timeStampEpoch);
 
 
+                // data_chart_hopper_sensor_data.addRows([[x, y]]);
 
-                var y = $scope.hopper_data[0].batteryDischargeRate;
+                // chart_div_sensor_data_hopper.draw(data_chart_hopper_sensor_data, options_SensorData);
 
-                var x1 = $scope.hopper_data[0].timeStamp;
-                data_chart_hopper_battery_Discharge.addRows([[x, y]]);
+                // if (chart_count > chart_count_max) {
+                //     data_chart_hopper_sensor_data.removeRow(0);
 
-                // super hack to update values in place
-                geo_chart_data.setValue(0, 0, $scope.hopper_data[0].lat);
-                geo_chart_data.setValue(0, 1, $scope.hopper_data[0].lon);
-                geo_chart_data.setValue(0, 3, $scope.hopper_data[0].sensorReading);
+                // }
 
-                chart_div_battery_discharge_hopper.draw(data_chart_hopper_battery_Discharge, options_Discharge);
 
-                if (chart_count > chart_count_max) {
-                    data_chart_hopper_battery_Discharge.removeRow(0); //slide
 
-                }
+                // var y = $scope.hopper_data[0].batteryDischargeRate;
+
+                // //var x1 = $scope.hopper_data[0].timeStamp;
+                // data_chart_hopper_battery_Discharge.addRows([[x, y]]);
+
+                // // super hack to update values in place
+                // geo_chart_data.setValue(0, 0, $scope.hopper_data[0].lat);
+                // geo_chart_data.setValue(0, 1, $scope.hopper_data[0].lon);
+                // geo_chart_data.setValue(0, 3, $scope.hopper_data[0].sensorReading);
+
+                // chart_div_battery_discharge_hopper.draw(data_chart_hopper_battery_Discharge, options_Discharge);
+
+                // if (chart_count > chart_count_max) {
+                //     data_chart_hopper_battery_Discharge.removeRow(0); //slide
+
+                // }
 
                 //
 
                 ///////////// knuth ////////////////
 
-                var y = Math.round($scope.knuth_data[0].batteryCharge);
+                var y = Math.round($scope.temperature_data[0].batteryCharge);
+                var x = new Date($scope.temperature_data[0].timeStampEpoch); // may or may not need
+                //var x1 = $scope.knuth_data[0].timeStamp;
 
-                var x1 = $scope.knuth_data[0].timeStamp;
 
+                data_chart_temperature_sensor_data.addRows([[x, y]]);
 
-                data_chart_knuth_battery_charge.addRows([[x, y]]);
-
-                chart_knuth_battery_charge.draw(data_chart_knuth_battery_charge, options_charge);
+                chart_temperature_reading.draw(data_chart_temperature_sensor_data, options_SensorData);
 
                 if (chart_count > chart_count_max) {
-                    data_chart_knuth_battery_charge.removeRow(0); //slide
+                    data_chart_temperature_sensor_data.removeRow(0); //slide
 
                 }
 
-                //  -- Sensor data
-                var y = Math.round($scope.knuth_data[0].sensorReading);
+                // //  -- Sensor data
+                // var y = Math.round($scope.knuth_data[0].sensorReading);
 
-                var x = new Date($scope.knuth_data[0].timeStampEpoch);
+                // var x = new Date($scope.knuth_data[0].timeStampEpoch);
 
 
-                data_chart_knuth_sensor_data.addRows([[x, y]]);
+                // data_chart_knuth_sensor_data.addRows([[x, y]]);
 
-                chart_div_sensor_data_knuth.draw(data_chart_knuth_sensor_data, options_SensorData);
+                // chart_div_sensor_data_knuth.draw(data_chart_knuth_sensor_data, options_SensorData);
 
-                if (chart_count > chart_count_max) {
-                    data_chart_knuth_sensor_data.removeRow(0); //slide
+                // if (chart_count > chart_count_max) {
+                //     data_chart_knuth_sensor_data.removeRow(0); //slide
 
-                }
+                // }
 
-                var y = $scope.knuth_data[0].batteryDischargeRate;
+                // var y = $scope.knuth_data[0].batteryDischargeRate;
 
-                var x1 = $scope.knuth_data[0].timeStamp;
-                data_chart_knuth_battery_Discharge.addRows([[x, y]]);
+                // //var x1 = $scope.knuth_data[0].timeStamp;
+                // data_chart_knuth_battery_Discharge.addRows([[x, y]]);
 
-                chart_div_battery_discharge_knuth.draw(data_chart_knuth_battery_Discharge, options_Discharge);
-                // super hack to update values in place
-                geo_chart_data.setValue(1, 0, $scope.knuth_data[0].lat);
-                geo_chart_data.setValue(1, 1, $scope.knuth_data[0].lon);
-                geo_chart_data.setValue(1, 3, $scope.knuth_data[0].sensorReading);
+                // chart_div_battery_discharge_knuth.draw(data_chart_knuth_battery_Discharge, options_Discharge);
+                // // super hack to update values in place
+                // geo_chart_data.setValue(1, 0, $scope.knuth_data[0].lat);
+                // geo_chart_data.setValue(1, 1, $scope.knuth_data[0].lon);
+                // geo_chart_data.setValue(1, 3, $scope.knuth_data[0].sensorReading);
 
-                if (chart_count > chart_count_max) {
-                    data_chart_knuth_battery_Discharge.removeRow(0); //slide
+                // if (chart_count > chart_count_max) {
+                //     data_chart_knuth_battery_Discharge.removeRow(0); //slide
 
-                }
+                // }
 
-                // redraw map
-                geo_chart.draw(geo_chart_data, geo_chart_options);
+                // // redraw map
+                // geo_chart.draw(geo_chart_data, geo_chart_options);
 
 
             },
