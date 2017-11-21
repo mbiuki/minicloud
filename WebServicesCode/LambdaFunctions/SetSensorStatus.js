@@ -5,9 +5,9 @@ const acceptedSensors = ["led", "lock"];
 function returnResult(callback, statusCode, body) {
 	callback(null, {
 		statusCode: statusCode,
-		headers: { 
-            "Access-Control-Allow-Origin": "*" 
-        },
+		headers: {
+			"Access-Control-Allow-Origin": "*"
+		},
 		body: JSON.stringify(body)
 	});
 }
@@ -28,19 +28,19 @@ exports.handler = (event, context, callback) => {
 	}
 
 	if (event.body) {
-	    let body = JSON.parse(event.body);
-	    if (body.status) {
-		    event.status = body.status;
-	    }
+		let body = JSON.parse(event.body);
+		if (body.status) {
+			event.status = body.status;
+		}
 	}
 
 	if (event.status === null || event.status === undefined) {
 		returnResult(callback, 400, "Missing Status in Body");
 		return;
 	}
-	
+
 	if (event.status != '0' && event.status != '1') {
-	    returnResult(callback, 400, "Status can only be 0 or 1");
+		returnResult(callback, 400, "Status can only be 0 or 1");
 		return;
 	}
 
