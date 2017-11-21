@@ -5,6 +5,9 @@ const acceptedSensors = ["led", "lock"];
 function returnResult(callback, statusCode, body) {
 	callback(null, {
 		statusCode: statusCode,
+		headers: { 
+            "Access-Control-Allow-Origin": "*" 
+        },
 		body: JSON.stringify(body)
 	});
 }

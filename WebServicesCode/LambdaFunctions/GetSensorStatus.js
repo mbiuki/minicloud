@@ -8,6 +8,9 @@ const acceptedSensors = ["led", "lock", "motion", "temperature"];
 function returnResult(callback, statusCode, body) {
 	callback(null, {
 		statusCode: statusCode,
+		headers: { 
+            "Access-Control-Allow-Origin": "*" 
+        },
 		body: JSON.stringify(body)
 	});
 }
@@ -67,7 +70,7 @@ exports.handler = (event, context, callback) => {
 			returnResult(callback, 400, err);
 		} else {
 			console.log(data);
-			returnResult(callback, 400, data);
+			returnResult(callback, 200, data);
 		}
 	});
 };
