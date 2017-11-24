@@ -50,45 +50,19 @@
             <!--/.container-fluid -->
         </nav>
 
-        <!-- geolocation (not necessary) -->
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <div class="panel-title">
-
-                    <rd-widget-header title=" Devices Geolocation" icon="fa-cog fa-spin"></rd-widget-header>
-
-                </div>
-            </div>
-            <div ng-show="showSpinkit">
-                <div class="spinner">
-                    <div class="bounce1"></div>
-                    <div class="bounce2"></div>
-                    <div class="bounce3"></div>
-                </div>
-            </div>
-            <div class="panel-body" ng-show="!showSpinkit">
-                <center>
-                    <div id="mapdiv" style="width: 650px; height: 360px;" align="center"></div>
-
-
-                </center>
-            </div>
-        </div>
-        <!-- geolocation ends -->
-
         <!-- display sensor data in the graph -->
         <div class="row">
             <div class="col-md-4 portfolio-item">
                 <h3>
-                    <a href="#">Lock</a>
+                    <a href="#">LED</a>
                 </h3>
                 <p></p>
 
-                <!-- Lock status graph  -->
+                <!-- LED status graph  -->
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Lock Status</h3>
+                        <h3 class="panel-title">LED Status</h3>
                     </div>
                     <div class="panel-body">
 
@@ -101,7 +75,7 @@
                         </div>
 
 
-                        <div id="chart_div_lock_status" ng-show="!showSpinkit_tables"></div>
+                        <div id="chart_div_led_status" ng-show="!showSpinkit_tables"></div>
                     </div>
                 </div>
 
@@ -157,160 +131,12 @@
                             </div>
                         </div>
 
-                        <div id="chart_div_temperature_reading" ng-show="!showSpinkit_tables"></div>
+                        <div id="chart_div_temperature_status" ng-show="!showSpinkit_tables"></div>
                     </div>
                 </div>
             </div>
 
         </div>
-
-
-
-        <!-- part that we don't really need-->
-        <!-- part that we don't really need-->
-        <!-- part that we don't really need-->
-        <!-- part that we don't really need-->
-        <!-- we only need one graph for each sensor-->
-        <!-- we need another section to take care of displaying photo -->
-        <!-- row  Discharge-->
-        <div class="row">
-            <!-- Discharge turing  -->
-            <div class="col-md-4 portfolio-item">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Battery Discharge</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div ng-show="showSpinkit_tables">
-                            <div class="spinner">
-                                <div class="bounce1"></div>
-                                <div class="bounce2"></div>
-                                <div class="bounce3"></div>
-                            </div>
-                        </div>
-
-                        <div id="chart_div_battery_discharge_turing" ng-show="!showSpinkit_tables"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Discharge hopper  -->
-            <div class="col-md-4 portfolio-item">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Battery Discharge</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div ng-show="showSpinkit_tables">
-                            <div class="spinner">
-                                <div class="bounce1"></div>
-                                <div class="bounce2"></div>
-                                <div class="bounce3"></div>
-                            </div>
-                        </div>
-
-                        <div id="chart_div_battery_discharge_hopper" ng-show="!showSpinkit_tables"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Discharge knuth"  -->
-            <div class="col-md-4 portfolio-item">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Battery Discharge</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div ng-show="showSpinkit_tables">
-                            <div class="spinner">
-                                <div class="bounce1"></div>
-                                <div class="bounce2"></div>
-                                <div class="bounce3"></div>
-                            </div>
-                        </div>
-
-                        <div id="chart_div_battery_discharge_knuth" ng-show="!showSpinkit_tables"></div>
-                    </div>
-                </div>
-            </div>
-
-
-        </div>
-        <!-- row  -->
-
-
-        <!-- row  Sensor Data (numval) -->
-
-        <div class="row">
-            <!-- Discharge turing  -->
-            <div class="col-md-4 portfolio-item">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Sensor Data</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div ng-show="showSpinkit_tables">
-                            <div class="spinner">
-                                <div class="bounce1"></div>
-                                <div class="bounce2"></div>
-                                <div class="bounce3"></div>
-                            </div>
-                        </div>
-
-                        <div id="chart_div_sensor_data_turing" ng-show="!showSpinkit_tables"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Discharge hopper  -->
-            <div class="col-md-4 portfolio-item">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Sensor Data</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div ng-show="showSpinkit_tables">
-                            <div class="spinner">
-                                <div class="bounce1"></div>
-                                <div class="bounce2"></div>
-                                <div class="bounce3"></div>
-                            </div>
-                        </div>
-
-                        <div id="chart_div_sensor_data_hopper" ng-show="!showSpinkit_tables"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Discharge knuth"  -->
-            <div class="col-md-4 portfolio-item">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Sensor Data</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div ng-show="showSpinkit_tables">
-                            <div class="spinner">
-                                <div class="bounce1"></div>
-                                <div class="bounce2"></div>
-                                <div class="bounce3"></div>
-                            </div>
-                        </div>
-
-                        <div id="chart_div_sensor_data_knuth" ng-show="!showSpinkit_tables"></div>
-                    </div>
-                </div>
-            </div>
-
-
-        </div>
-        <!-- row  -->
-        <!-- part that we don't really need-->
-        <!-- part that we don't really need-->
-        <!-- part that we don't really need-->
-        <!-- part that we don't really need-->
-
-
 
         <!-- a section for image -->
         <!-- currently we only have a static image -->
@@ -339,13 +165,11 @@
                             <tr>
                                 <th>Sensor</th>
                                 <th>Sensor Status</th>
-                                <th>Sensor Data</th>
                                 <th>Timestamp</th>
                             </tr>
                             <tr ng-repeat="item in $data"> <!-- ng-repeat directive provide data bounding -->
                                 <td> {{item.sensorId}}</td>
-                                <td> {{item.batteryCharge}}</td> <!-- feed data from sensor output -->
-                                <td> {{item.batteryDischargeRate}}</td>
+                                <td> {{item.status}}</td>
                                 <td> {{item.timeStamp}}</td>
                             </tr>
                         </table>

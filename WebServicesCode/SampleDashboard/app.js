@@ -17,7 +17,7 @@ var icon2 = "M3.5,13.277C3.5,6.22,9.22,0.5,16.276,0.5C23.333,0.5,29.053,6.22,29.
 
 
 var chart_count = 0; // counts number of chart items
-var chart_count_max = 80; // This is the threshold when charts start removing items from the left (movig x axis)
+var chart_count_max = 5; // This is the threshold when charts start removing items from the left (movig x axis)
 
 
 // $angular http object  Ajax call
@@ -30,7 +30,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
 
         $http({
             method: "GET",
-            url: devices_endpoint_url + 'status/lock',
+            url: devices_endpoint_url + 'status/led?timestart=0',
         }).success(function (data) {
             //var maxlat;
             //var maxlon;
@@ -43,7 +43,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
                 //var lon = JSON.stringify(data.Items[i].payload.location.lon);
                 var timeStamp = JSON.stringify(data.Items[i].payload.timeStampEpoch);
                 var status = JSON.stringify(data.Items[i].payload.status);
-                var sensorId = JSON.stringify(data.Items[i].payload.sensorId); //payload.sensorId is not yet implemented
+                var sensorId = JSON.stringify(data.Items[i].sensorId); //payload.sensorId is not yet implemented
                 if (timeStamp > maxtimeStamp) {
                     //maxlat = lat;
                     //maxlon = lon;
@@ -67,7 +67,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
             // Code for Get call start
             $http({
                 method: "GET",
-                url: devices_endpoint_url + 'status/motion',
+                url: devices_endpoint_url + 'status/motion?timestart=0',
             }).success(function (data) {
 
 
@@ -78,7 +78,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
                     //var lon = JSON.stringify(data.Items[i].payload.location.lon);
                     var timeStamp = JSON.stringify(data.Items[i].payload.timeStampEpoch);
                     var status = JSON.stringify(data.Items[i].payload.status);
-                    var sensorId = JSON.stringify(data.Items[i].payload.sensorId);
+                    var sensorId = JSON.stringify(data.Items[i].sensorId);
                     if (timeStamp > maxtimeStamp) {
                         //maxlat = lat;
                         //maxlon = lon;
@@ -103,7 +103,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
                 // Code for Get call start
                 $http({
                     method: "GET",
-                    url: devices_endpoint_url + 'status/temperature',
+                    url: devices_endpoint_url + 'status/temperature?timestart=0',
                 }).success(function (data) {
 
                     //console.log("data"+JSON.stringify(data));
@@ -114,7 +114,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
                         //var lon = JSON.stringify(data.Items[i].payload.location.lon);
                         var timeStamp = JSON.stringify(data.Items[i].payload.timeStampEpoch);
                         var status = JSON.stringify(data.Items[i].payload.status); // do we really use status for temperature????
-                        var sensorId = JSON.stringify(data.Items[i].payload.sensorId);
+                        var sensorId = JSON.stringify(data.Items[i].sensorId);
                         if (timeStamp > maxtimeStamp) {
                             //maxlat = lat;
                             //maxlon = lon;
@@ -158,7 +158,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
 
     $scope.all_sensors = []; // empty array
 
-    $scope.lock_data = [];
+    $scope.led_data = [];
 
     $scope.motion_data = [];
 
@@ -197,22 +197,22 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
 
             // Build array for each device
 
-            if (normalize_data.SensorId == 'lock') {
-                $scope.lock_data.unshift(normalize_data);
-                console.log('--------------> lock')
-                console.log($scope.lock_data);
-                if ($scope.lock_data.length > 20) {
-                    $scope.lock_data.pop();
+            if (normalize_data.sensorId == 'led') {
+                $scope.led_data.unshift(normalize_data);
+                console.log('--------------> led')
+                console.log($scope.led_data);
+                if ($scope.led_data.length > 20) {
+                    $scope.led_data.pop();
                 }
 
-            } else if (normalize_data.SensorId == 'motion') {
+            } else if (normalize_data.sensorId == 'motion') {
                 $scope.motion_data.unshift(normalize_data);
                 console.log('--------------> motion')
                 console.log($scope.motion_data);
                 if ($scope.motion_data.length > 20) {
                     $scope.motion_data.pop();
                 }
-            } else if (normalize_data.SensorId == 'temperature') {
+            } else if (normalize_data.sensorId == 'temperature') {
                 $scope.temperature_data.unshift(normalize_data);
                 console.log('--------------> temperature')
                 console.log($scope.temperature_data);
@@ -220,17 +220,17 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
                     $scope.temperature_data.pop();
                 }
             } else {
-                console.log('Error no such device' + normalize_data.SensorId)
+                console.log('Error no such device' + normalize_data.sensorId)
             };
 
 
             $scope.all_sensors.unshift(normalize_data);
 
 
-            if (($scope.all_snesors.length) >= 20) {
+            if (($scope.all_sensors.length) >= 20) {
                 $scope.all_sensors.pop();
                 $scope.all_sensors.pop();
-                $scope.all_snesors.pop(); //was shift
+                $scope.all_sensors.pop(); //was shift
             }
         });
         return print_obj;
@@ -245,7 +245,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
         // get the payload json
         var payload = json_obj.payload;
         var json_for_table = {};
-        json_for_table.sensorId = payload.sensorId; // need sensorId to be included in payload
+        json_for_table.sensorId = json_obj.sensorId; // need sensorId to be included in payload
         json_for_table.status = payload.status;
         //json_for_table.batteryCharge = payload.batteryCharge.toFixed(2);
         //json_for_table.batteryDischargeRate = payload.batteryDischargeRate.toFixed(2);
@@ -283,11 +283,11 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
 
     function drawMapAndCharts() {
 
-        var data_chart_lock_status = new google.visualization.DataTable();
+        var data_chart_led_status = new google.visualization.DataTable();
 
         var data_chart_motion_status = new google.visualization.DataTable();
 
-        var data_chart_temperature_sensor_data = new google.visualization.DataTable();
+        var data_chart_temperature_status = new google.visualization.DataTable();
 
         // set up GeoChart
         // we don't need the Geochart
@@ -313,17 +313,17 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
         };
         */
 
-        // add columns for lock
-        data_chart_lock_status.addColumn('date', 'X');
-        data_chart_lock_status.addColumn('number', 'status');
+        // add columns for led
+        data_chart_led_status.addColumn('string', 'X');
+        data_chart_led_status.addColumn('number', 'status');
 
         // add columns for motion sensor
-        data_chart_motion_status.addColumn('date', 'X');
+        data_chart_motion_status.addColumn('string', 'X');
         data_chart_motion_status.addColumn('number', 'status');
 
         // add columns for temperature sensor
-        data_chart_temperature_sensor_data.addColumn('date', 'X');
-        data_chart_temperature_sensor_data.addColumn('number', 'sensor_data');
+        data_chart_temperature_status.addColumn('string', 'X');
+        data_chart_temperature_status.addColumn('number', 'status');
 
         var options_status = {
             hAxis: {
@@ -336,6 +336,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
             backgroundColor: '#f1f8e9'
         };
         // display option for temperature sensor
+        /*
         var options_SensorData = {
             hAxis: {
                 title: 'Time'
@@ -346,9 +347,10 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
             },
             backgroundColor: '#f1f8e9'
         };
+        */
 
-        var chart_lock_status = new google.visualization.LineChart(document.getElementById('chart_div_lock_status'));
-        chart_lock_status.draw(data_chart_lock_status, options_status);
+        var chart_led_status = new google.visualization.LineChart(document.getElementById('chart_div_led_status'));
+        chart_led_status.draw(data_chart_led_status, options_status);
 
         // var chart_div_battery_discharge_turing =
         //     new google.visualization.LineChart(document.getElementById('chart_div_battery_discharge_turing'));
@@ -374,8 +376,8 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
 
 
         //knuth
-        var chart_temperature_reading = new google.visualization.LineChart(document.getElementById('chart_div_temperature_reading'));
-        chart_temperature_reading.draw(data_chart_temperature_sensor_data, options_charge);
+        var chart_temperature_status = new google.visualization.LineChart(document.getElementById('chart_div_temperature_status'));
+        chart_temperature_status.draw(data_chart_temperature_status, options_status);
 
 
         // var chart_div_battery_discharge_knuth =
@@ -396,19 +398,19 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
 
                 // console.log(geo_chart_data.getNumberOfRows());
 
-                // #### lock #####
-                var y = Math.round($scope.lock_data[0].status); //for lock status, we probably does not need math.round
+                // #### led #####
+                var y = $scope.led_data[0].status; //for led status, we probably does not need math.round
 
-                var x = new Date($scope.lock_data[0].timeStampEpoch);
+                // var x = new Date($scope.led_data[0].timeStampEpoch);
 
+                var x = $scope.led_data[0].timeStamp;
 
+                data_chart_led_status.addRows([[x, Number(y)]]);
 
-                data_chart_lock_status.addRows([[x, y]]);
-
-                chart_lock_status.draw(data_chart_lock_status, options_status);
+                chart_led_status.draw(data_chart_led_status, options_status);
 
                 if (chart_count > chart_count_max) {
-                    data_chart_lock_status.removeRow(0); //slide
+                    data_chart_led_status.removeRow(0); //slide
 
                 }
 
@@ -449,12 +451,13 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
 
                 //////////  motion  ///////////////////
 
-                var y = Math.round($scope.motion_data[0].status);
-                var x = new Date($scope.motion_data[0].timeStampEpoch); // may or may not need
+                var y = $scope.motion_data[0].status;
+                //var x = new Date($scope.motion_data[0].timeStampEpoch); // may or may not need
                 //var x1 = $scope.hopper_data[0].timeStamp;
+                var x = $scope.motion_data[0].timeStamp;
 
 
-                data_chart_motion_status.addRows([[x, y]]);
+                data_chart_motion_status.addRows([[x, Number(y)]]);
 
                 chart_motion_status.draw(data_chart_motion_status, options_status);
 
@@ -502,17 +505,18 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
 
                 ///////////// knuth ////////////////
 
-                var y = Math.round($scope.temperature_data[0].batteryCharge);
-                var x = new Date($scope.temperature_data[0].timeStampEpoch); // may or may not need
+                var y = Math.round($scope.temperature_data[0].status);
+                //var x = new Date($scope.temperature_data[0].timeStampEpoch); // may or may not need
                 //var x1 = $scope.knuth_data[0].timeStamp;
+                var x = $scope.temperature_data[0].timeStamp;
 
 
-                data_chart_temperature_sensor_data.addRows([[x, y]]);
+                data_chart_temperature_status.addRows([[x, Number(y)]]);
 
-                chart_temperature_reading.draw(data_chart_temperature_sensor_data, options_SensorData);
+                chart_temperature_status.draw(data_chart_temperature_status, options_status);
 
                 if (chart_count > chart_count_max) {
-                    data_chart_temperature_sensor_data.removeRow(0); //slide
+                    data_chart_temperature_status.removeRow(0); //slide
 
                 }
 
