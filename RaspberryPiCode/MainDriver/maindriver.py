@@ -138,9 +138,9 @@ while True:
     pir.wait_for_motion()
     motionMessage = getBaseMessage()
     motionMessage["status"] = '1'
-    myAWSIoTMQTTClient.publish(motionTopic, json.dumps(motionMessage), 1)
+    myAWSIoTMQTTClient.publishAsync(motionTopic, json.dumps(motionMessage), 1)
     
     pir.wait_for_no_motion()
     noMotionMessage = getBaseMessage()
     noMotionMessage["status"] = '0'
-    myAWSIoTMQTTClient.publish(motionTopic, json.dumps(noMotionMessage), 1)
+    myAWSIoTMQTTClient.publishAsync(motionTopic, json.dumps(noMotionMessage), 1)
