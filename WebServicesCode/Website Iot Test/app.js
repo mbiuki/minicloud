@@ -90,13 +90,18 @@ window.mqttClientConnectHandler = function() {
 	// Subscribe to our current topic.
 	//
 	mqttClient.subscribe("test");
+	mqttClient.subscribe("sensor/camera/image");
 	mqttClient.publish("test", JSON.stringify({"payload": "hello"}));
 };
 
 window.mqttClientMessageHandler = function(topic, payload) {
 	var message = 'message: ' + topic + ':' + payload.toString();
 	console.log(message);
+	var payloadObj = JSON.parse(payload);
 	document.getElementById("testp").innerHTML = message;
+	if (topic == "sensor/camera/image") {
+		document.getElementById("testimage").src = payloadObj["url"];
+	}
 };
 
 mqttClient.on('connect', window.mqttClientConnectHandler);
