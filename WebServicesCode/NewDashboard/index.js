@@ -1,6 +1,6 @@
-var ledChart;
-var motionChart;
-var tempChart;
+var ledChart = {};
+var motionChart = {};
+var tempChart = {};
 var ledStatus;
 var endpoint = "https://3v5mhdfdne.execute-api.us-west-2.amazonaws.com/prod";
 
@@ -70,7 +70,7 @@ function setupSensorData(sensor, sensorCtx, sensorChart) {
 		console.log(timeStamps);
 		console.log(data);
 
-		sensorChart = new Chart(sensorCtx, {
+		sensorChart.chart = new Chart(sensorCtx, {
 			type: 'line',
 			data: {
 				labels: timeStamps,
@@ -114,11 +114,11 @@ function onLedButtonClick() {
 	xhttp.send(JSON.stringify({"status": ledStatus}));
 }
 
-//var status = 0;
+// var status = 0;
 // setInterval(function() {
-// 	var dataLength = motionChart.data.datasets[0].data.length;
-// 	motionChart.data.datasets[0].data[dataLength] = status++ % 2;
-// 	motionChart.data.labels[dataLength] = new Date().getTime();
-// 	motionChart.update();
+// 	var dataLength = tempChart.chart.data.datasets[0].data.length;
+// 	tempChart.chart.data.datasets[0].data[dataLength] = Math.random() * 30;
+// 	tempChart.chart.data.labels[dataLength] = new Date().getTime();
+// 	tempChart.chart.update();
 // 	console.log(dataLength);
 // }, 1000);
