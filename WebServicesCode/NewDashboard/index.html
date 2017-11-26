@@ -11,9 +11,26 @@
 <body>
 <div class="container">
 	<h2>Chart.js — Bar Chart Demo</h2>
-	<div>
-		<canvas id="motionChart"></canvas>
+	<h3>Current Sensor Status:</h3>
+	<div class="statusRow">
+		<span>LED Status: </span>
+		<span id="ledStatus"></span>
+		<br/>
+		<br/>
+		<span>Motion Sensor Status: </span>
+		<span id="motionStatus"></span>
+		<br/>
+		<br/>
+		<span>Temperature Sensor Status: </span>
+		<span id="tempStatus"></span>
+		<br/>
+		<br/>
+		<button id="ledButton" onclick="onLedButtonClick()"></button>
+	</div>
+	<div class="row">
 		<canvas id="ledChart"></canvas>
+		<canvas id="motionChart"></canvas>
+		<canvas id="tempChart"></canvas>
 	</div>
 	<p id="caption">The chart is displaying motion sensor status.</p>
 </div>
