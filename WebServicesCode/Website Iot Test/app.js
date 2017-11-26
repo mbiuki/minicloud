@@ -88,18 +88,15 @@ function setupCurrSensorStatus() {
 				ledText.innerHTML = text;
 				ledStatus = sensorStatus[i].payload.status;
 				setLedButtonStatus(sensorStatus[i].payload.status);
-				createChart("led", document.getElementById('ledChart').getContext('2d'), ledChart, 
-					[sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
+				createChart("led", document.getElementById('ledChart').getContext('2d'), ledChart, [sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
 			}
 			if (sensorStatus[i].sensorId == "motion") {
 				motionText.innerHTML = text;
-				createChart("motion", document.getElementById('motionChart').getContext('2d'), motionChart, 
-					[sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
+				createChart("motion", document.getElementById('motionChart').getContext('2d'), motionChart, [sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
 			}
 			if (sensorStatus[i].sensorId == "temperature") {
 				tempText.innerHTML = text;
-				createChart("temperature", document.getElementById('tempChart').getContext('2d'), tempChart, 
-					[sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
+				createChart("temperature", document.getElementById('tempChart').getContext('2d'), tempChart, [sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
 			}
 		}
 	}
@@ -153,7 +150,6 @@ function createChart(sensor, sensorCtx, sensorChart, data, timeStamps) {
 			scales: {
 				xAxes: [{
 					type: 'time',
-					distribution: 'series'
 				}]
 			}
 		}
