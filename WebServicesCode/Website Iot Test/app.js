@@ -25,7 +25,7 @@ window.mqttClientMessageHandler = function(topic, payload) {
 		ledStatus = payloadObj["status"];
 		var dataLength = ledChart.chart.data.datasets[0].data.length;
 		ledChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
-		ledChart.chart.data.labels[dataLength] = payloadObj["timeStampEpoch"];
+		ledChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
 		ledChart.chart.update();
 		setLedButtonStatus(payloadObj["status"]);
 		var ledText = document.getElementById("ledStatus");
@@ -34,7 +34,7 @@ window.mqttClientMessageHandler = function(topic, payload) {
 	if (topic == "sensor/motion/payload") {
 		var dataLength = motionChart.chart.data.datasets[0].data.length;
 		motionChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
-		motionChart.chart.data.labels[dataLength] = payloadObj["timeStampEpoch"];
+		motionChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
 		motionChart.chart.update();
 		var motionText = document.getElementById("motionStatus");
 		motionText.innerHTML = setupSensorText(payloadObj["status"], payloadObj["timeStampIso"]);
@@ -42,7 +42,7 @@ window.mqttClientMessageHandler = function(topic, payload) {
 	if (topic == "sensor/temperature/payload") {
 		var dataLength = tempChart.chart.data.datasets[0].data.length;
 		tempChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
-		tempChart.chart.data.labels[dataLength] = payloadObj["timeStampEpoch"];
+		tempChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
 		tempChart.chart.update();
 		var tempText = document.getElementById("tempStatus");
 		tempText.innerHTML = setupSensorText(payloadObj["status"], payloadObj["timeStampIso"]);
@@ -88,15 +88,18 @@ function setupCurrSensorStatus() {
 				ledText.innerHTML = text;
 				ledStatus = sensorStatus[i].payload.status;
 				setLedButtonStatus(sensorStatus[i].payload.status);
-				createChart("led", document.getElementById('ledChart').getContext('2d'), ledChart, [sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
+				createChart("led", document.getElementById('ledChart').getContext('2d'), ledChart, 
+					[sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
 			}
 			if (sensorStatus[i].sensorId == "motion") {
 				motionText.innerHTML = text;
-				createChart("motion", document.getElementById('motionChart').getContext('2d'), motionChart, [sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
+				createChart("motion", document.getElementById('motionChart').getContext('2d'), motionChart, 
+					[sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
 			}
 			if (sensorStatus[i].sensorId == "temperature") {
 				tempText.innerHTML = text;
-				createChart("temperature", document.getElementById('tempChart').getContext('2d'), tempChart, [sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
+				createChart("temperature", document.getElementById('tempChart').getContext('2d'), tempChart, 
+					[sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
 			}
 		}
 	}
@@ -121,7 +124,7 @@ function setupSensorData(sensor, sensorCtx, sensorChart) {
 		var data = [];
 
 		for (var i = 0; i < responseData.length; i++) {
-			timeStamps.push(responseData[i].payload["timeStampEpoch"]);
+			timeStamps.push(responseData[i].payload["timeStampIso"]);
 			data.push(responseData[i].payload["status"]);
 		}
 
