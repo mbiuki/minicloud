@@ -1,18 +1,21 @@
 var mqttClient = require('./awsiot.js');
 
+var ledChart = {};
+var motionChart = {};
+var tempChart = {};
+var ledStatus;
+var endpoint = "https://3v5mhdfdne.execute-api.us-west-2.amazonaws.com/prod";
+
+// Subscribe to topics
 window.mqttClientConnectHandler = function() {
 	console.log('connect');
-	//
-	// Subscribe to our current topic.
-	//
-	mqttClient.subscribe("test");
 	mqttClient.subscribe("sensor/camera/image");
 	mqttClient.subscribe("sensor/led/payload");
 	mqttClient.subscribe("sensor/motion/payload");
 	mqttClient.subscribe("sensor/temperature/payload");
-	mqttClient.publish("test", JSON.stringify({ "payload": "hello" }));
 };
 
+// Respond to subscribed topics when they are published to
 window.mqttClientMessageHandler = function(topic, payload) {
 	var message = 'message: ' + topic + ':' + payload.toString();
 	console.log(message);
@@ -53,15 +56,6 @@ window.mqttClientMessageHandler = function(topic, payload) {
 mqttClient.on('connect', window.mqttClientConnectHandler);
 mqttClient.on('message', window.mqttClientMessageHandler);
 
-
-// Front-end code
-
-var ledChart = {};
-var motionChart = {};
-var tempChart = {};
-var ledStatus;
-var endpoint = "https://3v5mhdfdne.execute-api.us-west-2.amazonaws.com/prod";
-
 window.onload = function() {
 	setupCurrSensorStatus();
 }
@@ -84,22 +78,23 @@ function setupCurrSensorStatus() {
 
 		for (var i = 0; i < sensorStatus.length; i++) {
 			var text = setupSensorText(sensorStatus[i].payload.status, sensorStatus[i].payload.timeStampIso);
+			var timeStampIso = new Date().toISOString();
 			if (sensorStatus[i].sensorId == "led") {
 				ledText.innerHTML = text;
 				ledStatus = sensorStatus[i].payload.status;
 				setLedButtonStatus(sensorStatus[i].payload.status);
 				createChart("led", document.getElementById('ledChart').getContext('2d'), ledChart, 
-					[sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
+					[sensorStatus[i].payload.status], [timeStampIso]);
 			}
 			if (sensorStatus[i].sensorId == "motion") {
 				motionText.innerHTML = text;
 				createChart("motion", document.getElementById('motionChart').getContext('2d'), motionChart, 
-					[sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
+					[sensorStatus[i].payload.status], [timeStampIso]);
 			}
 			if (sensorStatus[i].sensorId == "temperature") {
 				tempText.innerHTML = text;
 				createChart("temperature", document.getElementById('tempChart').getContext('2d'), tempChart, 
-					[sensorStatus[i].payload.status], [sensorStatus[i].payload.timeStampIso]);
+					[sensorStatus[i].payload.status], [timeStampIso]);
 			}
 		}
 	}
@@ -179,4 +174,15 @@ window.onLedButtonClick = function() {
 	var newStatus = ledStatus == "1" ? "0" : "1";
 
 	xhttp.send(JSON.stringify({ "status": newStatus }));
+}
+
+window.onCameraButtonClick = function() {
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("PUT", endpoint + "/takepicture");
+
+	xhttp.onload = function(e) {
+		console.log(xhttp.response);
+	}
+
+	xhttp.send();
 }
