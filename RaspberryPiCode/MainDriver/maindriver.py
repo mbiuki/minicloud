@@ -19,24 +19,31 @@ def motionCallback(client, userdata, message):
     print(message.topic)
     payload = json.loads(message.payload)
     if payload["status"] == '1':
-        imagePath = datetime.datetime.now().isoformat() + ".png"
-        camera.capture(imagePath)
-        image = open(imagePath, "rb")
+        takePicture()
         
-        # Upload camera image to S3, and grab the url
-        s3Resource.Bucket('minicloud-images').put_object(Key=imagePath, Body=image)
-        url = s3Client.generate_presigned_url('get_object',
+    print("--------------\n\n")
+
+def cameraCallback(client, userdata, message):
+    takePicture()
+    
+def takePicture():
+    imagePath = datetime.datetime.now().isoformat() + ".png"
+    camera.capture(imagePath)
+    image = open(imagePath, "rb")
+        
+    # Upload camera image to S3, and grab the url
+    s3Resource.Bucket('minicloud-images').put_object(Key=imagePath, Body=image)
+    url = s3Client.generate_presigned_url('get_object',
                                 Params={
                                     'Bucket': 'minicloud-images',
                                     'Key': imagePath
                                 }
-        )                                      
-        print(url)
+    )                                      
+    print(url)
         
-        # Send the image url in an IoT Publish
-        myAWSIoTMQTTClient.publishAsync("sensor/camera/image", json.dumps({"url":url}), 1)
-        
-    print("--------------\n\n")
+    # Send the image url in an IoT Publish
+    myAWSIoTMQTTClient.publishAsync("sensor/camera/image", json.dumps({"url":url}), 1)
+    
 
 def ledCallback(client, userdata, message):
     print("Received a new message: ")
@@ -77,6 +84,7 @@ useWebsocket = args.useWebsocket
 clientId = args.clientId
 motionTopic = "sensor/motion/payload"
 ledTopic = "sensor/led/payload"
+cameraTopic = "sensor/camera/takepicture"
 
 if args.useWebsocket and args.certificatePath and args.privateKeyPath:
     parser.error("X.509 cert authentication and WebSocket are mutual exclusive. Please pick one.")
@@ -131,6 +139,7 @@ myAWSIoTMQTTClient.configureMQTTOperationTimeout(5)  # 5 sec
 myAWSIoTMQTTClient.connect()
 myAWSIoTMQTTClient.subscribe(motionTopic, 1, motionCallback)
 myAWSIoTMQTTClient.subscribe(ledTopic, 1, ledCallback)
+myAWSIoTMQTTClient.subscribe(cameraTopic, 1, cameraCallback)
 time.sleep(2)
 
 # Constantly check for motion, and no motion and publish 
@@ -139,7 +148,7 @@ while True:
     motionMessage = getBaseMessage()
     motionMessage["status"] = '1'
     myAWSIoTMQTTClient.publishAsync(motionTopic, json.dumps(motionMessage), 1)
-    
+
     pir.wait_for_no_motion()
     noMotionMessage = getBaseMessage()
     noMotionMessage["status"] = '0'
