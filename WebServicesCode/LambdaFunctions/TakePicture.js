@@ -5,8 +5,8 @@ function returnResult(callback, statusCode, body) {
 	callback(null, {
 		statusCode: statusCode,
 		headers: {
-			"Access-Control-Allow-Origin": "*",
-		},
+            "Access-Control-Allow-Origin": "*",
+        },
 		body: JSON.stringify(body)
 	});
 }
@@ -19,7 +19,7 @@ exports.handler = (event, context, callback) => {
 	payload.timeStampIso = date.toISOString();
 
 	const params = {
-		topic: 'takepicture',
+		topic: 'sensor/camera/takepicture',
 		payload: JSON.stringify(payload)
 	};
 
