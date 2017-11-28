@@ -85,18 +85,15 @@ function setupCurrSensorStatus() {
 				ledText.innerHTML = text;
 				ledStatus = sensorStatus[i].payload.status;
 				setLedButtonStatus(sensorStatus[i].payload.status);
-				createChart("led", document.getElementById('ledChart').getContext('2d'), ledChart, 
-					[sensorStatus[i].payload.status], [timeStampIso]);
+				createChart("led", document.getElementById('ledChart').getContext('2d'), ledChart, [sensorStatus[i].payload.status], [timeStampIso]);
 			}
 			if (sensorStatus[i].sensorId == "motion") {
 				motionText.innerHTML = text;
-				createChart("motion", document.getElementById('motionChart').getContext('2d'), motionChart, 
-					[sensorStatus[i].payload.status], [timeStampIso]);
+				createChart("motion", document.getElementById('motionChart').getContext('2d'), motionChart, [sensorStatus[i].payload.status], [timeStampIso]);
 			}
 			if (sensorStatus[i].sensorId == "temperature") {
 				tempText.innerHTML = text;
-				createChart("temperature", document.getElementById('tempChart').getContext('2d'), tempChart, 
-					[sensorStatus[i].payload.status], [timeStampIso]);
+				createChart("temperature", document.getElementById('tempChart').getContext('2d'), tempChart, [sensorStatus[i].payload.status], [timeStampIso]);
 			}
 		}
 	}
@@ -128,7 +125,12 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd) {
 		console.log(timeStamps);
 		console.log(data);
 
-		createChart(sensor, sensorCtx, sensorChart, data, timeStamps);
+		if (!sensorChart.chart) {
+			createChart(sensor, sensorCtx, sensorChart, data, timeStamps);
+		}
+		else {
+			updateChart(sensor, sensorChart, data, timeStamps);
+		}
 	}
 
 	xhttp.send();
@@ -156,6 +158,13 @@ function createChart(sensor, sensorCtx, sensorChart, data, timeStamps) {
 	});
 }
 
+function updateChart(sensor, sensorChart, data, timeStamps) {
+	sensorChart.chart.data.datasets[0].label = sensor + "Status";
+	sensorChart.chart.data.datasets[0].data = data;
+	sensorChart.chart.data.labels = timeStamps;
+	sensorChart.chart.update();
+}
+
 function setupSensorText(status, time) {
 	return status + ". Updated on " + time;
 }
@@ -171,7 +180,7 @@ function setDefaultTimeRange() {
 
 	var time = new Date().getTime();
 	timeEnd.value = parseInt(time);
-	timeStart.value = parseInt(time) - 1000 * 3600; 
+	timeStart.value = parseInt(time) - 1000 * 3600;
 }
 
 window.onLedButtonClick = function() {
