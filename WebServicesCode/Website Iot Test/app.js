@@ -3,6 +3,7 @@ var mqttClient = require('./awsiot.js');
 var ledChart = {};
 var motionChart = {};
 var tempChart = {};
+var dataChart = {};
 var ledStatus;
 var endpoint = "https://3v5mhdfdne.execute-api.us-west-2.amazonaws.com/prod";
 
@@ -57,6 +58,7 @@ mqttClient.on('connect', window.mqttClientConnectHandler);
 mqttClient.on('message', window.mqttClientMessageHandler);
 
 window.onload = function() {
+	setDefaultTimeRange();
 	setupCurrSensorStatus();
 }
 
@@ -102,9 +104,9 @@ function setupCurrSensorStatus() {
 	xhttp.send();
 }
 
-function setupSensorData(sensor, sensorCtx, sensorChart) {
+function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd) {
 	var xhttp = new XMLHttpRequest();
-	xhttp.open("GET", endpoint + "/status/" + sensor + "?timestart=0");
+	xhttp.open("GET", endpoint + "/status/" + sensor + "?timestart=" + timeStart + "&timeEnd=" + timeEnd);
 
 	xhttp.onload = function(e) {
 		if (this.status != 200) {
@@ -163,6 +165,15 @@ function setLedButtonStatus(newStatus) {
 	ledButton.innerHTML = newStatus == "1" ? "Turn LED Off" : "Turn LED On";
 }
 
+function setDefaultTimeRange() {
+	var timeStart = document.getElementById("timeStart");
+	var timeEnd = document.getElementById("timeEnd");
+
+	var time = new Date().getTime();
+	timeEnd.value = parseInt(time);
+	timeStart.value = parseInt(time) - 1000 * 3600; 
+}
+
 window.onLedButtonClick = function() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("PUT", endpoint + "/setstatus/led");
@@ -185,4 +196,17 @@ window.onCameraButtonClick = function() {
 	}
 
 	xhttp.send();
+}
+
+window.onGraphButtonClick = function() {
+	var sensorSelect = document.getElementById("sensorSelect");
+	var timeStart = document.getElementById("timeStart");
+	var timeEnd = document.getElementById("timeEnd");
+
+	if (parseInt(timeStart.value) > parseInt(timeEnd.value)) {
+		alert("Time Start cannot be lower than Time End");
+		return;
+	}
+
+	setupSensorData(sensorSelect.value, document.getElementById('dataChart').getContext('2d'), dataChart, timeStart.value, timeEnd.value);
 }
