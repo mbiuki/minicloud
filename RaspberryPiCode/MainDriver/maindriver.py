@@ -37,7 +37,8 @@ def takePicture():
                                 Params={
                                     'Bucket': 'minicloud-images',
                                     'Key': imagePath
-                                }
+                                },
+                                ExpiresIn = 3600 * 24 * 3
     )                                      
     print(url)
         
