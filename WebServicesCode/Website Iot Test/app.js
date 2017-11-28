@@ -2,7 +2,7 @@ var mqttClient = require('./awsiot.js');
 
 var ledChart = {};
 var motionChart = {};
-var tempChart = {};
+var lightChart = {};
 var dataChart = {};
 var ledStatus;
 var endpoint = "https://3v5mhdfdne.execute-api.us-west-2.amazonaws.com/prod";
@@ -13,7 +13,7 @@ window.mqttClientConnectHandler = function() {
 	mqttClient.subscribe("sensor/camera/image");
 	mqttClient.subscribe("sensor/led/payload");
 	mqttClient.subscribe("sensor/motion/payload");
-	mqttClient.subscribe("sensor/temperature/payload");
+	mqttClient.subscribe("sensor/light/payload");
 };
 
 // Respond to subscribed topics when they are published to
@@ -22,9 +22,12 @@ window.mqttClientMessageHandler = function(topic, payload) {
 	console.log(message);
 	var payloadObj = JSON.parse(payload);
 
+	// If new camera image, display it
 	if (topic == "sensor/camera/image") {
 		document.getElementById("cameraImage").src = payloadObj["url"];
 	}
+
+	// If sensor status changes, add to graph, and update current status
 	if (topic == "sensor/led/payload") {
 		ledStatus = payloadObj["status"];
 		var dataLength = ledChart.chart.data.datasets[0].data.length;
@@ -43,15 +46,17 @@ window.mqttClientMessageHandler = function(topic, payload) {
 		var motionText = document.getElementById("motionStatus");
 		motionText.innerHTML = setupSensorText(payloadObj["status"], payloadObj["timeStampIso"]);
 	}
-	if (topic == "sensor/temperature/payload") {
-		var dataLength = tempChart.chart.data.datasets[0].data.length;
-		tempChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
-		tempChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
-		tempChart.chart.update();
-		var tempText = document.getElementById("tempStatus");
-		tempText.innerHTML = setupSensorText(payloadObj["status"], payloadObj["timeStampIso"]);
+	if (topic == "sensor/light/payload") {
+		var dataLength = lightChart.chart.data.datasets[0].data.length;
+		lightChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
+		lightChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
+		lightChart.chart.update();
+		var lightText = document.getElementById("lightStatus");
+		lightText.innerHTML = setupSensorText(payloadObj["status"], payloadObj["timeStampIso"]);
 
 	}
+
+
 };
 
 mqttClient.on('connect', window.mqttClientConnectHandler);
@@ -62,6 +67,7 @@ window.onload = function() {
 	setupCurrSensorStatus();
 }
 
+// Get current status of sensors. Display and set up the graphs.
 function setupCurrSensorStatus() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("GET", endpoint + "/currstatus");
@@ -76,7 +82,7 @@ function setupCurrSensorStatus() {
 
 		var ledText = document.getElementById("ledStatus");
 		var motionText = document.getElementById("motionStatus");
-		var tempText = document.getElementById("tempStatus");
+		var lightText = document.getElementById("lightStatus");
 
 		for (var i = 0; i < sensorStatus.length; i++) {
 			var text = setupSensorText(sensorStatus[i].payload.status, sensorStatus[i].payload.timeStampIso);
@@ -91,9 +97,9 @@ function setupCurrSensorStatus() {
 				motionText.innerHTML = text;
 				createChart("motion", document.getElementById('motionChart').getContext('2d'), motionChart, [sensorStatus[i].payload.status], [timeStampIso]);
 			}
-			if (sensorStatus[i].sensorId == "temperature") {
-				tempText.innerHTML = text;
-				createChart("temperature", document.getElementById('tempChart').getContext('2d'), tempChart, [sensorStatus[i].payload.status], [timeStampIso]);
+			if (sensorStatus[i].sensorId == "light") {
+				lightText.innerHTML = text;
+				createChart("light", document.getElementById('lightChart').getContext('2d'), lightChart, [sensorStatus[i].payload.status], [timeStampIso]);
 			}
 		}
 	}
@@ -101,6 +107,7 @@ function setupCurrSensorStatus() {
 	xhttp.send();
 }
 
+// Graph data for a given sensor and time range
 function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd) {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("GET", endpoint + "/status/" + sensor + "?timestart=" + timeStart + "&timeEnd=" + timeEnd);
