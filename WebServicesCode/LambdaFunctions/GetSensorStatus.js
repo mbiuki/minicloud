@@ -3,7 +3,7 @@ console.log('Loading function');
 let doc = require('dynamodb-doc');
 let dynamo = new doc.DynamoDB();
 let sensorTable = "SensorTable";
-const acceptedSensors = ["led", "lock", "motion", "temperature"];
+const acceptedSensors = ["led", "motion", "light"];
 
 function returnResult(callback, statusCode, body) {
 	callback(null, {

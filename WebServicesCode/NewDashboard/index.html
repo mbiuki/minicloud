@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="main.css">
+	<script src="index.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/moment@2.19.2/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+	<h2>Minicloud</h2>
+	<h3>Current Sensor Status:</h3>
+	<div class="statusRow">
+		<span>LED Status: </span>
+		<span id="ledStatus"></span>
+		<br/>
+		<br/>
+		<span>Motion Sensor Status: </span>
+		<span id="motionStatus"></span>
+		<br/>
+		<br/>
+		<span>Temperature Sensor Status: </span>
+		<span id="tempStatus"></span>
+		<br/>
+		<br/>
+		<button id="ledButton" onclick="onLedButtonClick()"></button>
+	</div>
+	<div class="row">
+		<canvas id="ledChart"></canvas>
+		<canvas id="motionChart"></canvas>
+		<canvas id="tempChart"></canvas>
+	</div>
+	<p id="caption">The chart is displaying motion sensor status.</p>
+</div>
+</body>
+
+</html>

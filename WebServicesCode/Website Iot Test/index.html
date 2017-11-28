@@ -1,16 +1,61 @@
 <html>
-<head>
-   <meta charset="UTF-8"> 
-   <link rel="stylesheet" type="text/css" href="example.css">
-</head>
-<body>
 
-   <div class="spacer" id="spacer"></div>
-   <div class="block" id="connecting-div"></div>
-   <div class="block" id="temperature-control-div"></div>
-   <div class="block" id="temperature-monitor-div"></div>
-   <p id="testp">hiiii</p>
-   <image id="testimage"> </image>
-   <script src="bundle.js"></script>
+<head>
+	<link rel="stylesheet" href="main.css">
+	<script src="index.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/moment@2.19.2/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+	<script src="bundle.js"></script>
+</head>
+
+<body>
+	<div class="container">
+		<h2>Minicloud</h2>
+		<h3>Current Sensor Status:</h3>
+		<div class="statusRow">
+			<span>LED Status: </span>
+			<span id="ledStatus"></span>
+			<br/>
+			<br/>
+			<span>Motion Sensor Status: </span>
+			<span id="motionStatus"></span>
+			<br/>
+			<br/>
+			<span>Light Sensor Status: </span>
+			<span id="lightStatus"></span>
+			<br/>
+			<br/>
+			<button id="ledButton" onclick="onLedButtonClick()"></button>
+			<button id="cameraButton" onclick="onCameraButtonClick()">Take Picture</button>
+		</div>
+		<div class="graphRow">
+			<h3>LED Status</h3>
+			<canvas id="ledChart"></canvas>
+			<h3>Motion Sensor Status</h3>
+			<canvas id="motionChart"></canvas>
+			<h3>Light Sensor Status</h3>
+			<canvas id="lightChart"></canvas>
+		</div>
+		<h3>Graph Custom Data</h3>
+		<div class="dataRow">
+			<canvas id="dataChart"></canvas>
+			<label>Select Sensor</label>
+			<select id="sensorSelect">
+				<option value="led">LED</option>
+				<option value="motion">Motion Sensor</option>
+				<option value="light">Light Sensor</option>
+			</select>
+			<label>Time Start</label>
+			<input id="timeStart" type="number" min="0">
+			<label>Time End</label>
+			<input id="timeEnd" type="number" min="0">
+			<button id="graphButton" onclick="onGraphButtonClick()">Graph Data</button>
+		</div>
+		<h3>Current Camera Image:</h3>
+		<div>
+			<image id="cameraImage"></image>
+		</div>
+	</div>
 </body>
+
 </html>
