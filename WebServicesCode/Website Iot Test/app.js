@@ -65,6 +65,7 @@ mqttClient.on('message', window.mqttClientMessageHandler);
 window.onload = function() {
 	setDefaultTimeRange();
 	setupCurrSensorStatus();
+	getCurrImage();
 }
 
 // Get current status of sensors. Display and set up the graphs.
@@ -163,6 +164,19 @@ function createChart(sensor, sensorCtx, sensorChart, data, timeStamps) {
 			}
 		}
 	});
+}
+
+function getCurrImage() {
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("GET", endpoint + "/getpicture");
+
+	xhttp.onload = function(e) {
+		var cameraImage = document.getElementById("cameraImage");
+		var src = JSON.parse(xhttp.response)["Items"][0]["payload"]["url"];
+		cameraImage.src =src;
+	}
+
+	xhttp.send();
 }
 
 function updateChart(sensor, sensorChart, data, timeStamps) {
