@@ -205,7 +205,7 @@ window.onLedButtonClick = function() {
 
 window.onCameraButtonClick = function() {
 	var xhttp = new XMLHttpRequest();
-	xhttp.open("PUT", endpoint + "/takepicture");
+	xhttp.open("POST", endpoint + "/takepicture");
 
 	xhttp.onload = function(e) {
 		console.log(xhttp.response);
