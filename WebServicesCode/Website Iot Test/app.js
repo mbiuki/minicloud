@@ -85,9 +85,10 @@ function setupCurrSensorStatus() {
 		var motionText = document.getElementById("motionStatus");
 		var lightText = document.getElementById("lightStatus");
 
+		var timeStampIso = new Date().toISOString();
+
 		for (var i = 0; i < sensorStatus.length; i++) {
 			var text = setupSensorText(sensorStatus[i].payload.status, sensorStatus[i].payload.timeStampIso);
-			var timeStampIso = new Date().toISOString();
 			if (sensorStatus[i].sensorId == "led") {
 				ledText.innerHTML = text;
 				ledStatus = sensorStatus[i].payload.status;
