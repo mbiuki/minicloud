@@ -27,17 +27,17 @@ def cameraCallback(client, userdata, message):
     takePicture()
     
 def takePicture():
-    date = datetime.datetime.now().isoformat()
-    imagePath = "../minicloud_images/" + date + ".png"
+    filename = datetime.datetime.now().isoformat() + ".jpg"
+    imagePath = "../minicloud_images/" + filename
     camera.capture(imagePath)
     image = open(imagePath, "rb")
         
     # Upload camera image to S3, and grab the url
-    s3Resource.Bucket('minicloud-images').put_object(Key=date, Body=image)
+    s3Resource.Bucket('minicloud-images').put_object(Key=filename, Body=image)
     url = s3Client.generate_presigned_url('get_object',
                                 Params={
                                     'Bucket': 'minicloud-images',
-                                    'Key': date
+                                    'Key': filename
                                 },
                                 ExpiresIn = 3600 * 24 * 3
     )                                      
@@ -114,7 +114,7 @@ GPIO.setup(20,GPIO.OUT)
 pir = MotionSensor(4)
 
 # Init Camera
-camera = PiCamera()
+camera = PiCamera(resolution=(640, 480))
 
 # Init S3
 s3Resource = boto3.resource('s3')
