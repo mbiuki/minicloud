@@ -27,16 +27,17 @@ def cameraCallback(client, userdata, message):
     takePicture()
     
 def takePicture():
-    imagePath = datetime.datetime.now().isoformat() + ".png"
+    filename = datetime.datetime.now().isoformat() + ".jpg"
+    imagePath = "../minicloud_images/" + filename
     camera.capture(imagePath)
     image = open(imagePath, "rb")
         
     # Upload camera image to S3, and grab the url
-    s3Resource.Bucket('minicloud-images').put_object(Key=imagePath, Body=image)
+    s3Resource.Bucket('minicloud-images').put_object(Key=filename, Body=image)
     url = s3Client.generate_presigned_url('get_object',
                                 Params={
                                     'Bucket': 'minicloud-images',
-                                    'Key': imagePath
+                                    'Key': filename
                                 },
                                 ExpiresIn = 3600 * 24 * 3
     )                                      
@@ -54,10 +55,10 @@ def ledCallback(client, userdata, message):
     payload = json.loads(message.payload)
     if payload["status"] == '1':
         print("LED ON")
-        GPIO.output(18,GPIO.HIGH)
+        GPIO.output(20,GPIO.HIGH)
     else:
         print("LED OFF")
-        GPIO.output(18,GPIO.LOW)
+        GPIO.output(20,GPIO.LOW)
     print("--------------\n\n")
 
 def getBaseMessage():
@@ -107,12 +108,13 @@ logger.addHandler(streamHandler)
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(18,GPIO.OUT)
+GPIO.setup(20,GPIO.OUT)
 
 # Init Motion Sensor
 pir = MotionSensor(4)
 
 # Init Camera
-camera = PiCamera()
+camera = PiCamera(resolution=(640, 480))
 
 # Init S3
 s3Resource = boto3.resource('s3')
@@ -142,6 +144,7 @@ myAWSIoTMQTTClient.subscribe(motionTopic, 1, motionCallback)
 myAWSIoTMQTTClient.subscribe(ledTopic, 1, ledCallback)
 myAWSIoTMQTTClient.subscribe(cameraTopic, 1, cameraCallback)
 time.sleep(2)
+
 
 # Constantly check for motion, and no motion and publish 
 while True:
