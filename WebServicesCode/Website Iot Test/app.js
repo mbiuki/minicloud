@@ -65,6 +65,7 @@ mqttClient.on('message', window.mqttClientMessageHandler);
 window.onload = function() {
 	setDefaultTimeRange();
 	setupCurrSensorStatus();
+	getCurrImage();
 }
 
 // Get current status of sensors. Display and set up the graphs.
@@ -84,9 +85,10 @@ function setupCurrSensorStatus() {
 		var motionText = document.getElementById("motionStatus");
 		var lightText = document.getElementById("lightStatus");
 
+		var timeStampIso = new Date().toISOString();
+
 		for (var i = 0; i < sensorStatus.length; i++) {
 			var text = setupSensorText(sensorStatus[i].payload.status, sensorStatus[i].payload.timeStampIso);
-			var timeStampIso = new Date().toISOString();
 			if (sensorStatus[i].sensorId == "led") {
 				ledText.innerHTML = text;
 				ledStatus = sensorStatus[i].payload.status;
@@ -165,6 +167,19 @@ function createChart(sensor, sensorCtx, sensorChart, data, timeStamps) {
 	});
 }
 
+function getCurrImage() {
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("GET", endpoint + "/getpicture");
+
+	xhttp.onload = function(e) {
+		var cameraImage = document.getElementById("cameraImage");
+		var src = JSON.parse(xhttp.response)["Items"][0]["payload"]["url"];
+		cameraImage.src =src;
+	}
+
+	xhttp.send();
+}
+
 function updateChart(sensor, sensorChart, data, timeStamps) {
 	sensorChart.chart.data.datasets[0].label = sensor + "Status";
 	sensorChart.chart.data.datasets[0].data = data;
@@ -205,7 +220,7 @@ window.onLedButtonClick = function() {
 
 window.onCameraButtonClick = function() {
 	var xhttp = new XMLHttpRequest();
-	xhttp.open("PUT", endpoint + "/takepicture");
+	xhttp.open("POST", endpoint + "/takepicture");
 
 	xhttp.onload = function(e) {
 		console.log(xhttp.response);
