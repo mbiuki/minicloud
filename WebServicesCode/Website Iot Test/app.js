@@ -65,6 +65,7 @@ mqttClient.on('message', window.mqttClientMessageHandler);
 window.onload = function() {
 	setDefaultTimeRange();
 	setupCurrSensorStatus();
+	window.onGraphButtonClick();
 	getCurrImage();
 }
 
@@ -87,6 +88,7 @@ function setupCurrSensorStatus() {
 
 		var timeStampIso = new Date().toISOString();
 
+		// Create the graphs for the sensors
 		for (var i = 0; i < sensorStatus.length; i++) {
 			var text = setupSensorText(sensorStatus[i].payload.status, sensorStatus[i].payload.timeStampIso);
 			if (sensorStatus[i].sensorId == "led") {
@@ -136,8 +138,7 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd) {
 
 		if (!sensorChart.chart) {
 			createChart(sensor, sensorCtx, sensorChart, data, timeStamps);
-		}
-		else {
+		} else {
 			updateChart(sensor, sensorChart, data, timeStamps);
 		}
 	}
@@ -167,6 +168,7 @@ function createChart(sensor, sensorCtx, sensorChart, data, timeStamps) {
 	});
 }
 
+// Display the current camera image 
 function getCurrImage() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("GET", endpoint + "/getpicture");
@@ -174,7 +176,7 @@ function getCurrImage() {
 	xhttp.onload = function(e) {
 		var cameraImage = document.getElementById("cameraImage");
 		var src = JSON.parse(xhttp.response)["Items"][0]["payload"]["url"];
-		cameraImage.src =src;
+		cameraImage.src = src;
 	}
 
 	xhttp.send();
@@ -196,6 +198,7 @@ function setLedButtonStatus(newStatus) {
 	ledButton.innerHTML = newStatus == "1" ? "Turn LED Off" : "Turn LED On";
 }
 
+// Set default time range for graphing custom data
 function setDefaultTimeRange() {
 	var timeStart = document.getElementById("timeStart");
 	var timeEnd = document.getElementById("timeEnd");
