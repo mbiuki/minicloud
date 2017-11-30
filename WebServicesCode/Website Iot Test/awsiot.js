@@ -30,7 +30,7 @@ const mqttClient = awsIot.device({
 	//
 	// Use the clientId created earlier.
 	//
-	clientId: Math.random().toString();
+	clientId: Math.random().toString(),
 	//
 	// Connect via secure WebSocket
 	//
