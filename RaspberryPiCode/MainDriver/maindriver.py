@@ -78,7 +78,10 @@ def getBaseMessage():
     message["timeStampIso"] = datetime.datetime.now().isoformat()
     return message
 
-# Read in command-line parameters
+
+# ####################################
+# # Read in command-line parameters ##
+# ####################################
 parser = argparse.ArgumentParser()
 parser.add_argument("-e", "--endpoint", action="store", required=True, dest="host", help="Your AWS IoT custom endpoint")
 parser.add_argument("-r", "--rootCA", action="store", required=True, dest="rootCAPath", help="Root CA file path")
@@ -95,19 +98,27 @@ certificatePath = args.certificatePath
 privateKeyPath = args.privateKeyPath
 useWebsocket = args.useWebsocket
 clientId = args.clientId
-motionTopic = "sensor/motion/payload"
-ledTopic = "sensor/led/payload"
-cameraTopic = "sensor/camera/takepicture"
 
-if args.useWebsocket and args.certificatePath and args.privateKeyPath:
+if useWebsocket and certificatePath and privateKeyPath:
     parser.error("X.509 cert authentication and WebSocket are mutual exclusive. Please pick one.")
     exit(2)
 
-if not args.useWebsocket and (not args.certificatePath or not args.privateKeyPath):
+if not useWebsocket and (not certificatePath or not privateKeyPath):
     parser.error("Missing credentials for authentication.")
     exit(2)
 
-# Configure logging
+
+# ##################################
+# #### create some MQTT topics #####
+# ##################################
+motionTopic = "sensor/motion/payload"
+ledTopic    = "sensor/led/payload"
+cameraTopic = "sensor/camera/takepicture"
+
+
+# ##################################
+# ####### Configure logging ########
+# ##################################
 logger = logging.getLogger("AWSIoTPythonSDK.core")
 logger.setLevel(logging.DEBUG)
 streamHandler = logging.StreamHandler()
@@ -115,19 +126,28 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 streamHandler.setFormatter(formatter)
 logger.addHandler(streamHandler)
 
-# Init LED
+######################
+# #### Init LED ######
+######################
+# on this RPi3 we have two leds connected
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(18,GPIO.OUT)
 GPIO.setup(20,GPIO.OUT)
 
-# Init Motion Sensor
+######################
+# Init Motion Sensor #
+######################
 pir = MotionSensor(4)
 
-# Init Camera
+######################
+# ## Init Camera #####
+######################
 camera = PiCamera(resolution=(640, 480))
 
-# Init S3
+######################
+# #### Init S3 #######
+######################
 s3Resource = boto3.resource('s3')
 s3Client = boto3.client('s3')
 
@@ -171,3 +191,5 @@ while True:
     noMotionMessage = getBaseMessage()
     noMotionMessage["status"] = '0'
     myAWSIoTMQTTClient.publishAsync(motionTopic, json.dumps(noMotionMessage), 1)
+
+# EoF
