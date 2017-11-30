@@ -5,6 +5,8 @@ var motionChart = {};
 var lightChart = {};
 var dataChart = {};
 var ledStatus;
+var ledPublishTime; 
+var cameraPublishTime;
 var endpoint = "https://3v5mhdfdne.execute-api.us-west-2.amazonaws.com/prod";
 
 // Subscribe to topics
@@ -24,17 +26,31 @@ window.mqttClientMessageHandler = function(topic, payload) {
 
 	// If new camera image, display it
 	if (topic == "sensor/camera/image") {
+		// Calculate delay and display it
+		var delay = Date.now() - cameraPublishTime;
+		var cameraDelay = document.getElementById("cameraDelay");
+		cameraDelay.innerHTML = delay + " ms";
+		// Set the image src
 		document.getElementById("cameraImage").src = payloadObj["url"];
 	}
 
 	// If sensor status changes, add to graph, and update current status
 	if (topic == "sensor/led/payload") {
+		// Update led status
 		ledStatus = payloadObj["status"];
+
+		// Calculate delay and display it
+		var delay = Date.now() - ledPublishTime;
+		var ledDelay = document.getElementById("ledDelay");
+		ledDelay.innerHTML = delay + " ms";
+
+		// Graph the new data point
 		var dataLength = ledChart.chart.data.datasets[0].data.length;
 		ledChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
 		ledChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
 		ledChart.chart.update();
 
+		// Update text 
 		setLedButtonStatus(payloadObj["status"]);
 		var ledText = document.getElementById("ledStatus");
 		var ledUpdated = document.getElementById("ledUpdatedTime");
@@ -62,10 +78,7 @@ window.mqttClientMessageHandler = function(topic, payload) {
 		var lightUpdated = document.getElementById("lightUpdatedTime");
 		lightText.innerHTML = payloadObj["status"];
 		lightUpdated.innerHTML = payloadObj["timeStampIso"];
-
 	}
-
-
 };
 
 mqttClient.on('connect', window.mqttClientConnectHandler);
@@ -231,6 +244,8 @@ window.onLedButtonClick = function() {
 
 	var newStatus = ledStatus == "1" ? "0" : "1";
 
+	// Record time published to calculate delay later
+	ledPublishTime = Date.now();
 	xhttp.send(JSON.stringify({ "status": newStatus }));
 }
 
@@ -242,6 +257,8 @@ window.onCameraButtonClick = function() {
 		console.log(xhttp.response);
 	}
 
+	// Record time published to calculate delay later
+	cameraPublishTime = Date.now();
 	xhttp.send();
 }
 
