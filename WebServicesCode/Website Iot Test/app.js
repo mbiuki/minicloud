@@ -34,25 +34,34 @@ window.mqttClientMessageHandler = function(topic, payload) {
 		ledChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
 		ledChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
 		ledChart.chart.update();
+
 		setLedButtonStatus(payloadObj["status"]);
 		var ledText = document.getElementById("ledStatus");
-		ledText.innerHTML = setupSensorText(payloadObj["status"], payloadObj["timeStampIso"]);
+		var ledUpdated = document.getElementById("ledUpdatedTime");
+		ledText.innerHTML = payloadObj["status"];
+		ledUpdated.innerHTML = payloadObj["timeStampIso"];
 	}
 	if (topic == "sensor/motion/payload") {
 		var dataLength = motionChart.chart.data.datasets[0].data.length;
 		motionChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
 		motionChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
 		motionChart.chart.update();
+
 		var motionText = document.getElementById("motionStatus");
-		motionText.innerHTML = setupSensorText(payloadObj["status"], payloadObj["timeStampIso"]);
+		var motionUpdated = document.getElementById("motionUpdatedTime");
+		motionText.innerHTML = payloadObj["status"];
+		motionUpdated.innerHTML = payloadObj["timeStampIso"];
 	}
 	if (topic == "sensor/light/payload") {
 		var dataLength = lightChart.chart.data.datasets[0].data.length;
 		lightChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
 		lightChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
 		lightChart.chart.update();
+
 		var lightText = document.getElementById("lightStatus");
-		lightText.innerHTML = setupSensorText(payloadObj["status"], payloadObj["timeStampIso"]);
+		var lightUpdated = document.getElementById("lightUpdatedTime");
+		lightText.innerHTML = payloadObj["status"];
+		lightUpdated.innerHTML = payloadObj["timeStampIso"];
 
 	}
 
@@ -86,23 +95,31 @@ function setupCurrSensorStatus() {
 		var motionText = document.getElementById("motionStatus");
 		var lightText = document.getElementById("lightStatus");
 
+		var ledUpdated = document.getElementById("ledUpdatedTime");
+		var motionUpdated = document.getElementById("motionUpdatedTime");
+		var lightUpdated = document.getElementById("lightUpdatedTime");
+
 		var timeStampIso = new Date().toISOString();
 
 		// Create the graphs for the sensors
 		for (var i = 0; i < sensorStatus.length; i++) {
-			var text = setupSensorText(sensorStatus[i].payload.status, sensorStatus[i].payload.timeStampIso);
+			var status = sensorStatus[i].payload.status;
+			var date = sensorStatus[i].payload.timeStampIso;
 			if (sensorStatus[i].sensorId == "led") {
-				ledText.innerHTML = text;
+				ledText.innerHTML = status;
+				ledUpdated.innerHTML = date;
 				ledStatus = sensorStatus[i].payload.status;
 				setLedButtonStatus(sensorStatus[i].payload.status);
 				createChart("led", document.getElementById('ledChart').getContext('2d'), ledChart, [sensorStatus[i].payload.status], [timeStampIso]);
 			}
 			if (sensorStatus[i].sensorId == "motion") {
-				motionText.innerHTML = text;
+				motionText.innerHTML = status;
+				motionUpdated.innerHTML = date;
 				createChart("motion", document.getElementById('motionChart').getContext('2d'), motionChart, [sensorStatus[i].payload.status], [timeStampIso]);
 			}
 			if (sensorStatus[i].sensorId == "light") {
-				lightText.innerHTML = text;
+				lightText.innerHTML = status;
+				lightUpdated.innerHTML = date;
 				createChart("light", document.getElementById('lightChart').getContext('2d'), lightChart, [sensorStatus[i].payload.status], [timeStampIso]);
 			}
 		}
@@ -187,10 +204,6 @@ function updateChart(sensor, sensorChart, data, timeStamps) {
 	sensorChart.chart.data.datasets[0].data = data;
 	sensorChart.chart.data.labels = timeStamps;
 	sensorChart.chart.update();
-}
-
-function setupSensorText(status, time) {
-	return status + ". Updated on " + time;
 }
 
 function setLedButtonStatus(newStatus) {
