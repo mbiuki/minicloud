@@ -8,98 +8,104 @@
 }
 
 #statusTable {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-    margin-bottom: 20px;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	border-collapse: collapse;
+	width: 100%;
+	margin-bottom: 20px;
 }
 
-#statusTable td, #statusTable th {
-    border: 1px solid #ddd;
-    padding: 8px;
+#statusTable td,
+#statusTable th {
+	border: 1px solid #ddd;
+	padding: 8px;
 }
 
-#statusTable tr:nth-child(even){background-color: #f2f2f2;}
+#statusTable tr:nth-child(even) {
+	background-color: #f2f2f2;
+}
 
-#statusTable tr:hover {background-color: #ddd;}
+#statusTable tr:hover {
+	background-color: #ddd;
+}
 
 #statusTable th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: left;
-    background-color: #4CAF50;
-    color: white;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	text-align: left;
+	background-color: #4CAF50;
+	color: white;
 }
 
-#wrapper{
-    /*width: 600px;
+#wrapper {
+	/*width: 600px;
     margin: 0 auto;
     height: 200px;*/
+	width: 100%;
+	height: 300px;
+	margin: 15px auto;
+}
 
-    width: 100%;
-    height: 300px;
-    margin: 15px auto;
+#one {
+	padding-right: 5px;
+	width: 33%;
+	height: 350px;
+	margin: 0;
+	float: left;
 }
-#one{
-    padding-right: 5px;
-    width: 33%;
-    height: 350px;
-    margin: 0;
-    float: left;
+
+#oneIn {
+	width: 100%;
+	height: 100%;
+	background: white;
+	float: left;
 }
-#oneIn{
-    width: 100%;
-    height: 100%;
-    background: white;
-    float: left;
-}
-#two{
-/*    padding-left: 10px;
+
+#two {
+	/*    padding-left: 10px;
     padding-right: 10px;*/
-    width: 33%;
-    height: 300px;
-    margin: 0;
-    float: left;
-}
-#twoIn{
-    width: 100%;
-    height: 100%;
-    background: white;
-    margin: 0 auto;
-}
-#three{
-    padding-left: 5px;
-    width: 33%;
-    height: 300px;
-    margin: 0;
-    float: left;
-}
-#threeIn{
-    width: 100%;
-    height: 100%;
-    background: white;
-    float: right;
+	width: 33%;
+	height: 300px;
+	margin: 0;
+	float: left;
 }
 
-#wrapper2{
-    /*width: 600px;
-    margin: 0 auto;
-    height: 200px;*/
+#twoIn {
+	width: 100%;
+	height: 100%;
+	background: white;
+	margin: 0 auto;
+}
 
-    width: 100%;
-    height: 500px;
-    margin: 15px auto;
+#three {
+	padding-left: 5px;
+	width: 33%;
+	height: 300px;
+	margin: 0;
+	float: left;
 }
-#one2{
-    padding-right: 5px;
-    width: 75%;
-    height: 500px;
-    margin: auto;
-    /*float: left;*/
+
+#threeIn {
+	width: 100%;
+	height: 100%;
+	background: white;
+	float: right;
 }
-#oneIn2{
-    width: 100%;
-    height: 100%;
-    background: white;
-    /*float: left;*/
+
+#wrapper2 {
+	width: 100%;
+	height: 500px;
+	margin: 15px auto;
+}
+
+#one2 {
+	padding-right: 5px;
+	width: 75%;
+	height: 500px;
+	margin: auto;
+}
+
+#oneIn2 {
+	width: 100%;
+	height: 100%;
+	background: white;
 }

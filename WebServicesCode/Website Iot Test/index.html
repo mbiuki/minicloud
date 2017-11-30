@@ -34,52 +34,52 @@
 			</tr>
 		</table>
 		<button id="ledButton" onclick="onLedButtonClick()"></button>
-		<span style="margin-left: 5px">Last Delay: </span> 
+		<span style="margin-left: 5px">Last Delay: </span>
 		<span id="ledDelay"></span>
 		<br/>
 		<br/>
 		<button id="cameraButton" onclick="onCameraButtonClick()">Take Picture</button>
-		<span style="margin-left: 5px">Last Delay: </span> 
+		<span style="margin-left: 5px">Last Delay: </span>
 		<span id="cameraDelay"></span>
 		<div class="graphRow">
 			<div id="wrapper">
-			    <div id="one">
-			        <div id="oneIn">
-			        	<center>
-			            	<h3>LED Status</h3>
-			            </center>
+				<div id="one">
+					<div id="oneIn">
+						<center>
+							<h3>LED Status</h3>
+						</center>
 						<canvas id="ledChart"></canvas>
-			        </div>
-			    </div>
-			    <div id="two">
-			        <div id="twoIn">
-			        	<center>
-			        		<h3>Motion Sensor Status</h3>
-			        	</center>
+					</div>
+				</div>
+				<div id="two">
+					<div id="twoIn">
+						<center>
+							<h3>Motion Sensor Status</h3>
+						</center>
 						<canvas id="motionChart"></canvas>
-			        </div>
-			    </div>
-			    <div id="three">
-			        <div id="threeIn">
-			        	<center>
-			        		<h3>Light Sensor Status</h3>
-			        	</center>
+					</div>
+				</div>
+				<div id="three">
+					<div id="threeIn">
+						<center>
+							<h3>Light Sensor Status</h3>
+						</center>
 						<canvas id="lightChart"></canvas>
-			        </div>
-			    </div>
+					</div>
+				</div>
 			</div>
 		</div>
-		<br >
-		<div class="dataRow">				
+		<br>
+		<div class="dataRow">
 			<div id="wrapper2">
-			    <div id="one2">
-			        <div id="oneIn2">
-			        	<center>
+				<div id="one2">
+					<div id="oneIn2">
+						<center>
 							<h3>Graph Custom Data</h3>
 						</center>
-			        	<center>
-			            	<canvas id="dataChart"></canvas>
-			            </center>
+						<center>
+							<canvas id="dataChart"></canvas>
+						</center>
 						<label>Select Sensor</label>
 						<select id="sensorSelect">
 							<option value="led">LED</option>
@@ -91,8 +91,8 @@
 						<label>Time End</label>
 						<input id="timeEnd" type="number" min="0">
 						<button id="graphButton" onclick="onGraphButtonClick()">Graph Data</button>
-			        </div>
-			    </div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<h3>Current Camera Image:</h3>
