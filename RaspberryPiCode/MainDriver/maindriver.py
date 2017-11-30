@@ -11,7 +11,7 @@ import boto3
 import RPi.GPIO as GPIO
 
 
-# Custom MQTT message callback
+# Callback when motion sensor detects motion rising edge
 def motionCallback(client, userdata, message):
     print("Received a new message: ")
     print(message.payload)
@@ -19,34 +19,44 @@ def motionCallback(client, userdata, message):
     print(message.topic)
     payload = json.loads(message.payload)
     if payload["status"] == '1':
-        takePicture()
+        takePicture(False)
         
     print("--------------\n\n")
 
+# Callback when website presses Take Picture button
 def cameraCallback(client, userdata, message):
-    takePicture()
-    
-def takePicture():
+    takePicture(True)
+
+# Take a picture. Upload to S3 and generate a URL.
+# Send to Rekognition to see labels of images.
+# Send the URL and labels in an IoT Publish
+# manual param means whether an image was taken via button press or motion sensor.
+def takePicture(manual):
     filename = datetime.datetime.now().isoformat() + ".jpg"
     imagePath = "../minicloud_images/" + filename
     camera.capture(imagePath)
     image = open(imagePath, "rb")
         
     # Upload camera image to S3, and grab the url
+    bucket = 'minicloud-images'
     s3Resource.Bucket('minicloud-images').put_object(Key=filename, Body=image)
     url = s3Client.generate_presigned_url('get_object',
                                 Params={
-                                    'Bucket': 'minicloud-images',
+                                    'Bucket': bucket,
                                     'Key': filename
                                 },
                                 ExpiresIn = 3600 * 24 * 3
     )                                      
     print(url)
+    
+    response = rekClient.detect_labels(Image={'S3Object':{'Bucket':bucket,'Name':filename}},MinConfidence=40)
+    print(response)
         
     # Send the image url in an IoT Publish
-    myAWSIoTMQTTClient.publishAsync("sensor/camera/image", json.dumps({"url":url}), 1)
+    myAWSIoTMQTTClient.publishAsync("sensor/camera/image",
+        json.dumps({"url":url, "labels":response["Labels"], "manual": manual}), 1)
     
-
+# Callback when website presses LED button
 def ledCallback(client, userdata, message):
     print("Received a new message: ")
     print(message.payload)
@@ -58,7 +68,8 @@ def ledCallback(client, userdata, message):
         GPIO.output(20,GPIO.HIGH)
     else:
         print("LED OFF")
-        GPIO.output(20,GPIO.LOW)
+        GPIO.output(20,GPIO.LOW
+                    )
     print("--------------\n\n")
 
 def getBaseMessage():
@@ -119,6 +130,9 @@ camera = PiCamera(resolution=(640, 480))
 # Init S3
 s3Resource = boto3.resource('s3')
 s3Client = boto3.client('s3')
+
+# Init Rekognition
+rekClient = boto3.client('rekognition')
 
 # Init AWSIoTMQTTClient
 myAWSIoTMQTTClient = None
