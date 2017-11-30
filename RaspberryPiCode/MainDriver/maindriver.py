@@ -194,7 +194,11 @@ ledTopic    = "sensor/led/payload"
 cameraTopic = "sensor/camera/takepicture"
 # #########################################
 
-# Connect and subscribe to AWS IoT
+
+# ############################################
+# ## Subscription and Callback assignments ###
+# ## Connect and subscribe to AWS IoT ########
+# ############################################
 myAWSIoTMQTTClient.connect()
 myAWSIoTMQTTClient.subscribe(motionTopic, 1, motionCallback )
 myAWSIoTMQTTClient.subscribe(ledTopic,    1, ledCallback    )
