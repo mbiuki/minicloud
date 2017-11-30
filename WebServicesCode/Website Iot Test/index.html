@@ -47,7 +47,7 @@
 			        <div id="oneIn">
 			        	<center>
 			            	<h3>LED Status</h3>
-			            	</center>
+			            </center>
 						<canvas id="ledChart"></canvas>
 			        </div>
 			    </div>
@@ -55,7 +55,7 @@
 			        <div id="twoIn">
 			        	<center>
 			        		<h3>Motion Sensor Status</h3>
-			        		</center>
+			        	</center>
 						<canvas id="motionChart"></canvas>
 			        </div>
 			    </div>
@@ -63,26 +63,37 @@
 			        <div id="threeIn">
 			        	<center>
 			        		<h3>Light Sensor Status</h3>
-							<canvas id="lightChart"></canvas>
 			        	</center>
+						<canvas id="lightChart"></canvas>
 			        </div>
 			    </div>
 			</div>
 		</div>
-		<h3>Graph Custom Data</h3>
-		<div class="dataRow">
-			<canvas id="dataChart"></canvas>
-			<label>Select Sensor</label>
-			<select id="sensorSelect">
-				<option value="led">LED</option>
-				<option value="motion">Motion Sensor</option>
-				<option value="light">Light Sensor</option>
-			</select>
-			<label>Time Start</label>
-			<input id="timeStart" type="number" min="0">
-			<label>Time End</label>
-			<input id="timeEnd" type="number" min="0">
-			<button id="graphButton" onclick="onGraphButtonClick()">Graph Data</button>
+		<br >
+		<div class="dataRow">				
+			<div id="wrapper2">
+			    <div id="one2">
+			        <div id="oneIn2">
+			        	<center>
+							<h3>Graph Custom Data</h3>
+						</center>
+			        	<center>
+			            	<canvas id="dataChart"></canvas>
+			            </center>
+						<label>Select Sensor</label>
+						<select id="sensorSelect">
+							<option value="led">LED</option>
+							<option value="motion">Motion Sensor</option>
+							<option value="light">Light Sensor</option>
+						</select>
+						<label>Time Start</label>
+						<input id="timeStart" type="number" min="0">
+						<label>Time End</label>
+						<input id="timeEnd" type="number" min="0">
+						<button id="graphButton" onclick="onGraphButtonClick()">Graph Data</button>
+			        </div>
+			    </div>
+			</div>
 		</div>
 		<h3>Current Camera Image:</h3>
 		<div>
