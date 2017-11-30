@@ -1,3 +1,8 @@
+####################################
+# University of British Columbia
+# IoT Lab
+# Oct-Dec 2017
+#####################################
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 from gpiozero import MotionSensor
 from picamera import PiCamera
@@ -10,8 +15,9 @@ import json
 import boto3
 import RPi.GPIO as GPIO
 
-
+# #######################################################
 # Callback when motion sensor detects motion rising edge
+# #######################################################
 def motionCallback(client, userdata, message):
     print("Received a new message: ")
     print(message.payload)
@@ -23,14 +29,21 @@ def motionCallback(client, userdata, message):
         
     print("--------------\n\n")
 
+
+# ###################################################
 # Callback when website presses Take Picture button
+# ###################################################
 def cameraCallback(client, userdata, message):
     takePicture(True)
 
+
+# ###################################################
 # Take a picture. Upload to S3 and generate a URL.
 # Send to Rekognition to see labels of images.
 # Send the URL and labels in an IoT Publish
-# manual param means whether an image was taken via button press or motion sensor.
+# manual param means whether an image was taken via 
+# button press or motion sensor.
+# ###################################################
 def takePicture(manual):
     filename = datetime.datetime.now().isoformat() + ".jpg"
     imagePath = "../minicloud_images/" + filename
@@ -55,8 +68,11 @@ def takePicture(manual):
     # Send the image url in an IoT Publish
     myAWSIoTMQTTClient.publishAsync("sensor/camera/image",
         json.dumps({"url":url, "labels":response["Labels"], "manual": manual}), 1)
-    
+
+
+# ########################################
 # Callback when website presses LED button
+# ########################################
 def ledCallback(client, userdata, message):
     print("Received a new message: ")
     print(message.payload)
@@ -72,6 +88,11 @@ def ledCallback(client, userdata, message):
                     )
     print("--------------\n\n")
 
+
+# ##############################################
+# For motion sensor, timestamp the time that 
+# someone passes by the motion sensor
+# ##############################################
 def getBaseMessage():
     message = {}
     message["timeStampEpoch"] = int(time.time() * 1000)
@@ -106,14 +127,6 @@ if useWebsocket and certificatePath and privateKeyPath:
 if not useWebsocket and (not certificatePath or not privateKeyPath):
     parser.error("Missing credentials for authentication.")
     exit(2)
-
-
-# ##################################
-# #### create some MQTT topics #####
-# ##################################
-motionTopic = "sensor/motion/payload"
-ledTopic    = "sensor/led/payload"
-cameraTopic = "sensor/camera/takepicture"
 
 
 # ##################################
@@ -172,11 +185,24 @@ myAWSIoTMQTTClient.configureDrainingFrequency(2)  # Draining: 2 Hz
 myAWSIoTMQTTClient.configureConnectDisconnectTimeout(10)  # 10 sec
 myAWSIoTMQTTClient.configureMQTTOperationTimeout(5)  # 5 sec
 
-# Connect and subscribe to AWS IoT
+
+# ##################################
+# #### create some MQTT topics #####
+# ##################################
+motionTopic = "sensor/motion/payload"
+ledTopic    = "sensor/led/payload"
+cameraTopic = "sensor/camera/takepicture"
+# #########################################
+
+
+# ############################################
+# ## Subscription and Callback assignments ###
+# ## Connect and subscribe to AWS IoT ########
+# ############################################
 myAWSIoTMQTTClient.connect()
-myAWSIoTMQTTClient.subscribe(motionTopic, 1, motionCallback)
-myAWSIoTMQTTClient.subscribe(ledTopic, 1, ledCallback)
-myAWSIoTMQTTClient.subscribe(cameraTopic, 1, cameraCallback)
+myAWSIoTMQTTClient.subscribe(motionTopic, 1, motionCallback )
+myAWSIoTMQTTClient.subscribe(ledTopic,    1, ledCallback    )
+myAWSIoTMQTTClient.subscribe(cameraTopic, 1, cameraCallback )
 time.sleep(2)
 
 
