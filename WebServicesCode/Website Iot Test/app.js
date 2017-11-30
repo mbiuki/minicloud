@@ -5,9 +5,10 @@ var motionChart = {};
 var lightChart = {};
 var dataChart = {};
 var ledStatus;
-var ledPublishTime; 
+var ledPublishTime;
 var cameraPublishTime;
 var endpoint = "https://3v5mhdfdne.execute-api.us-west-2.amazonaws.com/prod";
+var slackWebhook = "https://hooks.slack.com/services/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";
 
 // Subscribe to topics
 window.mqttClientConnectHandler = function() {
@@ -34,6 +35,7 @@ window.mqttClientMessageHandler = function(topic, payload) {
 			cameraDelay.innerHTML = delay + " ms";
 		}
 
+		// Set the image and corresponding text
 		setImage(payloadObj);
 	}
 
@@ -179,6 +181,26 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd) {
 	xhttp.send();
 }
 
+function sendImageToSlack(url, message, humanDetectedMessage) {
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("POST", slackWebhook);
+
+	var body = {
+		"attachments": [{
+			"fallback": "New Camera Image",
+			"title": humanDetectedMessage,
+			"text": message,
+			"image_url": url,
+			"color": "#764FA5"
+		}],
+		"unfurl_links": true
+	}
+
+	xhttp.onload = function(e) {}
+
+	xhttp.send(JSON.stringify(body));
+}
+
 function createChart(sensor, sensorCtx, sensorChart, data, timeStamps) {
 	sensorChart.chart = new Chart(sensorCtx, {
 		type: 'line',
@@ -237,6 +259,8 @@ function setImage(response) {
 	} else {
 		humanDetected.innerText = "Human detected";
 	}
+
+	sendImageToSlack(src, rekText, humanDetected.innerText);
 }
 
 function updateChart(sensor, sensorChart, data, timeStamps) {
