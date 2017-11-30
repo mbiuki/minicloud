@@ -5,6 +5,8 @@ var motionChart = {};
 var lightChart = {};
 var dataChart = {};
 var ledStatus;
+var ledPublishTime; 
+var cameraPublishTime;
 var endpoint = "https://3v5mhdfdne.execute-api.us-west-2.amazonaws.com/prod";
 
 // Subscribe to topics
@@ -24,39 +26,59 @@ window.mqttClientMessageHandler = function(topic, payload) {
 
 	// If new camera image, display it
 	if (topic == "sensor/camera/image") {
+		// Calculate delay and display it
+		var delay = Date.now() - cameraPublishTime;
+		var cameraDelay = document.getElementById("cameraDelay");
+		cameraDelay.innerHTML = delay + " ms";
+		// Set the image src
 		document.getElementById("cameraImage").src = payloadObj["url"];
 	}
 
 	// If sensor status changes, add to graph, and update current status
 	if (topic == "sensor/led/payload") {
+		// Update led status
 		ledStatus = payloadObj["status"];
+
+		// Calculate delay and display it
+		var delay = Date.now() - ledPublishTime;
+		var ledDelay = document.getElementById("ledDelay");
+		ledDelay.innerHTML = delay + " ms";
+
+		// Graph the new data point
 		var dataLength = ledChart.chart.data.datasets[0].data.length;
 		ledChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
 		ledChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
 		ledChart.chart.update();
+
+		// Update text 
 		setLedButtonStatus(payloadObj["status"]);
 		var ledText = document.getElementById("ledStatus");
-		ledText.innerHTML = setupSensorText(payloadObj["status"], payloadObj["timeStampIso"]);
+		var ledUpdated = document.getElementById("ledUpdatedTime");
+		ledText.innerHTML = payloadObj["status"];
+		ledUpdated.innerHTML = payloadObj["timeStampIso"];
 	}
 	if (topic == "sensor/motion/payload") {
 		var dataLength = motionChart.chart.data.datasets[0].data.length;
 		motionChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
 		motionChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
 		motionChart.chart.update();
+
 		var motionText = document.getElementById("motionStatus");
-		motionText.innerHTML = setupSensorText(payloadObj["status"], payloadObj["timeStampIso"]);
+		var motionUpdated = document.getElementById("motionUpdatedTime");
+		motionText.innerHTML = payloadObj["status"];
+		motionUpdated.innerHTML = payloadObj["timeStampIso"];
 	}
 	if (topic == "sensor/light/payload") {
 		var dataLength = lightChart.chart.data.datasets[0].data.length;
 		lightChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
 		lightChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
 		lightChart.chart.update();
+
 		var lightText = document.getElementById("lightStatus");
-		lightText.innerHTML = setupSensorText(payloadObj["status"], payloadObj["timeStampIso"]);
-
+		var lightUpdated = document.getElementById("lightUpdatedTime");
+		lightText.innerHTML = payloadObj["status"];
+		lightUpdated.innerHTML = payloadObj["timeStampIso"];
 	}
-
-
 };
 
 mqttClient.on('connect', window.mqttClientConnectHandler);
@@ -65,6 +87,7 @@ mqttClient.on('message', window.mqttClientMessageHandler);
 window.onload = function() {
 	setDefaultTimeRange();
 	setupCurrSensorStatus();
+	window.onGraphButtonClick();
 	getCurrImage();
 }
 
@@ -85,22 +108,31 @@ function setupCurrSensorStatus() {
 		var motionText = document.getElementById("motionStatus");
 		var lightText = document.getElementById("lightStatus");
 
+		var ledUpdated = document.getElementById("ledUpdatedTime");
+		var motionUpdated = document.getElementById("motionUpdatedTime");
+		var lightUpdated = document.getElementById("lightUpdatedTime");
+
 		var timeStampIso = new Date().toISOString();
 
+		// Create the graphs for the sensors
 		for (var i = 0; i < sensorStatus.length; i++) {
-			var text = setupSensorText(sensorStatus[i].payload.status, sensorStatus[i].payload.timeStampIso);
+			var status = sensorStatus[i].payload.status;
+			var date = sensorStatus[i].payload.timeStampIso;
 			if (sensorStatus[i].sensorId == "led") {
-				ledText.innerHTML = text;
+				ledText.innerHTML = status;
+				ledUpdated.innerHTML = date;
 				ledStatus = sensorStatus[i].payload.status;
 				setLedButtonStatus(sensorStatus[i].payload.status);
 				createChart("led", document.getElementById('ledChart').getContext('2d'), ledChart, [sensorStatus[i].payload.status], [timeStampIso]);
 			}
 			if (sensorStatus[i].sensorId == "motion") {
-				motionText.innerHTML = text;
+				motionText.innerHTML = status;
+				motionUpdated.innerHTML = date;
 				createChart("motion", document.getElementById('motionChart').getContext('2d'), motionChart, [sensorStatus[i].payload.status], [timeStampIso]);
 			}
 			if (sensorStatus[i].sensorId == "light") {
-				lightText.innerHTML = text;
+				lightText.innerHTML = status;
+				lightUpdated.innerHTML = date;
 				createChart("light", document.getElementById('lightChart').getContext('2d'), lightChart, [sensorStatus[i].payload.status], [timeStampIso]);
 			}
 		}
@@ -136,8 +168,7 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd) {
 
 		if (!sensorChart.chart) {
 			createChart(sensor, sensorCtx, sensorChart, data, timeStamps);
-		}
-		else {
+		} else {
 			updateChart(sensor, sensorChart, data, timeStamps);
 		}
 	}
@@ -167,6 +198,7 @@ function createChart(sensor, sensorCtx, sensorChart, data, timeStamps) {
 	});
 }
 
+// Display the current camera image 
 function getCurrImage() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("GET", endpoint + "/getpicture");
@@ -174,7 +206,7 @@ function getCurrImage() {
 	xhttp.onload = function(e) {
 		var cameraImage = document.getElementById("cameraImage");
 		var src = JSON.parse(xhttp.response)["Items"][0]["payload"]["url"];
-		cameraImage.src =src;
+		cameraImage.src = src;
 	}
 
 	xhttp.send();
@@ -187,15 +219,12 @@ function updateChart(sensor, sensorChart, data, timeStamps) {
 	sensorChart.chart.update();
 }
 
-function setupSensorText(status, time) {
-	return status + ". Updated on " + time;
-}
-
 function setLedButtonStatus(newStatus) {
 	var ledButton = document.getElementById("ledButton");
 	ledButton.innerHTML = newStatus == "1" ? "Turn LED Off" : "Turn LED On";
 }
 
+// Set default time range for graphing custom data
 function setDefaultTimeRange() {
 	var timeStart = document.getElementById("timeStart");
 	var timeEnd = document.getElementById("timeEnd");
@@ -215,6 +244,8 @@ window.onLedButtonClick = function() {
 
 	var newStatus = ledStatus == "1" ? "0" : "1";
 
+	// Record time published to calculate delay later
+	ledPublishTime = Date.now();
 	xhttp.send(JSON.stringify({ "status": newStatus }));
 }
 
@@ -226,6 +257,8 @@ window.onCameraButtonClick = function() {
 		console.log(xhttp.response);
 	}
 
+	// Record time published to calculate delay later
+	cameraPublishTime = Date.now();
 	xhttp.send();
 }
 

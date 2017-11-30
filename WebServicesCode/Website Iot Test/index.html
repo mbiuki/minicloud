@@ -12,22 +12,36 @@
 	<div class="container">
 		<h2>Minicloud</h2>
 		<h3>Current Sensor Status:</h3>
-		<div class="statusRow">
-			<span>LED Status: </span>
-			<span id="ledStatus"></span>
-			<br/>
-			<br/>
-			<span>Motion Sensor Status: </span>
-			<span id="motionStatus"></span>
-			<br/>
-			<br/>
-			<span>Light Sensor Status: </span>
-			<span id="lightStatus"></span>
-			<br/>
-			<br/>
-			<button id="ledButton" onclick="onLedButtonClick()"></button>
-			<button id="cameraButton" onclick="onCameraButtonClick()">Take Picture</button>
-		</div>
+		<table id="statusTable">
+			<tr>
+				<th>Sensor</th>
+				<th>Status</th>
+				<th>Updated on</th>
+			</tr>
+			<tr>
+				<td>LED</td>
+				<td id="ledStatus"></td>
+				<td id="ledUpdatedTime"></td>
+			</tr>
+			<tr>
+				<td>Motion Sensor</td>
+				<td id="motionStatus"></td>
+				<td id="motionUpdatedTime"></td>
+			</tr>
+			<tr>
+				<td>Light Sensor</td>
+				<td id="lightStatus"></td>
+				<td id="lightUpdatedTime"></td>
+			</tr>
+		</table>
+		<button id="ledButton" onclick="onLedButtonClick()"></button>
+		<span style="margin-left: 5px">Last Delay: </span> 
+		<span id="ledDelay"></span>
+		<br/>
+		<br/>
+		<button id="cameraButton" onclick="onCameraButtonClick()">Take Picture</button>
+		<span style="margin-left: 5px">Last Delay: </span> 
+		<span id="cameraDelay"></span>
 		<div class="graphRow">
 			<h3>LED Status</h3>
 			<canvas id="ledChart"></canvas>
