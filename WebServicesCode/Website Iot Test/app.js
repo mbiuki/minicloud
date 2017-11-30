@@ -27,11 +27,14 @@ window.mqttClientMessageHandler = function(topic, payload) {
 	// If new camera image, display it
 	if (topic == "sensor/camera/image") {
 		// Calculate delay and display it
-		var delay = Date.now() - cameraPublishTime;
-		var cameraDelay = document.getElementById("cameraDelay");
-		cameraDelay.innerHTML = delay + " ms";
-		// Set the image src
-		document.getElementById("cameraImage").src = payloadObj["url"];
+		var manual = payloadObj["manual"];
+		if (manual) {
+			var delay = Date.now() - cameraPublishTime;
+			var cameraDelay = document.getElementById("cameraDelay");
+			cameraDelay.innerHTML = delay + " ms";
+		}
+
+		setImage(payloadObj);
 	}
 
 	// If sensor status changes, add to graph, and update current status
@@ -198,18 +201,42 @@ function createChart(sensor, sensorCtx, sensorChart, data, timeStamps) {
 	});
 }
 
-// Display the current camera image 
+// Get the current camera image and display it
 function getCurrImage() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("GET", endpoint + "/getpicture");
 
 	xhttp.onload = function(e) {
-		var cameraImage = document.getElementById("cameraImage");
-		var src = JSON.parse(xhttp.response)["Items"][0]["payload"]["url"];
-		cameraImage.src = src;
+		var response = JSON.parse(xhttp.response)["Items"][0]["payload"];
+		setImage(response);
 	}
 
 	xhttp.send();
+}
+
+// Uses the provided response from IoT and sets the camera image, labels, and human detected text accordingly
+function setImage(response) {
+	var cameraImage = document.getElementById("cameraImage");
+	var rekLabels = document.getElementById("rekLabels");
+	var humanDetected = document.getElementById("humanDetected");
+
+	var src = response["url"];
+	var labels = response["labels"];
+	cameraImage.src = src;
+
+	var isHuman = false;
+	var rekText = "";
+	for (var i = 0; i < labels.length; i++) {
+		isHuman |= labels[i]["Name"] == "Human";
+		rekText += "\n" + labels[i]["Name"] + ": " + labels[i]["Confidence"];
+	}
+	rekLabels.innerText = rekText;
+
+	if (!isHuman) {
+		humanDetected.innerText = "No human detected";
+	} else {
+		humanDetected.innerText = "Human detected";
+	}
 }
 
 function updateChart(sensor, sensorChart, data, timeStamps) {
