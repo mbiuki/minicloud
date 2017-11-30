@@ -165,7 +165,7 @@ appVar.controller('mapController', function ($scope, $http, $timeout, NgTablePar
     $scope.temperature_data = [];
 
     setInterval(function () {
-        $http.get(devices_endpoint_url+ "/currstatus" )
+        $http.get(devices_endpoint_url + "status" )
             .success(function (data, status, headers, config) {
 
 
