@@ -1,4 +1,5 @@
 var mqttClient = require('./awsiot.js');
+var config = require('./credentials.js');
 
 var ledChart = {};
 var motionChart = {};
@@ -7,8 +8,8 @@ var dataChart = {};
 var ledStatus;
 var ledPublishTime;
 var cameraPublishTime;
-var endpoint = "https://3v5mhdfdne.execute-api.us-west-2.amazonaws.com/prod";
-var slackWebhook = "https://hooks.slack.com/services/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";
+var endpoint = config.endpoint;
+var slackWebhook = config.slackWebhook;
 
 // Subscribe to topics
 window.mqttClientConnectHandler = function() {

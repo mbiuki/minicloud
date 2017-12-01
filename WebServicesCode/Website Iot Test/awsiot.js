@@ -1,18 +1,13 @@
 var AWS = require('aws-sdk');
 var awsIot = require('aws-iot-device-sdk');
-
-var awsConfiguration = {
-	poolId: "", // 'YourCognitoIdentityPoolId'
-	host: "", // 'YourAWSIoTEndpoint', e.g. 'prefix.iot.us-east-1.amazonaws.com'
-	region: "us-west-2" // 'YourAwsRegion', e.g. 'us-east-1'
-};
+var config = require('./credentials.js');
 
 //
 // Initialize our configuration.
 //
-AWS.config.region = awsConfiguration.region;
+AWS.config.region = config.region;
 AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-	IdentityPoolId: awsConfiguration.poolId
+	IdentityPoolId: config.poolId
 });
 
 // Create the AWS IoT device object.  Note that the credentials must be 
@@ -26,7 +21,7 @@ const mqttClient = awsIot.device({
 	region: AWS.config.region,
 	//
 	////Set the AWS IoT Host Endpoint
-	host: awsConfiguration.host,
+	host: config.host,
 	//
 	// Use the clientId created earlier.
 	//
