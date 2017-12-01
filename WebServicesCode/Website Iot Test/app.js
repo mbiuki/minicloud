@@ -182,9 +182,14 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd) {
 	xhttp.send();
 }
 
-function sendImageToSlack(url, message, humanDetectedMessage) {
+function sendImageToSlack(url, message, isHuman) {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("POST", slackWebhook);
+
+	var humanDetectedMessage = isHuman ? "Human Detected" : "No Human Detected";
+	if (isHuman) {
+		message = "<!everyone> " + message;
+	}
 
 	var body = {
 		"attachments": [{
@@ -261,7 +266,7 @@ function setImage(response) {
 		humanDetected.innerText = "Human detected";
 	}
 
-	sendImageToSlack(src, rekText, humanDetected.innerText);
+	sendImageToSlack(src, rekText, isHuman);
 }
 
 function updateChart(sensor, sensorChart, data, timeStamps) {
