@@ -1,10 +1,22 @@
+
+### Credentials setup
+Create a file called 'credential.js' in this directory.
+```
+var config = {
+	poolId: "", // 'YourCognitoIdentityPoolId'
+	host: "", // 'YourAWSIoTEndpoint', e.g. 'prefix.iot.us-east-1.amazonaws.com'
+	region: "", // e.g 'us-west-2'
+	endpoint : "", // API Gateway endpoint e.g. 'https://prefix-api.us-west-2.amazonaws.com/prod'
+	slackWebhook : "", // Slack Incoming Webhook URL e.g. "https://hooks.slack.com/services/test/test/test" 
+};
+
+module.exports = config;
+```
+
 ### Installation
-```sh
+```
 npm install
 npm install -g browserify
 browserify app.js -o bundle.js
 ```
-
-# AWS Cognito Credentials
-
-Supply the poolId and host in `awsConfiguration` in app.js. Run `browserify app.js -o bundle.js` again whenever JS changes are made. 
+Browserify is required to use the AWS IoT node libraries in the frontend. Whenever JS changes are made, run `browserify app.js -o bundle.js` again.
