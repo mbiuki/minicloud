@@ -1,6 +1,6 @@
 
 ### Credentials setup
-Create a file called 'credential.js' in this directory.
+Create a file called 'credentials.js' in this directory.
 ```
 var config = {
 	poolId: "", // 'YourCognitoIdentityPoolId'
