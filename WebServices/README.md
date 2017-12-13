@@ -5,7 +5,7 @@ Table below shows what each Lambda function does. The GET functions require Dyna
 | ------------- | ------------- | ------------- |
 | GetSensorCurrStatus  | Gets the current status of the sensors. No parameters.| GET https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/currstatus |
 | GetSensorStatus  | Query past data for a given sensor (path parameter) and time range (timestart, timeend in unix time as query parameters). | GET https://unique.execute-api.us-west-2.amazonaws.com/prod/status/motion?timestart=0&timeend=1512024820868 |
-| SetSensorStatus | Send command to set status of sensor (path parameter). | PUT https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/setstatus/led With “status”: “1” in the body |
+| SetSensorStatus | Send command to set status (body parameter) of sensor (path parameter). | PUT https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/setstatus/led With “status”: “1” in the body |
 | TakePicture | Send command to take picture. No parameters.| POST https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/takepicture |
 | GetCurrImage | Get url and labels of last picture taken. No parameters. | GET https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/getpicture |
 
