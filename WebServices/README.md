@@ -1,8 +1,9 @@
 ## Lambda Functions
 Table below shows what each Lambda function does. The GET functions require DynamoDB read IAM permissions. `SetSensorStatus` and `TakePicture` require AWS IotData publish IAM permissions, as well as setting the Lambda environment variable `AWS_IOT_ENDPOINT` to your AWS IoT Endpoint.
-| Function  | Description | API Gateway Example Usage|
+
+| Function  | Description | API Gateway Example Usage |
 | ------------- | ------------- | ------------- |
-| GetSensorCurrStatus  | Gets the current status of the sensors. Requires DynamoDB read IAM permissions.| GET https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/currstatus|
+| GetSensorCurrStatus  | Gets the current status of the sensors. Requires DynamoDB read IAM permissions.| GET https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/currstatus |
 | GetSensorStatus  | Query past data for a given sensor and time range (Unix time). Requires DynamoDB read IAM permissions. | GET https://unique.execute-api.us-west-2.amazonaws.com/prod/status/motion?timestart=0&timeend=1512024820868 |
 | SetSensorStatus | Send command to set status of sensor. Requires AWS IotData publish permissions.| PUT https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/setstatus/led With “status”: “1” in the body |
 | TakePicture | Send command to take picture. Requires AWS IotData publish permissions. | POST https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/takepicture |
