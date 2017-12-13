@@ -3,11 +3,11 @@ Table below shows what each Lambda function does. The GET functions require Dyna
 
 | Function  | Description | API Gateway Example Usage |
 | ------------- | ------------- | ------------- |
-| GetSensorCurrStatus  | Gets the current status of the sensors. Requires DynamoDB read IAM permissions.| GET https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/currstatus |
-| GetSensorStatus  | Query past data for a given sensor and time range (Unix time). Requires DynamoDB read IAM permissions. | GET https://unique.execute-api.us-west-2.amazonaws.com/prod/status/motion?timestart=0&timeend=1512024820868 |
-| SetSensorStatus | Send command to set status of sensor. Requires AWS IotData publish permissions.| PUT https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/setstatus/led With “status”: “1” in the body |
-| TakePicture | Send command to take picture. Requires AWS IotData publish permissions. | POST https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/takepicture |
-| GetCurrImage | Get url and labels of last picture taken. Requires DynamoDB read IAM permissions. | GET https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/getpicture |
+| GetSensorCurrStatus  | Gets the current status of the sensors. No parameters.| GET https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/currstatus |
+| GetSensorStatus  | Query past data for a given sensor (path parameter) and time range (timestart, timeend in unix time as query parameters). | GET https://unique.execute-api.us-west-2.amazonaws.com/prod/status/motion?timestart=0&timeend=1512024820868 |
+| SetSensorStatus | Send command to set status of sensor (path parameter). | PUT https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/setstatus/led With “status”: “1” in the body |
+| TakePicture | Send command to take picture. No parameters.| POST https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/takepicture |
+| GetCurrImage | Get url and labels of last picture taken. No parameters. | GET https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/getpicture |
 
 ## API Gateway Setup
 All API Gateway mappings to these Lambda functions need to be a Lambda Proxy Integration. Enable CORS for all PUT/POST methods.
