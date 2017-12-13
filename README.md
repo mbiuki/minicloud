@@ -11,10 +11,12 @@ MiniCloud Database for constrained devices
 
 * Also sends images to Slack via incomming webhook, alerting everyone if a human is in the image. 
 
+* Readme inside contains more details of setup
+
 ### Web Services
 * Contains the Node.js functions to upload to AWS Lambda that can query sensor data from DynamoDB and perform IoT publishes (Set LED, Take picture)
 
-* These need to be mapped to an AWS API Gateway endpoint. See http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html for more details.
+* These need to be mapped to an AWS API Gateway endpoint (Proxy Integration). Readme inside contains more details. See http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html as well for official documentations.
 
 ### Raspberry Pi
 * The Python code that the Raspberry Pi device (uses camera, motion sensor, LED, light sensor) runs. Connects to AWS IoT SDK and performs subscribe/publishes. Uses AWS S3 for storage, and AWS Rekognition for computer vision analysis
