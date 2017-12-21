@@ -13,6 +13,10 @@ var config = {
 module.exports = config;
 ```
 
+The `poolId` refers to the Identity pool ID created from Federated Identities in AWS Cognito. Create an unautheticated role, and make sure it has IAM permissions to AWS IoT, and use its pool ID. See equivalent instructions for setting up the Identity pool here https://github.com/aws/aws-iot-device-sdk-js#temperature-monitor-browser-example-application.
+
+The `slackWebhook` is optional, as a bonus feature, if forwarding received images and labels from the website to a Slack channel is so desired. 
+
 ### Installation
 ```
 npm install
