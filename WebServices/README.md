@@ -11,10 +11,10 @@ Table below shows what each Lambda function does. The GET functions require Dyna
 
 ## API Gateway Setup
 All API Gateway mappings to these Lambda functions need to be a Lambda Proxy Integration. Enable CORS for all PUT/POST methods.
-* `GetSensorCurrStatus` and `GetCurrImage` is setup by creating for each of them a new resource in your API. Then add to each resource a GET method that maps to the appropriate Lambda function. 
-* `TakePicture` is also setup by creating a new resource, but adding a POST method instead. 
-* `GetSensorStatus` is setup by creating a new proxy resource (since it takes a sensor ID in the path parameter), and then adding a GET method that maps to the created Lambda function.
-* `SetSensorStatus` is also setup as a proxy resource, and then adding a PUT method. 
+* `GetSensorCurrStatus` and `GetCurrImage` is setup by creating for each of them a new resource in your API. Call them `currstatus` and `getpicture` respectively. Then add to each resource a GET method that maps to the appropriate Lambda function. 
+* `TakePicture` is also setup by creating a new resource called `takepicture`, but adding a POST method instead. 
+* `GetSensorStatus` is setup by creating a resource called `status`. Then create a new proxy resource under that. Proxy means the string after the resource path. In our case, we want sensor ID in the path, so we use proxy here. Then add a GET method under the proxy resource that maps to the GetSensorStatus Lambda function.
+* `SetSensorStatus` is setup by creating a new resource called `setstatus`. Then create a new proxy resource under that, and add a PUT method to the SetSensorStatus Lambda Function.
 
 ## DynamoDB Setup
 `GetSensorCurrStatus`, `GetSensorStatus`, and `GetCurrImage` each query 3 different DynamoDB tables as shown in the code. 
