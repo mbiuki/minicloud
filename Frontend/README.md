@@ -24,3 +24,5 @@ npm install -g browserify
 browserify app.js -o bundle.js
 ```
 Browserify is required to use the AWS IoT node libraries in the frontend. Whenever JS changes are made, run `browserify app.js -o bundle.js` again.
+
+To run the above press shift, click on open power shell in Windows.
