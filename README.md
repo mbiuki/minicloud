@@ -24,3 +24,7 @@ MiniCloud Database for constrained devices
 * For example, listening to taking picture requests from the website, or emitting light sensor status. 
 
 * Uploads pictures taken to S3, and also analyzes them using AWS Rekognition to check for humans. The picture URL and resulting computer vision labels are sent to the website via an IoT publish. 
+
+### Architecture
+
+<img src="https://github.com/mbiuki/minicloud/blob/master/Architecture/AWS_IoT.png" alt="Screenshot" width="427" height="240" border="10"/>
