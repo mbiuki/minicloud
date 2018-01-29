@@ -13,7 +13,7 @@ var config = {
 module.exports = config;
 ```
 
-The `poolId` refers to the Identity pool ID created from Federated Identities in AWS Cognito. It gives the credentials for the website to access AWS IoT. Create an unautheticated role, and make sure it has IAM permissions to AWS IoT, and use its pool ID. See equivalent instructions for setting up the Identity pool here https://github.com/aws/aws-iot-device-sdk-js#temperature-monitor-browser-example-application.
+The `poolId` refers to the Identity pool ID created from Federated Identities in AWS Cognito. It gives the credentials for the website to access AWS IoT. Create an unautheticated role, and make sure it has IAM permissions to AWS IoT, and use its pool ID. See equivalent instructions for setting up the Identity pool here https://github.com/aws/aws-iot-device-sdk-js#temperature-monitor-browser-example-application. We allow any user to access our website, so restrict access in the Cognito IAM role as needed. 
 
 The `slackWebhook` is optional, as a bonus feature, if forwarding received images and labels from the website to a Slack channel is so desired. 
 
@@ -21,8 +21,8 @@ The `slackWebhook` is optional, as a bonus feature, if forwarding received image
 ```
 npm install
 npm install -g browserify
-browserify app.js -o bundle.js
+browserify awsiot.js --standalone mqttClient > bundle.js
 ```
-Browserify is required to use the AWS IoT node libraries in the frontend. Whenever JS changes are made, run `browserify app.js -o bundle.js` again.
+Browserify is required to use the AWS IoT node libraries in the frontend. If you change your credentials, run the last command again.
 
 To run the above press shift, click on open power shell in Windows.
