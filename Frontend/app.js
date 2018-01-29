@@ -1,6 +1,3 @@
-var mqttClient = require('./awsiot.js');
-var config = require('./credentials.js');
-
 var ledChart = {};
 var motionChart = {};
 var lightChart = {};
@@ -8,11 +5,11 @@ var dataChart = {};
 var ledStatus;
 var ledPublishTime;
 var cameraPublishTime;
-var endpoint = config.endpoint;
-var slackWebhook = config.slackWebhook;
+var endpoint = mqttClient.config.endpoint;
+var slackWebhook = mqttClient.config.slackWebhook;
 
 // Subscribe to topics
-window.mqttClientConnectHandler = function() {
+function mqttClientConnectHandler() {
 	console.log('connect');
 	mqttClient.subscribe("sensor/camera/image");
 	mqttClient.subscribe("sensor/led/payload");
@@ -21,7 +18,7 @@ window.mqttClientConnectHandler = function() {
 };
 
 // Respond to subscribed topics when they are published to
-window.mqttClientMessageHandler = function(topic, payload) {
+function mqttClientMessageHandler(topic, payload) {
 	var message = 'message: ' + topic + ':' + payload.toString();
 	console.log(message);
 	var payloadObj = JSON.parse(payload);
@@ -87,8 +84,8 @@ window.mqttClientMessageHandler = function(topic, payload) {
 	}
 };
 
-mqttClient.on('connect', window.mqttClientConnectHandler);
-mqttClient.on('message', window.mqttClientMessageHandler);
+mqttClient.on('connect', mqttClientConnectHandler);
+mqttClient.on('message', mqttClientMessageHandler);
 
 window.onload = function() {
 	setDefaultTimeRange();
@@ -291,7 +288,7 @@ function setDefaultTimeRange() {
 	timeStart.value = parseInt(time) - 1000 * 3600;
 }
 
-window.onLedButtonClick = function() {
+function onLedButtonClick() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("PUT", endpoint + "/setstatus/led");
 
@@ -306,7 +303,7 @@ window.onLedButtonClick = function() {
 	xhttp.send(JSON.stringify({ "status": newStatus }));
 }
 
-window.onCameraButtonClick = function() {
+function onCameraButtonClick() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("POST", endpoint + "/takepicture");
 
@@ -319,7 +316,7 @@ window.onCameraButtonClick = function() {
 	xhttp.send();
 }
 
-window.onGraphButtonClick = function() {
+function onGraphButtonClick() {
 	var sensorSelect = document.getElementById("sensorSelect");
 	var timeStart = document.getElementById("timeStart");
 	var timeEnd = document.getElementById("timeEnd");

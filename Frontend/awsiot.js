@@ -49,6 +49,8 @@ const mqttClient = awsIot.device({
 	sessionToken: ''
 });
 
+mqttClient.config = config;
+
 var cognitoIdentity = new AWS.CognitoIdentity();
 AWS.config.credentials.get(function(err, data) {
 	if (!err) {
