@@ -51,8 +51,7 @@ def takePicture(manual):
     image = open(imagePath, "rb")
         
     # Upload camera image to S3, and grab the url
-    bucket = 'minicloud-images'
-    s3Resource.Bucket('minicloud-images').put_object(Key=filename, Body=image)
+    s3Resource.Bucket(s3Bucket).put_object(Key=filename, Body=image)
     url = s3Client.generate_presigned_url('get_object',
                                 Params={
                                     'Bucket': bucket,
@@ -108,6 +107,7 @@ parser.add_argument("-e", "--endpoint", action="store", required=True, dest="hos
 parser.add_argument("-r", "--rootCA", action="store", required=True, dest="rootCAPath", help="Root CA file path")
 parser.add_argument("-c", "--cert", action="store", dest="certificatePath", help="Certificate file path")
 parser.add_argument("-k", "--key", action="store", dest="privateKeyPath", help="Private key file path")
+parser.add_argument("-s", "--s3", action="store", dest="s3bucket", help="S3 Bucket Name")
 parser.add_argument("-w", "--websocket", action="store_true", dest="useWebsocket", default=False,
                     help="Use MQTT over WebSocket")
 parser.add_argument("-id", "--clientId", action="store", dest="clientId", default="basicPubSub",
@@ -119,6 +119,7 @@ certificatePath = args.certificatePath
 privateKeyPath = args.privateKeyPath
 useWebsocket = args.useWebsocket
 clientId = args.clientId
+s3Bucket = args.s3bucket
 
 if useWebsocket and certificatePath and privateKeyPath:
     parser.error("X.509 cert authentication and WebSocket are mutual exclusive. Please pick one.")
