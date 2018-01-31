@@ -126,17 +126,17 @@ function setupCurrSensorStatus() {
 				ledUpdated.innerHTML = date;
 				ledStatus = sensorStatus[i].payload.status;
 				setLedButtonStatus(sensorStatus[i].payload.status);
-				createChart("led", document.getElementById('ledChart').getContext('2d'), ledChart, [sensorStatus[i].payload.status], [timeStampIso]);
+				createChart("led", document.getElementById('ledChart').getContext('2d'), ledChart, [], []);
 			}
 			if (sensorStatus[i].sensorId == "motion") {
 				motionText.innerHTML = status;
 				motionUpdated.innerHTML = date;
-				createChart("motion", document.getElementById('motionChart').getContext('2d'), motionChart, [sensorStatus[i].payload.status], [timeStampIso]);
+				createChart("motion", document.getElementById('motionChart').getContext('2d'), motionChart, [], []);
 			}
 			if (sensorStatus[i].sensorId == "light") {
 				lightText.innerHTML = status;
 				lightUpdated.innerHTML = date;
-				createChart("light", document.getElementById('lightChart').getContext('2d'), lightChart, [sensorStatus[i].payload.status], [timeStampIso]);
+				createChart("light", document.getElementById('lightChart').getContext('2d'), lightChart, [], []);
 			}
 		}
 	}
