@@ -61,7 +61,7 @@ def takePicture(manual):
     )                                      
     print(url)
     
-    response = rekClient.detect_labels(Image={'S3Object':{'Bucket':s3bucket,'Name':filename}},MinConfidence=40)
+    response = rekClient.detect_labels(Image={'S3Object':{'Bucket':s3Bucket,'Name':filename}},MinConfidence=40)
     print(response)
         
     # Send the image url in an IoT Publish
@@ -158,6 +158,8 @@ pir = MotionSensor(4)
 # ## Init Camera #####
 ######################
 camera = PiCamera(resolution=(640, 480))
+camera.vflip = True
+camera.hflip = True
 
 ######################
 # #### Init S3 #######
