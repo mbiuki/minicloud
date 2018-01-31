@@ -3,3 +3,7 @@ node_modules
 .project
 bundle.js
 credentials.js
+*.pem
+*.key
+*.crt
+certs/

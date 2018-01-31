@@ -54,14 +54,14 @@ def takePicture(manual):
     s3Resource.Bucket(s3Bucket).put_object(Key=filename, Body=image)
     url = s3Client.generate_presigned_url('get_object',
                                 Params={
-                                    'Bucket': bucket,
+                                    'Bucket': s3Bucket,
                                     'Key': filename
                                 },
                                 ExpiresIn = 3600 * 24 * 3
     )                                      
     print(url)
     
-    response = rekClient.detect_labels(Image={'S3Object':{'Bucket':bucket,'Name':filename}},MinConfidence=40)
+    response = rekClient.detect_labels(Image={'S3Object':{'Bucket':s3bucket,'Name':filename}},MinConfidence=40)
     print(response)
         
     # Send the image url in an IoT Publish
