@@ -1,0 +1,117 @@
+<html>
+
+<head>
+	<link rel="stylesheet" href="main.css">
+	<script src="https://cdn.jsdelivr.net/npm/moment@2.19.2/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+	<script src="bundle.js"></script>
+	<script src="app.js"></script>
+</head>
+
+<body>
+	<div class="container">
+		<h2>Minicloud</h2>
+		<h3>Current Sensor Status:</h3>
+		<table id="statusTable">
+			<tr>
+				<th>Sensor</th>
+				<th>Status</th>
+				<th>Updated on</th>
+			</tr>
+			<tr>
+				<td>LED</td>
+				<td id="ledStatus"></td>
+				<td id="ledUpdatedTime"></td>
+			</tr>
+			<tr>
+				<td>Motion Sensor</td>
+				<td id="motionStatus"></td>
+				<td id="motionUpdatedTime"></td>
+			</tr>
+			<tr>
+				<td>Light Sensor</td>
+				<td id="lightStatus"></td>
+				<td id="lightUpdatedTime"></td>
+			</tr>
+		</table>
+		<button id="ledButton" onclick="onLedButtonClick()"></button>
+		<span style="margin-left: 5px">Last Delay: </span>
+		<span id="ledDelay"></span>
+		<br/>
+		<br/>
+		<button id="cameraButton" onclick="onCameraButtonClick()">Take Picture</button>
+		<span style="margin-left: 5px">Last Delay: </span>
+		<span id="cameraDelay"></span>
+		<div class="graphRow">
+			<div id="wrapper">
+				<div id="one">
+					<div id="oneIn">
+						<center>
+							<h3>LED Status</h3>
+						</center>
+						<canvas id="ledChart"></canvas>
+					</div>
+				</div>
+				<div id="two">
+					<div id="twoIn">
+						<center>
+							<h3>Motion Sensor Status</h3>
+						</center>
+						<canvas id="motionChart"></canvas>
+					</div>
+				</div>
+				<div id="three">
+					<div id="threeIn">
+						<center>
+							<h3>Light Sensor Status</h3>
+						</center>
+						<canvas id="lightChart"></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br>
+		<div style="text-align: center">
+			<h3 style="margin-top: 100px">Current Camera Image:</h3>
+			<div>
+				<h4 id="humanDetected"></h4>
+				<image id="cameraImage"></image>
+				<p id="rekLabels"></p>
+			</div>
+		</div>
+		<div class="dataRow" style="margin-top: 75px">
+			<div id="wrapper2">
+				<div id="one2">
+					<div id="oneIn2" style="text-align: center">
+						<center>
+							<h3>Graph Custom Data</h3>
+						</center>
+						<center>
+							<canvas id="dataChart"></canvas>
+						</center>
+						<label>Select Sensor</label>
+						<select id="sensorSelect">
+							<option value="led">LED</option>
+							<option value="motion">Motion Sensor</option>
+							<option value="light">Light Sensor</option>
+						</select>
+						<label>Time Start</label>
+						<input id="timeStart" type="number" min="0">
+						<label>Time End</label>
+						<input id="timeEnd" type="number" min="0">
+						<button id="graphButton" onclick="onGraphButtonClick()">Graph Data</button>
+						<br/>
+						<br/>
+						<br/>
+						<br/>
+						<br/>
+						<br/>
+						<br/>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

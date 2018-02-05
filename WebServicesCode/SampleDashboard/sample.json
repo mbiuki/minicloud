@@ -1,0 +1,36 @@
+{
+"Items": [
+{
+ 	"payload":
+ 	{
+		"timeStampIso": "2016-09-10T22:35:06.732142",
+ 		"timeStampEpoch": 1473546906732,
+ 		"status": 1,
+ 		"deviceId": "lock",
+ 	},
+ 	"deviceId": "lock"
+},
+{
+ 	"payload":
+ 	{
+		"timeStampIso": "2016-09-10T22:35:06.732142",
+ 		"timeStampEpoch": 1473546906732,
+ 		"status": 0,
+ 		"deviceId": "motion",
+ 	},
+ 	"deviceId": "motion"
+},
+{
+ 	"payload":
+ 	{
+		"timeStampIso": "2016-09-10T22:35:06.732142",
+ 		"timeStampEpoch": 1473546906732,
+ 		"tempReading": 20.0,
+ 		"deviceId": "temperature",
+ 	},
+ 	"deviceId": "temperature"
+}
+],
+"Count": 3,
+"ScannedCount": 3
+}

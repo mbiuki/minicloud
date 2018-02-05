@@ -1,0 +1,19 @@
+{
+  "name": "aws-iot-frontend",
+  "version": "1.0.0",
+  "description": "Create a file called 'credentials.js' in this directory.\r ```\r var config = {\r \tpoolId: \"\", // 'YourCognitoIdentityPoolId'\r \thost: \"\", // 'YourAWSIoTEndpoint', e.g. 'prefix.iot.us-east-1.amazonaws.com'\r \tregion: \"\", // e.g 'us-west-2'\r \tendpoint : \"\", // API Gateway endpoint e.g. 'https://prefix-api.us-west-2.amazonaws.com/prod'\r \tslackWebhook : \"\", // Slack Incoming Webhook URL e.g. \"https://hooks.slack.com/services/test/test/test\" \r };",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mbiuki/minicloud/"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-iot-device-sdk": "^2.2.0",
+    "aws-sdk": "^2.188.0"
+  }
+}
