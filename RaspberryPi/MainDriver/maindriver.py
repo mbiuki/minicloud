@@ -16,7 +16,7 @@ import json
 import boto3
 import RPi.GPIO as GPIO
 import requests
-# import tempSensor
+import tempSensor
 # import pigpio
 # import DHT22
 # from time import sleep
@@ -158,26 +158,6 @@ GPIO.setup(20,GPIO.OUT)
 pir = MotionSensor(4)
 
 ######################
-# Init Temp Sensor   #
-######################
-# Initiate GPIO for pigpio
-##pi = pigpio.pi()
-### Setup the sensor
-##dht22 = DHT22.sensor(pi, 12) # use the actual GPIO pin name
-##dht22.trigger()
-##
-##sleepTime = 5
-##
-##def readDHT22():
-##    # Get a new reading
-##    dht22.trigger()
-##    # Save our values
-##    humidity  = '%.2f' % (dht22.humidity())
-##    temp = '%.2f' % (dht22.temperature())
-##    return (humidity, temp)
-
-
-######################
 # ## Init Camera #####
 ######################
 camera = PiCamera(resolution=(640, 480))
@@ -231,11 +211,12 @@ myAWSIoTMQTTClient.subscribe(ledTopic,    1, ledCallback    )
 myAWSIoTMQTTClient.subscribe(cameraTopic, 1, cameraCallback )
 time.sleep(2)
 
+Thread(target=tempSensor.read_temp_every(5)).start()
+
 # Constantly check for motion, and no motion and publish 
 while True:
     pir.wait_for_motion()
     Thread(target=publishMotion("1")).start()
     pir.wait_for_no_motion()
-    Thread(target=publishMotion("0")).start()
-    
+    Thread(target=publishMotion("0")).start()    
 # EoF
