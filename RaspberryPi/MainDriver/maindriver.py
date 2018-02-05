@@ -96,9 +96,14 @@ def publishImage(url, labels, manual):
     data = {"url": url, "labels": labels, "manual":manual}
     print(requests.put(url=apiUrl + "/publishpicture", data=json.dumps(data)).text)
 
+def publishTemp(temp, humidity):
+    data = {"temp": temp, "humidity": humidity}
+    print(requests.put(url=apiUrl + "/updatetemp", data=json.dumps(data)).text)
+
 def emitTemperature():
     while True:
         humidity, temperature = tempSensor.readDHT22()
+        Thread(target=publishTemp(temperature, humidity)).start()    
         print("Humidity is: " + humidity + "%")
         print("Temperature is: " + temperature + "C")
         time.sleep(5)
