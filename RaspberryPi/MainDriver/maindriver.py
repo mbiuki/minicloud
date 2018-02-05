@@ -17,9 +17,6 @@ import boto3
 import RPi.GPIO as GPIO
 import requests
 import tempSensor
-# import pigpio
-# import DHT22
-# from time import sleep
 
 # #######################################################
 # Callback when motion sensor detects motion rising edge
@@ -98,6 +95,13 @@ def publishMotion(status):
 def publishImage(url, labels, manual):
     data = {"url": url, "labels": labels, "manual":manual}
     print(requests.put(url=apiUrl + "/publishpicture", data=json.dumps(data)).text)
+
+def emitTemperature():
+    while True:
+        humidity, temperature = tempSensor.readDHT22()
+        print("Humidity is: " + humidity + "%")
+        print("Temperature is: " + temperature + "C")
+        time.sleep(5)
 
 # ####################################
 # # Read in command-line parameters ##
@@ -211,7 +215,7 @@ myAWSIoTMQTTClient.subscribe(ledTopic,    1, ledCallback    )
 myAWSIoTMQTTClient.subscribe(cameraTopic, 1, cameraCallback )
 time.sleep(2)
 
-Thread(target=tempSensor.read_temp_every(5)).start()
+Thread(target=emitTemperature()).start()
 
 # Constantly check for motion, and no motion and publish 
 while True:
