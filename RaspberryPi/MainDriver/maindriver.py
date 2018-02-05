@@ -7,6 +7,7 @@ from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 from gpiozero import MotionSensor
 from picamera import PiCamera
 from random import randint
+from threading import Thread
 import logging
 import datetime
 import time
@@ -14,6 +15,11 @@ import argparse
 import json
 import boto3
 import RPi.GPIO as GPIO
+import requests
+# import tempSensor
+# import pigpio
+# import DHT22
+# from time import sleep
 
 # #######################################################
 # Callback when motion sensor detects motion rising edge
@@ -65,8 +71,8 @@ def takePicture(manual):
     print(response)
         
     # Send the image url in an IoT Publish
-    myAWSIoTMQTTClient.publishAsync("sensor/camera/image",
-        json.dumps({"url":url, "labels":response["Labels"], "manual": manual}), 1)
+    manual = 1 if manual else 0
+    publishImage(url, response["Labels"], manual)
 
 
 # ########################################
@@ -83,21 +89,15 @@ def ledCallback(client, userdata, message):
         GPIO.output(20,GPIO.HIGH)
     else:
         print("LED OFF")
-        GPIO.output(20,GPIO.LOW
-                    )
+        GPIO.output(20,GPIO.LOW)
     print("--------------\n\n")
+    
+def publishMotion(status):
+    requests.put(url=apiUrl + "/setstatus/motion", data=json.dumps({"status":status}))
 
-
-# ##############################################
-# For motion sensor, timestamp the time that 
-# someone passes by the motion sensor
-# ##############################################
-def getBaseMessage():
-    message = {}
-    message["timeStampEpoch"] = int(time.time() * 1000)
-    message["timeStampIso"] = datetime.datetime.now().isoformat()
-    return message
-
+def publishImage(url, labels, manual):
+    data = {"url": url, "labels": labels, "manual":manual}
+    print(requests.put(url=apiUrl + "/publishpicture", data=json.dumps(data)).text)
 
 # ####################################
 # # Read in command-line parameters ##
@@ -107,11 +107,13 @@ parser.add_argument("-e", "--endpoint", action="store", required=True, dest="hos
 parser.add_argument("-r", "--rootCA", action="store", required=True, dest="rootCAPath", help="Root CA file path")
 parser.add_argument("-c", "--cert", action="store", dest="certificatePath", help="Certificate file path")
 parser.add_argument("-k", "--key", action="store", dest="privateKeyPath", help="Private key file path")
-parser.add_argument("-s", "--s3", action="store", dest="s3bucket", help="S3 Bucket Name")
+parser.add_argument("-s", "--s3", action="store", dest="s3Bucket", help="S3 Bucket Name")
 parser.add_argument("-w", "--websocket", action="store_true", dest="useWebsocket", default=False,
                     help="Use MQTT over WebSocket")
 parser.add_argument("-id", "--clientId", action="store", dest="clientId", default="basicPubSub",
                     help="Targeted client id")
+parser.add_argument("-a", "--api", action="store", dest="apiUrl", help="API Gateway Endpoint")
+
 args = parser.parse_args()
 host = args.host
 rootCAPath = args.rootCAPath
@@ -119,7 +121,8 @@ certificatePath = args.certificatePath
 privateKeyPath = args.privateKeyPath
 useWebsocket = args.useWebsocket
 clientId = args.clientId
-s3Bucket = args.s3bucket
+s3Bucket = args.s3Bucket
+apiUrl = args.apiUrl
 
 if useWebsocket and certificatePath and privateKeyPath:
     parser.error("X.509 cert authentication and WebSocket are mutual exclusive. Please pick one.")
@@ -153,6 +156,26 @@ GPIO.setup(20,GPIO.OUT)
 # Init Motion Sensor #
 ######################
 pir = MotionSensor(4)
+
+######################
+# Init Temp Sensor   #
+######################
+# Initiate GPIO for pigpio
+##pi = pigpio.pi()
+### Setup the sensor
+##dht22 = DHT22.sensor(pi, 12) # use the actual GPIO pin name
+##dht22.trigger()
+##
+##sleepTime = 5
+##
+##def readDHT22():
+##    # Get a new reading
+##    dht22.trigger()
+##    # Save our values
+##    humidity  = '%.2f' % (dht22.humidity())
+##    temp = '%.2f' % (dht22.temperature())
+##    return (humidity, temp)
+
 
 ######################
 # ## Init Camera #####
@@ -208,17 +231,11 @@ myAWSIoTMQTTClient.subscribe(ledTopic,    1, ledCallback    )
 myAWSIoTMQTTClient.subscribe(cameraTopic, 1, cameraCallback )
 time.sleep(2)
 
-
 # Constantly check for motion, and no motion and publish 
 while True:
     pir.wait_for_motion()
-    motionMessage = getBaseMessage()
-    motionMessage["status"] = '1'
-    myAWSIoTMQTTClient.publishAsync(motionTopic, json.dumps(motionMessage), 1)
-
+    Thread(target=publishMotion("1")).start()
     pir.wait_for_no_motion()
-    noMotionMessage = getBaseMessage()
-    noMotionMessage["status"] = '0'
-    myAWSIoTMQTTClient.publishAsync(motionTopic, json.dumps(noMotionMessage), 1)
-
+    Thread(target=publishMotion("0")).start()
+    
 # EoF
