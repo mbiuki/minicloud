@@ -6,4 +6,5 @@ credentials.js
 *.pem
 *.key
 *.crt
+*.pyc
 certs/

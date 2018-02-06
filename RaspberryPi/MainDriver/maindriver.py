@@ -7,6 +7,7 @@ from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 from gpiozero import MotionSensor
 from picamera import PiCamera
 from random import randint
+from threading import Thread
 import logging
 import datetime
 import time
@@ -14,6 +15,8 @@ import argparse
 import json
 import boto3
 import RPi.GPIO as GPIO
+import requests
+import tempSensor
 
 # #######################################################
 # Callback when motion sensor detects motion rising edge
@@ -65,8 +68,8 @@ def takePicture(manual):
     print(response)
         
     # Send the image url in an IoT Publish
-    myAWSIoTMQTTClient.publishAsync("sensor/camera/image",
-        json.dumps({"url":url, "labels":response["Labels"], "manual": manual}), 1)
+    manual = 1 if manual else 0
+    publishImage(url, response["Labels"], manual)
 
 
 # ########################################
@@ -83,21 +86,27 @@ def ledCallback(client, userdata, message):
         GPIO.output(20,GPIO.HIGH)
     else:
         print("LED OFF")
-        GPIO.output(20,GPIO.LOW
-                    )
+        GPIO.output(20,GPIO.LOW)
     print("--------------\n\n")
+    
+def publishMotion(status):
+    requests.put(url=apiUrl + "/setstatus/motion", data=json.dumps({"status":status}))
 
+def publishImage(url, labels, manual):
+    data = {"url": url, "labels": labels, "manual":manual}
+    print(requests.put(url=apiUrl + "/publishpicture", data=json.dumps(data)).text)
 
-# ##############################################
-# For motion sensor, timestamp the time that 
-# someone passes by the motion sensor
-# ##############################################
-def getBaseMessage():
-    message = {}
-    message["timeStampEpoch"] = int(time.time() * 1000)
-    message["timeStampIso"] = datetime.datetime.now().isoformat()
-    return message
+def publishTemp(temp, humidity):
+    data = {"temp": temp, "humidity": humidity}
+    print(requests.put(url=apiUrl + "/updatetemp", data=json.dumps(data)).text)
 
+def emitTemperature():
+    while True:
+        humidity, temperature = tempSensor.readDHT22()
+        Thread(target=publishTemp(temperature, humidity)).start()    
+        print("Humidity is: " + humidity + "%")
+        print("Temperature is: " + temperature + "C")
+        time.sleep(5)
 
 # ####################################
 # # Read in command-line parameters ##
@@ -107,11 +116,13 @@ parser.add_argument("-e", "--endpoint", action="store", required=True, dest="hos
 parser.add_argument("-r", "--rootCA", action="store", required=True, dest="rootCAPath", help="Root CA file path")
 parser.add_argument("-c", "--cert", action="store", dest="certificatePath", help="Certificate file path")
 parser.add_argument("-k", "--key", action="store", dest="privateKeyPath", help="Private key file path")
-parser.add_argument("-s", "--s3", action="store", dest="s3bucket", help="S3 Bucket Name")
+parser.add_argument("-s", "--s3", action="store", dest="s3Bucket", help="S3 Bucket Name")
 parser.add_argument("-w", "--websocket", action="store_true", dest="useWebsocket", default=False,
                     help="Use MQTT over WebSocket")
 parser.add_argument("-id", "--clientId", action="store", dest="clientId", default="basicPubSub",
                     help="Targeted client id")
+parser.add_argument("-a", "--api", action="store", dest="apiUrl", help="API Gateway Endpoint")
+
 args = parser.parse_args()
 host = args.host
 rootCAPath = args.rootCAPath
@@ -119,7 +130,8 @@ certificatePath = args.certificatePath
 privateKeyPath = args.privateKeyPath
 useWebsocket = args.useWebsocket
 clientId = args.clientId
-s3Bucket = args.s3bucket
+s3Bucket = args.s3Bucket
+apiUrl = args.apiUrl
 
 if useWebsocket and certificatePath and privateKeyPath:
     parser.error("X.509 cert authentication and WebSocket are mutual exclusive. Please pick one.")
@@ -208,17 +220,12 @@ myAWSIoTMQTTClient.subscribe(ledTopic,    1, ledCallback    )
 myAWSIoTMQTTClient.subscribe(cameraTopic, 1, cameraCallback )
 time.sleep(2)
 
+Thread(target=emitTemperature()).start()
 
 # Constantly check for motion, and no motion and publish 
 while True:
     pir.wait_for_motion()
-    motionMessage = getBaseMessage()
-    motionMessage["status"] = '1'
-    myAWSIoTMQTTClient.publishAsync(motionTopic, json.dumps(motionMessage), 1)
-
+    Thread(target=publishMotion("1")).start()
     pir.wait_for_no_motion()
-    noMotionMessage = getBaseMessage()
-    noMotionMessage["status"] = '0'
-    myAWSIoTMQTTClient.publishAsync(motionTopic, json.dumps(noMotionMessage), 1)
-
+    Thread(target=publishMotion("0")).start()    
 # EoF
