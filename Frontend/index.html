@@ -29,12 +29,17 @@
 				<td id="motionUpdatedTime"></td>
 			</tr>
 			<tr>
-				<td>Light Sensor</td>
-				<td id="lightStatus"></td>
-				<td id="lightUpdatedTime"></td>
+				<td>Temperature</td>
+				<td id="tempStatus"></td>
+				<td id="tempUpdatedTime"></td>
+			</tr>
+			<tr>
+				<td>Humidity</td>
+				<td id="humidityStatus"></td>
+				<td id="humidityUpdatedTime"></td>
 			</tr>
 		</table>
-		<button id="ledButton" onclick="onLedButtonClick()"></button>
+		<button id="ledButton" onclick="onLedButtonClick()">Turn LED</button>
 		<span style="margin-left: 5px">Last Delay: </span>
 		<span id="ledDelay"></span>
 		<br/>
@@ -63,9 +68,9 @@
 				<div id="three">
 					<div id="threeIn">
 						<center>
-							<h3>Light Sensor Status</h3>
+							<h3>Temperature and Humidity Sensor Status</h3>
 						</center>
-						<canvas id="lightChart"></canvas>
+						<canvas id="tempChart"></canvas>
 					</div>
 				</div>
 			</div>
@@ -74,6 +79,7 @@
 		<div style="text-align: center">
 			<h3 style="margin-top: 100px">Current Camera Image:</h3>
 			<div>
+				<h4 id="imageDate"></h4>
 				<h4 id="humanDetected"></h4>
 				<image id="cameraImage"></image>
 				<p id="rekLabels"></p>
@@ -91,9 +97,9 @@
 						</center>
 						<label>Select Sensor</label>
 						<select id="sensorSelect">
-							<option value="led">LED</option>
+							<option value="led" selected="selected">LED</option>
 							<option value="motion">Motion Sensor</option>
-							<option value="light">Light Sensor</option>
+							<option value="temp">Temperature and Humidity Sensor</option>
 						</select>
 						<label>Time Start</label>
 						<input id="timeStart" type="number" min="0">
