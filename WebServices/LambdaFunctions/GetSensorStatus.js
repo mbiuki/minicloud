@@ -3,7 +3,7 @@ console.log('Loading function');
 let doc = require('dynamodb-doc');
 let dynamo = new doc.DynamoDB();
 let sensorTable = "SensorTable";
-const acceptedSensors = ["led", "motion", "light"];
+const acceptedSensors = ["led", "motion", "temp"];
 
 function returnResult(callback, statusCode, body) {
 	callback(null, {
@@ -32,9 +32,9 @@ exports.handler = (event, context, callback) => {
 		return;
 	}
 
-	// Default time range if not provided (last 5 mins)
+	// Default time range if not provided (last 60 mins)
 	let timeend = new Date().getTime();
-	let timestart = timeend - (300 * 1000);
+	let timestart = timeend - (60 * 60 * 1000);
 
 	// Use timeStart and timeEnd if provided directly (test)
 	if (event.timestart) {
