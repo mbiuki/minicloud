@@ -69,7 +69,7 @@ def takePicture(manual):
         
     # Send the image url in an IoT Publish
     manual = 1 if manual else 0
-    publishImage(url, response["Labels"], manual)
+    Thread(target=publishImage, args=(url, response["Labels"], manual)).start()
 
 
 # ########################################
@@ -103,10 +103,23 @@ def publishTemp(temp, humidity):
 def emitTemperature():
     while True:
         humidity, temperature = tempSensor.readDHT22()
-        Thread(target=publishTemp(temperature, humidity)).start()    
+        Thread(target=publishTemp, args=(temperature, humidity)).start()    
         print("Humidity is: " + humidity + "%")
         print("Temperature is: " + temperature + "C")
-        time.sleep(5)
+        time.sleep(10)
+
+def setInitLedStatus():
+    r = requests.get(url=apiUrl + "/currstatus").json()
+    print(r)
+    for item in r["Items"]:
+        if item["sensorId"] == "led":
+            status = int(item["payload"]["status"])
+            if (status):
+                print("Init LED Status is high")
+                GPIO.output(20,GPIO.HIGH)
+            else:
+                print("Init LED Status is low")
+                GPIO.output(20, GPIO.LOW)
 
 # ####################################
 # # Read in command-line parameters ##
@@ -220,12 +233,13 @@ myAWSIoTMQTTClient.subscribe(ledTopic,    1, ledCallback    )
 myAWSIoTMQTTClient.subscribe(cameraTopic, 1, cameraCallback )
 time.sleep(2)
 
-Thread(target=emitTemperature()).start()
+Thread(target=emitTemperature).start()
+Thread(target=setInitLedStatus).start()
 
 # Constantly check for motion, and no motion and publish 
 while True:
     pir.wait_for_motion()
-    Thread(target=publishMotion("1")).start()
+    Thread(target=publishMotion, args=("1")).start()
     pir.wait_for_no_motion()
-    Thread(target=publishMotion("0")).start()    
+    Thread(target=publishMotion, args=("0")).start()    
 # EoF
