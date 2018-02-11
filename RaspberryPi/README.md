@@ -10,4 +10,4 @@ http://boto3.readthedocs.io/en/latest/guide/quickstart.html
 See https://github.com/aws/aws-iot-device-sdk-python for more
 
 # Run
-python maindriver.py -e [AWS IoT Endpoint] -r [Root CA] -c [Certificate] -k [Private Key] -s [S3 Bucket Name] -a [API Gateway Endpoint]
+python maindriver.py -e [AWS IoT Endpoint] -r [Root CA] -c [Certificate] -k [Private Key] -s [S3 Bucket Name] -a [API Gateway Endpoint] -p [API Gateway Password]
