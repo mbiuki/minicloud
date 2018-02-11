@@ -39,14 +39,23 @@
 				<td id="humidityUpdatedTime"></td>
 			</tr>
 		</table>
-		<button id="ledButton" onclick="onLedButtonClick()">Turn LED</button>
-		<span style="margin-left: 5px">Last Delay: </span>
-		<span id="ledDelay"></span>
 		<br/>
 		<br/>
-		<button id="cameraButton" onclick="onCameraButtonClick()">Take Picture</button>
-		<span style="margin-left: 5px">Last Delay: </span>
-		<span id="cameraDelay"></span>
+		<div id="passwordDiv"> 
+			<p>Enter password to interact with sensors</p>
+			<input id="passwordText" type="password" name="password" placeholder="Password">
+			<button onclick="onPasswordSubmit()">Submit</button>
+		</div>
+		<div id="buttonDiv">
+			<button id="ledButton" onclick="onLedButtonClick()">Turn LED</button>
+			<span style="margin-left: 5px">Last Delay: </span>
+			<span id="ledDelay"></span>
+			<br/>
+			<br/>
+			<button id="cameraButton" onclick="onCameraButtonClick()">Take Picture</button>
+			<span style="margin-left: 5px">Last Delay: </span>
+			<span id="cameraDelay"></span>
+		</div>
 		<div class="graphRow">
 			<div id="wrapper">
 				<div id="one">

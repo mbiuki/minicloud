@@ -116,3 +116,7 @@
 	margin: 75px;
 	padding: 75px;
 }
+
+#buttonDiv {
+	display:none;
+}
