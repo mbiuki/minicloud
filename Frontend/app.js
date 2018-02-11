@@ -11,7 +11,6 @@ var password;
 
 // Subscribe to topics
 function mqttClientConnectHandler() {
-	console.log(mqttClient)
 	mqttClient.subscribe("sensor/camera/image");
 	mqttClient.subscribe("sensor/led/payload");
 	mqttClient.subscribe("sensor/motion/payload");
@@ -291,24 +290,28 @@ function createTempHumidityChart(sensorCtx, sensorChart, tempData, humidityData,
 		type: 'line',
 		data: {
 			labels: timeStamps,
-			datasets: [
-			{
-				label: "Temperature",
-				data: tempData,
-				backgroundColor: "rgba(153,255,51,0.4)"
-			},
-			{
-				label: "Humidity",
-				data: humidityData,
-				backgroundColor: "rgba(75,133,200,0.4)"
-			},
+			datasets: [{
+					label: "Temperature",
+					data: tempData,
+					backgroundColor: "rgba(153,255,51,0.4)"
+				},
+				{
+					label: "Humidity",
+					data: humidityData,
+					backgroundColor: "rgba(75,133,200,0.4)"
+				},
 			]
 		},
 		options: {
 			scales: {
 				xAxes: [{
 					type: 'time',
-				}]
+				}],
+				yAxes: [{
+					ticks: {
+						suggestedMin: 0
+					}
+				}],
 			}
 		}
 	});
@@ -372,6 +375,7 @@ function setDefaultTimeRange() {
 function onLedButtonClick() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("PUT", endpoint + "/setstatus/led");
+	xhttp.setRequestHeader("authorizationToken", password);
 
 	xhttp.onload = function(e) {
 		console.log(xhttp.response);
