@@ -17,6 +17,7 @@ import boto3
 import RPi.GPIO as GPIO
 import requests
 import tempSensor
+import folderDetector
 
 # #######################################################
 # Callback when motion sensor detects motion rising edge
@@ -70,7 +71,7 @@ def takePicture(manual):
     # Send the image url in an IoT Publish
     manual = 1 if manual else 0
     Thread(target=publishImage, args=(url, response["Labels"], manual)).start()
-
+    Thread(target=folderDetector.cleanup).start()
 
 # ########################################
 # Callback when website presses LED button
@@ -90,15 +91,18 @@ def ledCallback(client, userdata, message):
     print("--------------\n\n")
     
 def publishMotion(status):
-    requests.put(url=apiUrl + "/setstatus/motion", data=json.dumps({"status":status}))
+    print(requests.put(url=apiUrl + "/setstatus/motion", data=json.dumps({"status":status}),
+                 headers={"authorizationToken": apiPass}).text)
 
 def publishImage(url, labels, manual):
     data = {"url": url, "labels": labels, "manual":manual}
-    print(requests.put(url=apiUrl + "/publishpicture", data=json.dumps(data)).text)
+    print(requests.put(url=apiUrl + "/publishpicture", data=json.dumps(data),
+                       headers={"authorizationToken": apiPass}).text)
 
 def publishTemp(temp, humidity):
     data = {"temp": temp, "humidity": humidity}
-    print(requests.put(url=apiUrl + "/updatetemp", data=json.dumps(data)).text)
+    print(requests.put(url=apiUrl + "/updatetemp", data=json.dumps(data),
+                       headers={"authorizationToken": apiPass}).text)
 
 def emitTemperature():
     while True:
@@ -106,7 +110,7 @@ def emitTemperature():
         Thread(target=publishTemp, args=(temperature, humidity)).start()    
         print("Humidity is: " + humidity + "%")
         print("Temperature is: " + temperature + "C")
-        time.sleep(10)
+        time.sleep(60)
 
 def setInitLedStatus():
     r = requests.get(url=apiUrl + "/currstatus").json()
@@ -135,6 +139,8 @@ parser.add_argument("-w", "--websocket", action="store_true", dest="useWebsocket
 parser.add_argument("-id", "--clientId", action="store", dest="clientId", default="basicPubSub",
                     help="Targeted client id")
 parser.add_argument("-a", "--api", action="store", dest="apiUrl", help="API Gateway Endpoint")
+parser.add_argument("-p", "--password", action="store", dest="apiPass", help="API Gateway Password")
+
 
 args = parser.parse_args()
 host = args.host
@@ -145,6 +151,7 @@ useWebsocket = args.useWebsocket
 clientId = args.clientId
 s3Bucket = args.s3Bucket
 apiUrl = args.apiUrl
+apiPass = args.apiPass
 
 if useWebsocket and certificatePath and privateKeyPath:
     parser.error("X.509 cert authentication and WebSocket are mutual exclusive. Please pick one.")
