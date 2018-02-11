@@ -7,10 +7,11 @@ var ledPublishTime;
 var cameraPublishTime;
 var endpoint = mqttClient.config.endpoint;
 var slackWebhook = mqttClient.config.slackWebhook;
+var password;
 
 // Subscribe to topics
 function mqttClientConnectHandler() {
-	console.log('connect');
+	console.log(mqttClient)
 	mqttClient.subscribe("sensor/camera/image");
 	mqttClient.subscribe("sensor/led/payload");
 	mqttClient.subscribe("sensor/motion/payload");
@@ -57,8 +58,8 @@ function mqttClientMessageHandler(topic, payload) {
 		setLedButtonStatus(payloadObj["status"]);
 		var ledText = document.getElementById("ledStatus");
 		var ledUpdated = document.getElementById("ledUpdatedTime");
-		ledText.innerHTML = payloadObj["status"];
-		ledUpdated.innerHTML = payloadObj["timeStampIso"];
+		ledText.innerHTML = payloadObj["status"] == 1 ? "LED On" : "LED Off";
+		ledUpdated.innerHTML = new Date(payloadObj["timeStampIso"]).toLocaleString();
 	}
 	if (topic == "sensor/motion/payload") {
 		var dataLength = motionChart.chart.data.datasets[0].data.length;
@@ -68,14 +69,14 @@ function mqttClientMessageHandler(topic, payload) {
 
 		var motionText = document.getElementById("motionStatus");
 		var motionUpdated = document.getElementById("motionUpdatedTime");
-		motionText.innerHTML = payloadObj["status"];
-		motionUpdated.innerHTML = payloadObj["timeStampIso"];
+		motionText.innerHTML = payloadObj["status"] == 1 ? "Motion Detected" : "No Motion Detected";
+		motionUpdated.innerHTML = new Date(payloadObj["timeStampIso"]).toLocaleString();
 	}
 	if (topic == "sensor/temp/payload") {
 		var dataLength = tempChart.chart.data.datasets[0].data.length;
 		tempChart.chart.data.datasets[0].data[dataLength] = payloadObj["temp"];
 		tempChart.chart.data.datasets[1].data[dataLength] = payloadObj["humidity"];
-		tempChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
+		tempChart.chart.data.labels[dataLength] = new Date(payloadObj["timeStampIso"]).toLocaleString();
 		tempChart.chart.update();
 
 		var tempText = document.getElementById("tempStatus");
@@ -128,8 +129,11 @@ function setupCurrSensorStatus() {
 		// Create the graphs for the sensors
 		for (var i = 0; i < sensorStatus.length; i++) {
 			var date = sensorStatus[i].payload.timeStampIso;
+			date = new Date(date);
+			date = date.toLocaleString();
 			if (sensorStatus[i].sensorId == "led") {
 				var status = sensorStatus[i].payload.status;
+				status = status == 1 ? "LED On" : "LED Off";
 				ledText.innerHTML = status;
 				ledUpdated.innerHTML = date;
 				ledStatus = sensorStatus[i].payload.status;
@@ -138,6 +142,7 @@ function setupCurrSensorStatus() {
 			}
 			if (sensorStatus[i].sensorId == "motion") {
 				var status = sensorStatus[i].payload.status;
+				status = status == 1 ? "Motion Detected" : "No Motion Detected";
 				motionText.innerHTML = status;
 				motionUpdated.innerHTML = date;
 				createChart("motion", document.getElementById('motionChart').getContext('2d'), motionChart, [], []);
@@ -334,7 +339,7 @@ function setImage(response) {
 	var imageDateText = response["timeStampIso"];
 
 	cameraImage.src = src;
-	imageDate.innerText = imageDateText;
+	imageDate.innerText = new Date(imageDateText).toLocaleString();
 
 	var isHuman = false;
 	var rekText = "";
@@ -382,6 +387,7 @@ function onLedButtonClick() {
 function onCameraButtonClick() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("POST", endpoint + "/takepicture");
+	xhttp.setRequestHeader("authorizationToken", password);
 
 	xhttp.onload = function(e) {
 		console.log(xhttp.response);
@@ -408,4 +414,25 @@ function onGraphButtonClick() {
 	else {
 		setupSensorData(sensorSelect.value, document.getElementById('dataChart').getContext('2d'), dataChart, timeStart.value, timeEnd.value);
 	}
+}
+
+function onPasswordSubmit() {
+	var passwordText = document.getElementById("passwordText").value;
+
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("post", endpoint + "/checkpassword");
+
+	xhttp.onload = function(e) {
+		var result = JSON.parse(xhttp.response);
+		console.log(result);
+		if (result["valid"]) {
+			alert("Access granted");
+			password = passwordText;
+			document.getElementById("passwordDiv").style.display = 'none';
+			document.getElementById("buttonDiv").style.display = 'block';
+
+		}
+	}
+
+	xhttp.send(JSON.stringify({ "password": passwordText }));
 }

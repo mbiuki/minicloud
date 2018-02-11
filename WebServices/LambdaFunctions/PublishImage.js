@@ -1,6 +1,5 @@
 const AWS = require('aws-sdk');
 const iotData = new AWS.IotData({ endpoint: process.env.AWS_IOT_ENDPOINT });
-const acceptedSensors = ["led", "motion"];
 
 function returnResult(callback, statusCode, body) {
 	callback(null, {
@@ -13,34 +12,25 @@ function returnResult(callback, statusCode, body) {
 }
 
 exports.handler = (event, context, callback) => {
-	if (event.pathParameters && event.pathParameters.proxy) {
-		event.sensorId = event.pathParameters.proxy;
-	}
-
-	if (!event.sensorId) {
-		returnResult(callback, 400, "Missing Sensor ID in Path");
-		return;
-	}
-
-	if (acceptedSensors.indexOf(event.sensorId) < 0) {
-		returnResult(callback, 400, "Not an accepted sensor to modify status");
-		return;
-	}
-
 	if (event.body) {
 	    let body = JSON.parse(event.body);
-	    if (body.status) {
-		    event.status = body.status;
+	    if (body.url) {
+		    event.url = body.url;
+	    }
+	    if (body.labels) {
+	    	event.labels = body.labels;
+	    }
+	    if (body.manual) {
+	    	event.manual = body.manual;
 	    }
 	}
 
-	if (event.status === null || event.status === undefined) {
-		returnResult(callback, 400, "Missing Status in Body");
+	if (event.url === null || event.url === undefined) {
+		returnResult(callback, 400, "Missing URL in Body");
 		return;
 	}
-	
-	if (event.status != '0' && event.status != '1') {
-	    returnResult(callback, 400, "Status can only be 0 or 1 for digital sensors");
+	if (event.labels === null || event.labels === undefined) {
+		returnResult(callback, 400, "Missing labels in Body");
 		return;
 	}
 
@@ -48,10 +38,12 @@ exports.handler = (event, context, callback) => {
 	let date = new Date();
 	payload.timeStampEpoch = date.getTime();
 	payload.timeStampIso = date.toISOString();
-	payload.status = event.status;
+	payload.url = event.url;
+	payload.labels = event.labels;
+	payload.manual = event.manual;
 
 	const params = {
-		topic: 'sensor/' + event.sensorId + '/payload',
+		topic: 'sensor/camera/image',
 		payload: JSON.stringify(payload)
 	};
 

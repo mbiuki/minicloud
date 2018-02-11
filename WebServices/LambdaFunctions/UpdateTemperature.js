@@ -1,6 +1,5 @@
 const AWS = require('aws-sdk');
 const iotData = new AWS.IotData({ endpoint: process.env.AWS_IOT_ENDPOINT });
-const acceptedSensors = ["led", "motion"];
 
 function returnResult(callback, statusCode, body) {
 	callback(null, {
@@ -13,34 +12,23 @@ function returnResult(callback, statusCode, body) {
 }
 
 exports.handler = (event, context, callback) => {
-	if (event.pathParameters && event.pathParameters.proxy) {
-		event.sensorId = event.pathParameters.proxy;
-	}
-
-	if (!event.sensorId) {
-		returnResult(callback, 400, "Missing Sensor ID in Path");
-		return;
-	}
-
-	if (acceptedSensors.indexOf(event.sensorId) < 0) {
-		returnResult(callback, 400, "Not an accepted sensor to modify status");
-		return;
-	}
-
 	if (event.body) {
 	    let body = JSON.parse(event.body);
-	    if (body.status) {
-		    event.status = body.status;
+	    if (body.temp) {
+		    event.temp = body.temp;
+	    }
+	    if (body.humidity) {
+		    event.humidity = body.humidity;
 	    }
 	}
 
-	if (event.status === null || event.status === undefined) {
-		returnResult(callback, 400, "Missing Status in Body");
+	if (event.temp === null || event.temp === undefined) {
+		returnResult(callback, 400, "Missing Temperature in Body");
 		return;
 	}
 	
-	if (event.status != '0' && event.status != '1') {
-	    returnResult(callback, 400, "Status can only be 0 or 1 for digital sensors");
+	if (event.humidity === null || event.humidity === undefined) {
+		returnResult(callback, 400, "Missing Humidity in Body");
 		return;
 	}
 
@@ -48,10 +36,11 @@ exports.handler = (event, context, callback) => {
 	let date = new Date();
 	payload.timeStampEpoch = date.getTime();
 	payload.timeStampIso = date.toISOString();
-	payload.status = event.status;
+	payload.temp = event.temp;
+	payload.humidity = event.humidity;
 
 	const params = {
-		topic: 'sensor/' + event.sensorId + '/payload',
+		topic: 'sensor/temp/payload',
 		payload: JSON.stringify(payload)
 	};
 
