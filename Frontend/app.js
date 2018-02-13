@@ -73,9 +73,10 @@ function mqttClientMessageHandler(topic, payload) {
 	}
 	if (topic == "sensor/temp/payload") {
 		var dataLength = tempChart.chart.data.datasets[0].data.length;
+		var date = new Date(payloadObj["timeStampIso"]).toLocaleString();
 		tempChart.chart.data.datasets[0].data[dataLength] = payloadObj["temp"];
 		tempChart.chart.data.datasets[1].data[dataLength] = payloadObj["humidity"];
-		tempChart.chart.data.labels[dataLength] = new Date(payloadObj["timeStampIso"]).toLocaleString();
+		tempChart.chart.data.labels[dataLength] = date;
 		tempChart.chart.update();
 
 		var tempText = document.getElementById("tempStatus");
@@ -84,9 +85,9 @@ function mqttClientMessageHandler(topic, payload) {
 		var humidityUpdated = document.getElementById("humidityUpdatedTime");
 
 		tempText.innerHTML = payloadObj["temp"] + " C";
-		tempUpdated.innerHTML = payloadObj["timeStampIso"];
+		tempUpdated.innerHTML = date;
 		humidityText.innerHTML = payloadObj["humidity"] + "%";
-		humidityUpdated.innerHTML = payloadObj["timeStampIso"];
+		humidityUpdated.innerHTML = date;
 	}
 };
 
@@ -348,7 +349,7 @@ function setImage(response) {
 	var rekText = "";
 	for (var i = 0; i < labels.length; i++) {
 		isHuman |= labels[i]["Name"] == "Human";
-		rekText += "\n" + labels[i]["Name"] + ": " + labels[i]["Confidence"];
+		rekText += "\n" + labels[i]["Name"] + ": " + labels[i]["Confidence"].toFixed(2);
 	}
 	rekLabels.innerText = rekText;
 
