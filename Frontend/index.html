@@ -6,6 +6,8 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
 	<script src="bundle.js"></script>
 	<script src="app.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 
 <body>
@@ -111,9 +113,9 @@
 							<option value="temp">Temperature and Humidity Sensor</option>
 						</select>
 						<label>Time Start</label>
-						<input id="timeStart" type="number" min="0">
+						<input id="timeStartPicker" placeholder="Start Date">
 						<label>Time End</label>
-						<input id="timeEnd" type="number" min="0">
+						<input id="timeEndPicker" placeholder="End Date">
 						<button id="graphButton" onclick="onGraphButtonClick()">Graph Data</button>
 						<br/>
 						<br/>
