@@ -1,6 +1,7 @@
 var ledChart = {};
 var motionChart = {};
 var tempChart = {};
+var humChart = {};
 var dataChart = {};
 var ledStatus;
 var ledPublishTime;
@@ -8,10 +9,11 @@ var cameraPublishTime;
 var endpoint = mqttClient.config.endpoint;
 var slackWebhook = mqttClient.config.slackWebhook;
 var password;
+var timeStartPicker;
+var timeEndPicker;
 
 // Subscribe to topics
 function mqttClientConnectHandler() {
-	console.log(mqttClient)
 	mqttClient.subscribe("sensor/camera/image");
 	mqttClient.subscribe("sensor/led/payload");
 	mqttClient.subscribe("sensor/motion/payload");
@@ -23,6 +25,7 @@ function mqttClientMessageHandler(topic, payload) {
 	var message = 'message: ' + topic + ':' + payload.toString();
 	console.log(message);
 	var payloadObj = JSON.parse(payload);
+	var date = new Date(payloadObj["timeStampIso"]).toLocaleString();
 
 	// If new camera image, display it
 	if (topic == "sensor/camera/image") {
@@ -51,7 +54,7 @@ function mqttClientMessageHandler(topic, payload) {
 		// Graph the new data point
 		var dataLength = ledChart.chart.data.datasets[0].data.length;
 		ledChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
-		ledChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
+		ledChart.chart.data.labels[dataLength] = date;
 		ledChart.chart.update();
 
 		// Update text 
@@ -59,25 +62,28 @@ function mqttClientMessageHandler(topic, payload) {
 		var ledText = document.getElementById("ledStatus");
 		var ledUpdated = document.getElementById("ledUpdatedTime");
 		ledText.innerHTML = payloadObj["status"] == 1 ? "LED On" : "LED Off";
-		ledUpdated.innerHTML = new Date(payloadObj["timeStampIso"]).toLocaleString();
+		ledUpdated.innerHTML = date;
 	}
 	if (topic == "sensor/motion/payload") {
 		var dataLength = motionChart.chart.data.datasets[0].data.length;
 		motionChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
-		motionChart.chart.data.labels[dataLength] = payloadObj["timeStampIso"];
+		motionChart.chart.data.labels[dataLength] = date;
 		motionChart.chart.update();
 
 		var motionText = document.getElementById("motionStatus");
 		var motionUpdated = document.getElementById("motionUpdatedTime");
 		motionText.innerHTML = payloadObj["status"] == 1 ? "Motion Detected" : "No Motion Detected";
-		motionUpdated.innerHTML = new Date(payloadObj["timeStampIso"]).toLocaleString();
+		motionUpdated.innerHTML = date;
 	}
+	// Temperature and humidity data are emitted together
 	if (topic == "sensor/temp/payload") {
 		var dataLength = tempChart.chart.data.datasets[0].data.length;
 		tempChart.chart.data.datasets[0].data[dataLength] = payloadObj["temp"];
-		tempChart.chart.data.datasets[1].data[dataLength] = payloadObj["humidity"];
-		tempChart.chart.data.labels[dataLength] = new Date(payloadObj["timeStampIso"]).toLocaleString();
+		humChart.chart.data.datasets[0].data[dataLength] = payloadObj["humidity"];
+		tempChart.chart.data.labels[dataLength] = date;
+		humChart.chart.data.labels[dataLength] = date;
 		tempChart.chart.update();
+		humChart.chart.update();
 
 		var tempText = document.getElementById("tempStatus");
 		var tempUpdated = document.getElementById("tempUpdatedTime");
@@ -85,9 +91,9 @@ function mqttClientMessageHandler(topic, payload) {
 		var humidityUpdated = document.getElementById("humidityUpdatedTime");
 
 		tempText.innerHTML = payloadObj["temp"] + " C";
-		tempUpdated.innerHTML = payloadObj["timeStampIso"];
+		tempUpdated.innerHTML = date;
 		humidityText.innerHTML = payloadObj["humidity"] + "%";
-		humidityUpdated.innerHTML = payloadObj["timeStampIso"];
+		humidityUpdated.innerHTML = date;
 	}
 };
 
@@ -95,10 +101,19 @@ mqttClient.on('connect', mqttClientConnectHandler);
 mqttClient.on('message', mqttClientMessageHandler);
 
 window.onload = function() {
-	setDefaultTimeRange();
 	setupCurrSensorStatus();
-	window.onGraphButtonClick();
 	getCurrImage();
+	timeStartPicker = flatpickr("#timeStartPicker", {
+		enableTime: true,
+		dateFormat: "Y-m-d H:i",
+		defaultDate: (new Date().getTime()) - 1000 * 3600,
+	});
+	timeEndPicker = flatpickr("#timeEndPicker", {
+		enableTime: true,
+		dateFormat: "Y-m-d H:i",
+		defaultDate: new Date(),
+	});
+	plotCustomGraph();
 }
 
 // Get current status of sensors. Display and set up the graphs.
@@ -124,13 +139,9 @@ function setupCurrSensorStatus() {
 		var tempUpdated = document.getElementById("tempUpdatedTime");
 		var humidityUpdated = document.getElementById("humidityUpdatedTime");
 
-		var timeStampIso = new Date().toISOString();
-
 		// Create the graphs for the sensors
 		for (var i = 0; i < sensorStatus.length; i++) {
-			var date = sensorStatus[i].payload.timeStampIso;
-			date = new Date(date);
-			date = date.toLocaleString();
+			var date = new Date(sensorStatus[i].payload.timeStampIso).toLocaleString();
 			if (sensorStatus[i].sensorId == "led") {
 				var status = sensorStatus[i].payload.status;
 				status = status == 1 ? "LED On" : "LED Off";
@@ -138,15 +149,16 @@ function setupCurrSensorStatus() {
 				ledUpdated.innerHTML = date;
 				ledStatus = sensorStatus[i].payload.status;
 				setLedButtonStatus(sensorStatus[i].payload.status);
-				createChart("led", document.getElementById('ledChart').getContext('2d'), ledChart, [], []);
+				createChart("LED", document.getElementById('ledChart').getContext('2d'), ledChart, [], [], true);
 			}
 			if (sensorStatus[i].sensorId == "motion") {
 				var status = sensorStatus[i].payload.status;
 				status = status == 1 ? "Motion Detected" : "No Motion Detected";
 				motionText.innerHTML = status;
 				motionUpdated.innerHTML = date;
-				createChart("motion", document.getElementById('motionChart').getContext('2d'), motionChart, [], []);
+				createChart("Motion", document.getElementById('motionChart').getContext('2d'), motionChart, [], [], true);
 			}
+			// Temperature and humidity data are emitted together
 			if (sensorStatus[i].sensorId == "temp") {
 				var temp = sensorStatus[i].payload.temp;
 				var humidity = sensorStatus[i].payload.humidity;
@@ -154,7 +166,8 @@ function setupCurrSensorStatus() {
 				tempUpdated.innerHTML = date;
 				humidityText.innerHTML = humidity + "%";
 				humidityUpdated.innerHTML = date;
-				createTempHumidityChart(document.getElementById('tempChart').getContext('2d'), tempChart);
+				createChart("Temperature", document.getElementById('tempChart').getContext('2d'), tempChart, [], [], false);
+				createChart("Humidity", document.getElementById('humChart').getContext('2d'), humChart, [], [], false);
 			}
 		}
 	}
@@ -163,9 +176,15 @@ function setupCurrSensorStatus() {
 }
 
 // Graph data for a given sensor and time range
-function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd) {
+function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd, steppedLine) {
+	// Temp and humidity are grouped under temp for API
+	var querySensor = sensor;
+	if (sensor == "humidity") {
+		querySensor = "temp";
+	}
+
 	var xhttp = new XMLHttpRequest();
-	xhttp.open("GET", endpoint + "/status/" + sensor + "?timestart=" + timeStart + "&timeEnd=" + timeEnd);
+	xhttp.open("GET", endpoint + "/status/" + querySensor + "?timestart=" + timeStart + "&timeEnd=" + timeEnd);
 
 	xhttp.onload = function(e) {
 		if (this.status != 200) {
@@ -180,8 +199,17 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd) {
 		var data = [];
 
 		for (var i = 0; i < responseData.length; i++) {
-			var val = responseData[i].payload["status"];
-			timeStamps.push(responseData[i].payload["timeStampIso"]);
+			timeStamps.push(new Date(responseData[i].payload["timeStampIso"]).toLocaleString());
+			var val;
+			if (sensor == "temp") {
+				val = responseData[i].payload["temp"];
+			}
+			else if (sensor == "humidity") {
+				val = responseData[i].payload["humidity"];
+			}
+			else {
+				val = responseData[i].payload["status"];
+			}
 			data.push(val);
 		}
 
@@ -192,48 +220,7 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd) {
 			sensorChart.chart.destroy();
 		}
 
-		createChart(sensor, sensorCtx, sensorChart, data, timeStamps);
-	}
-
-	xhttp.send();
-}
-
-// Graph data for temp/humidity in a given time range
-function setupTempHumidityData(sensorCtx, sensorChart, timeStart, timeEnd) {
-	var xhttp = new XMLHttpRequest();
-	xhttp.open("GET", endpoint + "/status/temp?timestart=" + timeStart + "&timeEnd=" + timeEnd);
-
-	xhttp.onload = function(e) {
-		if (this.status != 200) {
-			console.error("Error getting sensor data");
-			return;
-		}
-
-		var responseData = JSON.parse(xhttp.response)["Items"];
-		console.log(responseData)
-
-		var timeStamps = [];
-		var tempData = [];
-		var humidityData = [];
-
-		for (var i = 0; i < responseData.length; i++) {
-			if (!responseData[i].payload["temp"]) {
-				continue;
-			}
-			timeStamps.push(responseData[i].payload["timeStampIso"]);
-			tempData.push(responseData[i].payload["temp"]);
-			humidityData.push(responseData[i].payload["humidity"]);
-		}
-
-		console.log(timeStamps);
-		console.log(tempData);
-		console.log(humidityData);
-
-		if (sensorChart.chart) {
-			sensorChart.chart.destroy();
-		}
-
-		createTempHumidityChart(sensorCtx, sensorChart, tempData, humidityData, timeStamps);
+		createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine);
 	}
 
 	xhttp.send();
@@ -264,7 +251,7 @@ function sendImageToSlack(url, message, isHuman) {
 	xhttp.send(JSON.stringify(body));
 }
 
-function createChart(sensor, sensorCtx, sensorChart, data, timeStamps) {
+function createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine) {
 	sensorChart.chart = new Chart(sensorCtx, {
 		type: 'line',
 		data: {
@@ -272,7 +259,7 @@ function createChart(sensor, sensorCtx, sensorChart, data, timeStamps) {
 			datasets: [{
 				label: sensor + " Status",
 				data: data,
-				steppedLine: true,
+				steppedLine: steppedLine,
 				backgroundColor: "rgba(153,255,51,0.4)"
 			}]
 		},
@@ -280,35 +267,12 @@ function createChart(sensor, sensorCtx, sensorChart, data, timeStamps) {
 			scales: {
 				xAxes: [{
 					type: 'time',
-				}]
-			}
-		}
-	});
-}
-
-function createTempHumidityChart(sensorCtx, sensorChart, tempData, humidityData, timeStamps) {
-	sensorChart.chart = new Chart(sensorCtx, {
-		type: 'line',
-		data: {
-			labels: timeStamps,
-			datasets: [
-			{
-				label: "Temperature",
-				data: tempData,
-				backgroundColor: "rgba(153,255,51,0.4)"
-			},
-			{
-				label: "Humidity",
-				data: humidityData,
-				backgroundColor: "rgba(75,133,200,0.4)"
-			},
-			]
-		},
-		options: {
-			scales: {
-				xAxes: [{
-					type: 'time',
-				}]
+				}],
+				yAxes: [{
+					ticks: {
+						suggestedMin: 0
+					}
+				}],
 			}
 		}
 	});
@@ -345,7 +309,7 @@ function setImage(response) {
 	var rekText = "";
 	for (var i = 0; i < labels.length; i++) {
 		isHuman |= labels[i]["Name"] == "Human";
-		rekText += "\n" + labels[i]["Name"] + ": " + labels[i]["Confidence"];
+		rekText += "\n" + labels[i]["Name"] + ": " + labels[i]["Confidence"].toFixed(2);
 	}
 	rekLabels.innerText = rekText;
 
@@ -359,19 +323,11 @@ function setLedButtonStatus(newStatus) {
 	ledButton.innerHTML = newStatus == "1" ? "Turn LED Off" : "Turn LED On";
 }
 
-// Set default time range for graphing custom data
-function setDefaultTimeRange() {
-	var timeStart = document.getElementById("timeStart");
-	var timeEnd = document.getElementById("timeEnd");
-
-	var time = new Date().getTime();
-	timeEnd.value = parseInt(time);
-	timeStart.value = parseInt(time) - 1000 * 3600;
-}
 
 function onLedButtonClick() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("PUT", endpoint + "/setstatus/led");
+	xhttp.setRequestHeader("authorizationToken", password);
 
 	xhttp.onload = function(e) {
 		console.log(xhttp.response);
@@ -399,21 +355,23 @@ function onCameraButtonClick() {
 }
 
 function onGraphButtonClick() {
-	var sensorSelect = document.getElementById("sensorSelect");
-	var timeStart = document.getElementById("timeStart");
-	var timeEnd = document.getElementById("timeEnd");
+	plotCustomGraph();
+}
 
-	if (parseInt(timeStart.value) > parseInt(timeEnd.value)) {
+function plotCustomGraph() {
+	var sensorSelect = document.getElementById("sensorSelect");
+
+	var timeStart = timeStartPicker.selectedDates[0].getTime();
+	var timeEnd = timeEndPicker.selectedDates[0].getTime();
+
+	if (timeStart > timeEnd) {
 		alert("Time Start cannot be lower than Time End");
 		return;
 	}
 
-	if (sensorSelect.value == "temp") {
-		setupTempHumidityData(document.getElementById('dataChart').getContext('2d'), dataChart, timeStart.value, timeEnd.value);
-	}
-	else {
-		setupSensorData(sensorSelect.value, document.getElementById('dataChart').getContext('2d'), dataChart, timeStart.value, timeEnd.value);
-	}
+	var steppedLine = false;
+	steppedLine = sensorSelect.value == "led" || sensorSelect.value == "motion";
+	setupSensorData(sensorSelect.value, document.getElementById('dataChart').getContext('2d'), dataChart, timeStart, timeEnd, steppedLine);
 }
 
 function onPasswordSubmit() {
@@ -430,7 +388,6 @@ function onPasswordSubmit() {
 			password = passwordText;
 			document.getElementById("passwordDiv").style.display = 'none';
 			document.getElementById("buttonDiv").style.display = 'block';
-
 		}
 	}
 
