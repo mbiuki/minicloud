@@ -7,7 +7,6 @@ var ledStatus;
 var ledPublishTime;
 var cameraPublishTime;
 var endpoint = mqttClient.config.endpoint;
-var slackWebhook = mqttClient.config.slackWebhook;
 var password;
 var timeStartPicker;
 var timeEndPicker;
@@ -226,31 +225,6 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd, ste
 	xhttp.send();
 }
 
-function sendImageToSlack(url, message, isHuman) {
-	var xhttp = new XMLHttpRequest();
-	xhttp.open("POST", slackWebhook);
-
-	var humanDetectedMessage = isHuman ? "Human Detected" : "No Human Detected";
-	if (isHuman) {
-		message = "<!everyone> " + message;
-	}
-
-	var body = {
-		"attachments": [{
-			"fallback": "New Camera Image",
-			"title": humanDetectedMessage,
-			"text": message,
-			"image_url": url,
-			"color": "#764FA5"
-		}],
-		"unfurl_links": true
-	}
-
-	xhttp.onload = function(e) {}
-
-	xhttp.send(JSON.stringify(body));
-}
-
 function createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine) {
 	sensorChart.chart = new Chart(sensorCtx, {
 		type: 'line',
@@ -314,8 +288,6 @@ function setImage(response) {
 	rekLabels.innerText = rekText;
 
 	humanDetected.innerText = isHuman ? "Human detected" : "No human detected";
-
-	sendImageToSlack(src, rekText, isHuman);
 }
 
 function setLedButtonStatus(newStatus) {
