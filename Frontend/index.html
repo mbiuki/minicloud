@@ -2,11 +2,11 @@
 
 <head>
 	<link rel="stylesheet" href="main.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/moment@2.19.2/moment.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
 	<script src="bundle.js"></script>
 	<script src="app.js"></script>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 
@@ -43,7 +43,7 @@
 		</table>
 		<br/>
 		<br/>
-		<div id="passwordDiv"> 
+		<div id="passwordDiv">
 			<p>Enter password to interact with sensors</p>
 			<input id="passwordText" type="password" name="password" placeholder="Password">
 			<button onclick="onPasswordSubmit()">Submit</button>
@@ -59,30 +59,32 @@
 			<span id="cameraDelay"></span>
 		</div>
 		<div class="graphRow">
-			<div id="wrapper">
-				<div id="one">
-					<div id="oneIn">
-						<center>
-							<h3>LED Status</h3>
-						</center>
-						<canvas id="ledChart"></canvas>
-					</div>
+			<div style="display: inline-block; width:100%; ">
+				<div style="width: 40%; float:left; margin-left:100px">
+					<center>
+						<h3>LED Status</h3>
+					</center>
+					<canvas id="ledChart"></canvas>
 				</div>
-				<div id="two">
-					<div id="twoIn">
-						<center>
-							<h3>Motion Sensor Status</h3>
-						</center>
-						<canvas id="motionChart"></canvas>
-					</div>
+				<div style="width: 40%; float:right; margin-right:100px">
+					<center>
+						<h3>Motion Sensor Status</h3>
+					</center>
+					<canvas id="motionChart"></canvas>
 				</div>
-				<div id="three">
-					<div id="threeIn">
-						<center>
-							<h3>Temperature and Humidity Sensor Status</h3>
-						</center>
-						<canvas id="tempChart"></canvas>
-					</div>
+			</div>
+			<div style="display: inline-block; width:100%; margin-top: 70px">
+				<div style="width: 40%; float:left; margin-left:100px">
+					<center>
+						<h3>Temperature Sensor Status</h3>
+					</center>
+					<canvas id="tempChart"></canvas>
+				</div>
+				<div style="width: 40%; float:right; margin-right:100px">
+					<center>
+						<h3>Humidity Sensor Status</h3>
+					</center>
+					<canvas id="humChart"></canvas>
 				</div>
 			</div>
 		</div>
@@ -96,37 +98,30 @@
 				<p id="rekLabels"></p>
 			</div>
 		</div>
-		<div class="dataRow" style="margin-top: 75px">
-			<div id="wrapper2">
-				<div id="one2">
-					<div id="oneIn2" style="text-align: center">
-						<center>
-							<h3>Graph Custom Data</h3>
-						</center>
-						<center>
-							<canvas id="dataChart"></canvas>
-						</center>
-						<label>Select Sensor</label>
-						<select id="sensorSelect">
-							<option value="led" selected="selected">LED</option>
-							<option value="motion">Motion Sensor</option>
-							<option value="temp">Temperature and Humidity Sensor</option>
-						</select>
-						<label>Time Start</label>
-						<input id="timeStartPicker" placeholder="Start Date">
-						<label>Time End</label>
-						<input id="timeEndPicker" placeholder="End Date">
-						<button id="graphButton" onclick="onGraphButtonClick()">Graph Data</button>
-						<br/>
-						<br/>
-						<br/>
-						<br/>
-						<br/>
-						<br/>
-						<br/>
-					</div>
-				</div>
-			</div>
+		<div class="dataRow" style="margin-top:100px">
+			<center>
+				<h3>Graph Custom Data</h3>
+				<canvas id="dataChart"></canvas>
+				<label>Select Sensor</label>
+				<select id="sensorSelect">
+					<option value="led" selected="selected">LED</option>
+					<option value="motion">Motion Sensor</option>
+					<option value="temp">Temperature Sensor</option>
+					<option value="humidity">Humidity Sensor</option>
+				</select>
+				<label>Time Start</label>
+				<input id="timeStartPicker" placeholder="Start Date">
+				<label>Time End</label>
+				<input id="timeEndPicker" placeholder="End Date">
+				<button id="graphButton" onclick="onGraphButtonClick()">Graph Data</button>
+			</center>
+			<br/>
+			<br/>
+			<br/>
+			<br/>
+			<br/>
+			<br/>
+			<br/>
 		</div>
 	</div>
 </body>
