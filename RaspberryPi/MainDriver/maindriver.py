@@ -192,6 +192,7 @@ pir = MotionSensor(4)
 camera = PiCamera(resolution=(640, 480))
 camera.vflip = True
 camera.hflip = True
+camera.shutter_speed = 10000
 
 ######################
 # #### Init S3 #######

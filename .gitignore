@@ -7,4 +7,5 @@ credentials.js
 *.key
 *.crt
 *.pyc
+runpi.sh
 certs/
