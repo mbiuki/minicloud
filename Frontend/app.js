@@ -89,7 +89,7 @@ function mqttClientMessageHandler(topic, payload) {
 		var humidityText = document.getElementById("humidityStatus");
 		var humidityUpdated = document.getElementById("humidityUpdatedTime");
 
-		tempText.innerHTML = payloadObj["temp"] + " C";
+		tempText.innerHTML = payloadObj["temp"] + " \xB0C";
 		tempUpdated.innerHTML = date;
 		humidityText.innerHTML = payloadObj["humidity"] + "%";
 		humidityUpdated.innerHTML = date;
@@ -148,20 +148,20 @@ function setupCurrSensorStatus() {
 				ledUpdated.innerHTML = date;
 				ledStatus = sensorStatus[i].payload.status;
 				setLedButtonStatus(sensorStatus[i].payload.status);
-				createChart("LED", document.getElementById('ledChart').getContext('2d'), ledChart, [], [], true);
+				createStatusChart("LED", document.getElementById('ledChart').getContext('2d'), ledChart, [], [], true);
 			}
 			if (sensorStatus[i].sensorId == "motion") {
 				var status = sensorStatus[i].payload.status;
 				status = status == 1 ? "Motion Detected" : "No Motion Detected";
 				motionText.innerHTML = status;
 				motionUpdated.innerHTML = date;
-				createChart("Motion", document.getElementById('motionChart').getContext('2d'), motionChart, [], [], true);
+				createStatusChart("Motion", document.getElementById('motionChart').getContext('2d'), motionChart, [], [], true);
 			}
 			// Temperature and humidity data are emitted together
 			if (sensorStatus[i].sensorId == "temp") {
 				var temp = sensorStatus[i].payload.temp;
 				var humidity = sensorStatus[i].payload.humidity;
-				tempText.innerHTML = temp + " C";
+				tempText.innerHTML = temp + " \xB0C";
 				tempUpdated.innerHTML = date;
 				humidityText.innerHTML = humidity + "%";
 				humidityUpdated.innerHTML = date;
@@ -245,6 +245,45 @@ function createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLi
 				yAxes: [{
 					ticks: {
 						suggestedMin: 0
+					}
+				}],
+			}
+		}
+	});
+}
+
+function createStatusChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine) {
+	sensorChart.chart = new Chart(sensorCtx, {
+		type: 'line',
+		data: {
+			labels: timeStamps,
+			datasets: [{
+				label: sensor + " Status",
+				data: data,
+				steppedLine: steppedLine,
+				backgroundColor: "rgba(153,255,51,0.4)"
+			}]
+		},
+		options: {
+			scales: {
+				xAxes: [{
+					type: 'time',
+				}],
+				yAxes: [{
+					ticks: {
+						min: 0,
+					    max: 1,
+					    stepSize: 1,
+					    suggestedMin: 0,
+					    suggestedMax: 1,
+					    callback: function(label, index, labels) {
+					        switch (label) {
+					            case 0:
+					                return 'OFF';
+					            case 1:
+					                return 'ON';
+					        }
+					    }
 					}
 				}],
 			}
