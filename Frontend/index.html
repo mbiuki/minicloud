@@ -8,6 +8,9 @@
 	<script src="bundle.js"></script>
 	<script src="app.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+	<meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="114518079517-cil59u4ltbp03gpklvoc6i65umbs49df.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
 
 <body>
@@ -44,6 +47,8 @@
 		<br/>
 		<br/>
 		<div id="passwordDiv">
+			<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+			 <a href="#" onclick="signOut()">Sign out</a>
 			<p>Enter password to interact with sensors</p>
 			<input id="passwordText" type="password" name="password" placeholder="Password">
 			<button onclick="onPasswordSubmit()">Submit</button>
