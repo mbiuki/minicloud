@@ -27,5 +27,5 @@ Browserify is required to use the AWS IoT node libraries in the frontend. If you
 
 To run the above press shift, click on open power shell in Windows.
 
-# Running Locally 
+### Running Locally 
 Since Google Sign in has been implemented (which uses async requests), you need to serve the files here on a server for proper local testing. You can use `http-server` (https://github.com/indexzero/http-server) from Node.js, or `SimpleHTTPServer` (https://developer.mozilla.org/en-US/docs/Learn/Common_questions/set_up_a_local_testing_server#Running_a_simple_local_HTTP_server) from Python to do so. 
