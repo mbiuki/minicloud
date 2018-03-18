@@ -113,6 +113,10 @@ window.onload = function() {
 		defaultDate: new Date(),
 	});
 	plotCustomGraph();
+	console.log("IS SIGNED IN: " + gapi.auth2.getAuthInstance().isSignedIn.get());
+	if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
+		document.getElementById("buttonDiv").style.display = 'block';
+	}
 }
 
 // Get current status of sensors. Display and set up the graphs.
@@ -297,7 +301,9 @@ function setLedButtonStatus(newStatus) {
 function onLedButtonClick() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("PUT", endpoint + "/setstatus/led");
-	xhttp.setRequestHeader("authorizationToken", password);
+	var token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+	console.log(token);
+	xhttp.setRequestHeader("authorizationToken", token);
 
 	xhttp.onload = function(e) {
 		console.log(xhttp.response);
@@ -313,7 +319,8 @@ function onLedButtonClick() {
 function onCameraButtonClick() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("POST", endpoint + "/takepicture");
-	xhttp.setRequestHeader("authorizationToken", password);
+	var token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+	xhttp.setRequestHeader("authorizationToken", token);
 
 	xhttp.onload = function(e) {
 		console.log(xhttp.response);
@@ -377,6 +384,8 @@ function onSignIn(googleUser) {
 	// The ID token you need to pass to your backend:
 	var id_token = googleUser.getAuthResponse().id_token;
 	console.log("ID Token: " + id_token);
+
+	document.getElementById("buttonDiv").style.display = 'block';
 };
 
 function signOut() {
@@ -384,4 +393,6 @@ function signOut() {
 	auth2.signOut().then(function() {
 		console.log('User signed out.');
 	});
+
+	document.getElementById("buttonDiv").style.display = 'none';
 }
