@@ -113,10 +113,8 @@ window.onload = function() {
 		defaultDate: new Date(),
 	});
 	plotCustomGraph();
-	console.log("IS SIGNED IN: " + gapi.auth2.getAuthInstance().isSignedIn.get());
-	if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
-		document.getElementById("buttonDiv").style.display = 'block';
-	}
+	var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+	showSignInPrompt(!isSignedIn)
 }
 
 // Get current status of sensors. Display and set up the graphs.
@@ -307,6 +305,11 @@ function onLedButtonClick() {
 
 	xhttp.onload = function(e) {
 		console.log(xhttp.response);
+		console.log("boom");
+	}
+
+	xhttp.onerror = function(e) {
+		alert("You can send commands again in 24 hours");
 	}
 
 	var newStatus = ledStatus == "1" ? "0" : "1";
@@ -324,6 +327,10 @@ function onCameraButtonClick() {
 
 	xhttp.onload = function(e) {
 		console.log(xhttp.response);
+	}
+
+	xhttp.onerror = function(e) {
+		alert("You can send commands again in 24 hours");
 	}
 
 	// Record time published to calculate delay later
@@ -351,26 +358,6 @@ function plotCustomGraph() {
 	setupSensorData(sensorSelect.value, document.getElementById('dataChart').getContext('2d'), dataChart, timeStart, timeEnd, steppedLine);
 }
 
-function onPasswordSubmit() {
-	var passwordText = document.getElementById("passwordText").value;
-
-	var xhttp = new XMLHttpRequest();
-	xhttp.open("post", endpoint + "/checkpassword");
-
-	xhttp.onload = function(e) {
-		var result = JSON.parse(xhttp.response);
-		console.log(result);
-		if (result["valid"]) {
-			alert("Access granted");
-			password = passwordText;
-			document.getElementById("passwordDiv").style.display = 'none';
-			document.getElementById("buttonDiv").style.display = 'block';
-		}
-	}
-
-	xhttp.send(JSON.stringify({ "password": passwordText }));
-}
-
 function onSignIn(googleUser) {
 	// Useful data for your client-side scripts:
 	var profile = googleUser.getBasicProfile();
@@ -385,7 +372,7 @@ function onSignIn(googleUser) {
 	var id_token = googleUser.getAuthResponse().id_token;
 	console.log("ID Token: " + id_token);
 
-	document.getElementById("buttonDiv").style.display = 'block';
+	showSignInPrompt(false);
 };
 
 function signOut() {
@@ -394,5 +381,18 @@ function signOut() {
 		console.log('User signed out.');
 	});
 
-	document.getElementById("buttonDiv").style.display = 'none';
+	showSignInPrompt(true);
+}
+
+function showSignInPrompt(show) {
+	if (show) {
+		document.getElementById("signInText").style.display = 'block';
+		document.getElementById("buttonDiv").style.display = 'none';
+		document.getElementById("googleSignout").style.display = 'none';
+	}
+	else {
+		document.getElementById("signInText").style.display = 'none';
+		document.getElementById("buttonDiv").style.display = 'block';
+		document.getElementById("googleSignout").style.display = 'block';
+	}
 }
