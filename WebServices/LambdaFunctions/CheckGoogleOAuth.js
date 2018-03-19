@@ -89,8 +89,8 @@ exports.handler = (event, context, callback) => {
 						let nextTime = new Date(data.Item.timeAssigned + commandRefreshTime);
 						// Check if can refresh number of commands
 						if (currTime >= nextTime) {
-							updateParams["UpdateExpression"] = "set numCommands = :n";
-							updateParams["ExpressionAttributeValues"] = { ":n": numCommands - 1 };
+							updateParams["UpdateExpression"] = "set numCommands = :n, set timeAssigned = :d";
+							updateParams["ExpressionAttributeValues"] = { ":n": numCommands - 1, ":d": currTime};
 						} else {
 							console.log("No commands left to be sent. Please wait until " + nextTime);
 							callback(null, generatePolicy('user', 'Deny', event.methodArn));
