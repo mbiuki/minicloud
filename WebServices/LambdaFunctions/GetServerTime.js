@@ -3,8 +3,9 @@ exports.handler = (event, context, callback) => {
         {
             statusCode: 200, 
             body: 
+                JSON.stringify(
                 {
                     "time": new Date().getTime(),
-                }
+                })
         });
 };
