@@ -100,6 +100,10 @@ mqttClient.on('connect', mqttClientConnectHandler);
 mqttClient.on('message', mqttClientMessageHandler);
 
 window.onload = function() {
+	preloadPlot("LED", document.getElementById('ledChart').getContext('2d'), ledChart, true);
+	preloadPlot("Motion", document.getElementById('motionChart').getContext('2d'), motionChart, true);
+	preloadPlot("Temperature", document.getElementById('tempChart').getContext('2d'), tempChart, false);
+	preloadPlot("Humidity", document.getElementById('humChart').getContext('2d'), humChart, false);
 	setupCurrSensorStatus();
 	getCurrImage();
 	timeStartPicker = flatpickr("#timeStartPicker", {
@@ -219,7 +223,80 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd, ste
 			sensorChart.chart.destroy();
 		}
 
-		createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine);
+		// createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine);
+		if (sensor == "Temperature" || sensor == "Humidity") {
+			createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine);
+		} else {
+			createStatusChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine);
+		}
+	}
+
+	xhttp.send();
+}
+
+function preloadPlot(sensor, sensorCtx, sensorChart, steppedLine) {
+	// Temp and humidity are grouped under temp for API
+	if(sensor == "LED"){
+		querySensor = "led"
+	}
+	else if (sensor == "Motion"){
+		querySensor = "motion"
+	}
+	else {
+		querySensor = "temp"
+	}
+
+	var xhttp = new XMLHttpRequest();
+	timeStart = (new Date().getTime()) - 1000 * 3600 * 24;
+	xhttp.open("GET", endpoint + "/status/" + querySensor + "?timestart=" + timeStart); 
+	// what is the correct time for tmr for the corresponding format (+ "?timestart=" + timeStart + "&timeEnd=" + timeEnd) ?
+
+	xhttp.onload = function(e) {
+		if (this.status != 200) {
+			console.error("Error getting sensor data");
+			return;
+		}
+
+		var responseData = JSON.parse(xhttp.response)["Items"];
+		console.log(responseData)
+
+		var timeStamps = [];
+		var data = [];
+
+		if(responseData.length < 10){
+			startId = 0;
+			endId = responseData.length;
+		} else {
+			startId = responseData.length - 10;
+			endId = responseData.length;
+		}
+
+		for (var i = startId; i < endId; i++) {
+			timeStamps.push(new Date(responseData[i].payload["timeStampIso"]).toLocaleString());
+			var val;
+			if (sensor == "Temperature") {
+				val = responseData[i].payload["temp"];
+			} else if (sensor == "Humidity") {
+				val = responseData[i].payload["humidity"];
+			} else {
+				val = responseData[i].payload["status"];
+			}
+			data.push(val);
+		}
+
+		console.log(timeStamps);
+		console.log(data);
+
+		if (sensorChart.chart) {
+			sensorChart.chart.destroy();
+		}
+
+		if (sensor == "Temperature" || sensor == "Humidity") {
+			createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine);
+		} else {
+			createStatusChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine);
+		}
+
 	}
 
 	xhttp.send();
