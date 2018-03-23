@@ -83,21 +83,21 @@ exports.handler = (event, context, callback) => {
 						},
 					};
 
-					// Check if user is out of commands
-					if (data.Item.numCommands <= 0) {
-						let currTime = (new Date).getTime();
-						let nextTime = new Date(data.Item.timeAssigned + commandRefreshTime);
-						// Check if can refresh number of commands
-						if (currTime >= nextTime) {
-							updateParams["UpdateExpression"] = "set numCommands = :n, set timeAssigned = :d";
-							updateParams["ExpressionAttributeValues"] = { ":n": numCommands - 1, ":d": currTime};
-						} else {
-							console.log("No commands left to be sent. Please wait until " + nextTime);
-							callback(null, generatePolicy('user', 'Deny', event.methodArn));
-							return;
-						}
+					let currTime = (new Date).getTime();
+					let nextTime = new Date(data.Item.timeAssigned + commandRefreshTime);
+
+					// Check if can refresh commands
+					if (currTime >= nextTime) {
+						updateParams["UpdateExpression"] = "set numCommands = :n, timeAssigned = :d";
+						updateParams["ExpressionAttributeValues"] = { ":n": numCommands - 1, ":d": currTime};
 					}
-					// If commands available, decrement them.
+					// Check if out of commands
+					else if (data.Item.numCommands <= 0) {
+						console.log("No commands left to be sent. Please wait until " + nextTime);
+						callback(null, generatePolicy('user', 'Deny', event.methodArn));
+						return;
+					}
+					// Otherwise, decrement from remaining commands
 					else {
 						updateParams["UpdateExpression"] = "set numCommands = numCommands - :val";
 						updateParams["ExpressionAttributeValues"] = { ":val": 1 };
