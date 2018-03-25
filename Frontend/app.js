@@ -3,6 +3,7 @@ var motionChart = {};
 var tempChart = {};
 var humChart = {};
 var dataChart = {};
+var maxDataPoint = 13;
 var ledStatus;
 var ledPublishTime;
 var cameraPublishTime;
@@ -52,8 +53,15 @@ function mqttClientMessageHandler(topic, payload) {
 
 		// Graph the new data point
 		var dataLength = ledChart.chart.data.datasets[0].data.length;
-		ledChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
-		ledChart.chart.data.labels[dataLength] = date;
+		if(dataLength>=maxDataPoint){
+			ledChart.chart.data.labels.shift();
+			ledChart.chart.data.datasets[0].data.shift();
+			ledChart.chart.data.datasets[0].data[maxDataPoint-1] = payloadObj["status"];
+			ledChart.chart.data.labels[maxDataPoint-1] = date;
+		} else {
+			ledChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
+			ledChart.chart.data.labels[dataLength] = date;
+		}
 		ledChart.chart.update();
 
 		// Update text 
@@ -65,8 +73,15 @@ function mqttClientMessageHandler(topic, payload) {
 	}
 	if (topic == "sensor/motion/payload") {
 		var dataLength = motionChart.chart.data.datasets[0].data.length;
-		motionChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
-		motionChart.chart.data.labels[dataLength] = date;
+		if(dataLength>=maxDataPoint){
+			motionChart.chart.data.labels.shift();
+			motionChart.chart.data.datasets[0].data.shift();
+			motionChart.chart.data.datasets[0].data[maxDataPoint-1] = payloadObj["status"];
+			motionChart.chart.data.labels[maxDataPoint-1] = date;
+		} else {
+			motionChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
+			motionChart.chart.data.labels[dataLength] = date;
+		}
 		motionChart.chart.update();
 
 		var motionText = document.getElementById("motionStatus");
@@ -77,10 +92,21 @@ function mqttClientMessageHandler(topic, payload) {
 	// Temperature and humidity data are emitted together
 	if (topic == "sensor/temp/payload") {
 		var dataLength = tempChart.chart.data.datasets[0].data.length;
-		tempChart.chart.data.datasets[0].data[dataLength] = payloadObj["temp"];
-		humChart.chart.data.datasets[0].data[dataLength] = payloadObj["humidity"];
-		tempChart.chart.data.labels[dataLength] = date;
-		humChart.chart.data.labels[dataLength] = date;
+		if(dataLength>=maxDataPoint){
+			tempChart.chart.data.labels.shift();
+			tempChart.chart.data.datasets[0].data.shift();
+			tempChart.chart.data.datasets[0].data[maxDataPoint-1] = payloadObj["temp"];
+			tempChart.chart.data.labels[maxDataPoint-1] = date;
+			humChart.chart.data.labels.shift();
+			humChart.chart.data.datasets[0].data.shift();
+			humChart.chart.data.datasets[0].data[maxDataPoint-1] = payloadObj["humidity"];
+			humChart.chart.data.labels[maxDataPoint-1] = date;
+		} else {
+			tempChart.chart.data.datasets[0].data[dataLength] = payloadObj["temp"];
+			humChart.chart.data.datasets[0].data[dataLength] = payloadObj["humidity"];
+			tempChart.chart.data.labels[dataLength] = date;
+			humChart.chart.data.labels[dataLength] = date;
+		}
 		tempChart.chart.update();
 		humChart.chart.update();
 
