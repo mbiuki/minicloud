@@ -29,7 +29,7 @@ def motionCallback(client, userdata, message):
     print(message.topic)
     payload = json.loads(message.payload)
     if payload["status"] == '1':
-        takePicture(False)
+        takePicture()
         
     print("--------------\n\n")
 
@@ -38,17 +38,20 @@ def motionCallback(client, userdata, message):
 # Callback when website presses Take Picture button
 # ###################################################
 def cameraCallback(client, userdata, message):
-    takePicture(True)
+    if ("sender" in message.payload):
+        takePicture(sender)
+    else:
+        takePicture()
 
 
 # ###################################################
 # Take a picture. Upload to S3 and generate a URL.
 # Send to Rekognition to see labels of images.
 # Send the URL and labels in an IoT Publish
-# manual param means whether an image was taken via 
-# button press or motion sensor.
+# Sender param is the unique ID of the person who sent this request
+# from the website for delay calculation purposes.
 # ###################################################
-def takePicture(manual):
+def takePicture(sender=None):
     filename = datetime.datetime.now().isoformat() + ".jpg"
     imagePath = "../minicloud_images/" + filename
     camera.capture(imagePath)
@@ -69,8 +72,7 @@ def takePicture(manual):
     print(response)
         
     # Send the image url in an IoT Publish
-    manual = 1 if manual else 0
-    Thread(target=publishImage, args=(url, response["Labels"], manual)).start()
+    Thread(target=publishImage, args=(url, response["Labels"], sender)).start()
     Thread(target=folderDetector.cleanup).start()
 
 # ########################################
@@ -94,8 +96,8 @@ def publishMotion(status):
     print(requests.put(url=apiUrl + "/setstatus/motion", data=json.dumps({"status":status}),
                  headers={"authorizationToken": apiPass}).text)
 
-def publishImage(url, labels, manual):
-    data = {"url": url, "labels": labels, "manual":manual}
+def publishImage(url, labels, sender=None):
+    data = {"url": url, "labels": labels, "sender":sender}
     print(requests.put(url=apiUrl + "/publishpicture", data=json.dumps(data),
                        headers={"authorizationToken": apiPass}).text)
 
