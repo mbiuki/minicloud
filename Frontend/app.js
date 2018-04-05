@@ -143,6 +143,8 @@ window.onload = function() {
 		defaultDate: new Date(),
 	});
 	plotCustomGraph();
+	var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+	showSignInPrompt(!isSignedIn)
 }
 
 // Get current status of sensors. Display and set up the graphs.
@@ -232,11 +234,9 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd, ste
 			var val;
 			if (sensor == "temp") {
 				val = responseData[i].payload["temp"];
-			}
-			else if (sensor == "humidity") {
+			} else if (sensor == "humidity") {
 				val = responseData[i].payload["humidity"];
-			}
-			else {
+			} else {
 				val = responseData[i].payload["status"];
 			}
 			data.push(val);
@@ -441,10 +441,17 @@ function setLedButtonStatus(newStatus) {
 function onLedButtonClick() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("PUT", endpoint + "/setstatus/led");
-	xhttp.setRequestHeader("authorizationToken", password);
+	var token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+	console.log(token);
+	xhttp.setRequestHeader("authorizationToken", token);
 
 	xhttp.onload = function(e) {
 		console.log(xhttp.response);
+		console.log("boom");
+	}
+
+	xhttp.onerror = function(e) {
+		alert("You can send commands again in 24 hours");
 	}
 
 	var newStatus = ledStatus == "1" ? "0" : "1";
@@ -457,10 +464,15 @@ function onLedButtonClick() {
 function onCameraButtonClick() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("POST", endpoint + "/takepicture");
-	xhttp.setRequestHeader("authorizationToken", password);
+	var token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+	xhttp.setRequestHeader("authorizationToken", token);
 
 	xhttp.onload = function(e) {
 		console.log(xhttp.response);
+	}
+
+	xhttp.onerror = function(e) {
+		alert("You can send commands again in 24 hours");
 	}
 
 	// Record time published to calculate delay later
@@ -488,22 +500,41 @@ function plotCustomGraph() {
 	setupSensorData(sensorSelect.value, document.getElementById('dataChart').getContext('2d'), dataChart, timeStart, timeEnd, steppedLine);
 }
 
-function onPasswordSubmit() {
-	var passwordText = document.getElementById("passwordText").value;
+function onSignIn(googleUser) {
+	// Useful data for your client-side scripts:
+	var profile = googleUser.getBasicProfile();
+	console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+	console.log('Full Name: ' + profile.getName());
+	console.log('Given Name: ' + profile.getGivenName());
+	console.log('Family Name: ' + profile.getFamilyName());
+	console.log("Image URL: " + profile.getImageUrl());
+	console.log("Email: " + profile.getEmail());
 
-	var xhttp = new XMLHttpRequest();
-	xhttp.open("post", endpoint + "/checkpassword");
+	// The ID token you need to pass to your backend:
+	var id_token = googleUser.getAuthResponse().id_token;
+	console.log("ID Token: " + id_token);
 
-	xhttp.onload = function(e) {
-		var result = JSON.parse(xhttp.response);
-		console.log(result);
-		if (result["valid"]) {
-			alert("Access granted");
-			password = passwordText;
-			document.getElementById("passwordDiv").style.display = 'none';
-			document.getElementById("buttonDiv").style.display = 'block';
-		}
+	showSignInPrompt(false);
+};
+
+function signOut() {
+	var auth2 = gapi.auth2.getAuthInstance();
+	auth2.signOut().then(function() {
+		console.log('User signed out.');
+	});
+
+	showSignInPrompt(true);
+}
+
+function showSignInPrompt(show) {
+	if (show) {
+		document.getElementById("signInText").style.display = 'block';
+		document.getElementById("buttonDiv").style.display = 'none';
+		document.getElementById("googleSignout").style.display = 'none';
 	}
-
-	xhttp.send(JSON.stringify({ "password": passwordText }));
+	else {
+		document.getElementById("signInText").style.display = 'none';
+		document.getElementById("buttonDiv").style.display = 'block';
+		document.getElementById("googleSignout").style.display = 'block';
+	}
 }

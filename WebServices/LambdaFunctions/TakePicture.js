@@ -17,6 +17,12 @@ exports.handler = (event, context, callback) => {
 	let date = new Date();
 	payload.timeStampEpoch = date.getTime();
 	payload.timeStampIso = date.toISOString();
+	payload.sender = event.sender;
+	if (event.body && event.body.sender) {
+		payload.sender = event.body.sender;
+	}
+
+	console.log(payload);
 
 	const params = {
 		topic: 'sensor/camera/takepicture',

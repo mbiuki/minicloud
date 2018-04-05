@@ -8,6 +8,9 @@
 	<script src="bundle.js"></script>
 	<script src="app.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+	<meta name="google-signin-scope" content="profile email">
+	<meta name="google-signin-client_id" content="114518079517-cil59u4ltbp03gpklvoc6i65umbs49df.apps.googleusercontent.com">
+	<script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
 
 <body>
@@ -41,14 +44,15 @@
 				<td id="humidityUpdatedTime"></td>
 			</tr>
 		</table>
-		<br/>
-		<br/>
 		<div id="passwordDiv">
-			<p>Enter password to interact with sensors</p>
-			<input id="passwordText" type="password" name="password" placeholder="Password">
-			<button onclick="onPasswordSubmit()">Submit</button>
+			<p id="signInText">Sign in to send commands</p>
+			<span id="commandsText">You can send up to 3 commands every day.</span>
+			<br/>
+			<br/>
+			<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+			<a id="googleSignout" href="#" onclick="signOut()">Sign out</a>
 		</div>
-		<div id="buttonDiv">
+		<div id="buttonDiv" style="margin-top: 15px">
 			<button id="ledButton" onclick="onLedButtonClick()">Turn LED</button>
 			<span style="margin-left: 5px">Last Delay: </span>
 			<span id="ledDelay"></span>
