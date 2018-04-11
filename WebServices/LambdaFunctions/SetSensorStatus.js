@@ -32,7 +32,11 @@ exports.handler = (event, context, callback) => {
 	    if (body.status) {
 		    event.status = body.status;
 	    }
+	    if (body.sender) {
+	    	event.sender = body.sender;
+	    }
 	}
+
 
 	if (event.status === null || event.status === undefined) {
 		returnResult(callback, 400, "Missing Status in Body");
@@ -49,6 +53,7 @@ exports.handler = (event, context, callback) => {
 	payload.timeStampEpoch = date.getTime();
 	payload.timeStampIso = date.toISOString();
 	payload.status = event.status;
+	payload.sender = event.sender;
 
 	const params = {
 		topic: 'sensor/' + event.sensorId + '/payload',

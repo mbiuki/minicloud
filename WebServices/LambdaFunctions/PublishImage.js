@@ -4,25 +4,25 @@ const iotData = new AWS.IotData({ endpoint: process.env.AWS_IOT_ENDPOINT });
 function returnResult(callback, statusCode, body) {
 	callback(null, {
 		statusCode: statusCode,
-		headers: { 
-            "Access-Control-Allow-Origin": "*",
-        },
+		headers: {
+			"Access-Control-Allow-Origin": "*",
+		},
 		body: JSON.stringify(body)
 	});
 }
 
 exports.handler = (event, context, callback) => {
 	if (event.body) {
-	    let body = JSON.parse(event.body);
-	    if (body.url) {
-		    event.url = body.url;
-	    }
-	    if (body.labels) {
-	    	event.labels = body.labels;
-	    }
-	    if (body.manual) {
-	    	event.manual = body.manual;
-	    }
+		let body = JSON.parse(event.body);
+		if (body.url) {
+			event.url = body.url;
+		}
+		if (body.labels) {
+			event.labels = body.labels;
+		}
+		if (body.sender) {
+			event.sender = body.sender;
+		}
 	}
 
 	if (event.url === null || event.url === undefined) {
@@ -40,7 +40,7 @@ exports.handler = (event, context, callback) => {
 	payload.timeStampIso = date.toISOString();
 	payload.url = event.url;
 	payload.labels = event.labels;
-	payload.manual = event.manual;
+	payload.sender = event.sender;
 
 	const params = {
 		topic: 'sensor/camera/image',

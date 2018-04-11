@@ -18,8 +18,11 @@ exports.handler = (event, context, callback) => {
 	payload.timeStampEpoch = date.getTime();
 	payload.timeStampIso = date.toISOString();
 	payload.sender = event.sender;
-	if (event.body && event.body.sender) {
-		payload.sender = event.body.sender;
+	if (event.body) {
+		let body = JSON.parse(event.body);
+		if (body.sender) {
+			payload.sender = body.sender;
+		}
 	}
 
 	console.log(payload);
