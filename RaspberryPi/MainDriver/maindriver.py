@@ -38,8 +38,13 @@ def motionCallback(client, userdata, message):
 # Callback when website presses Take Picture button
 # ###################################################
 def cameraCallback(client, userdata, message):
-    if ("sender" in message.payload):
-        takePicture(sender)
+    print("Received a new message: ")
+    print(message.payload)
+    print("from topic: ")
+    print(message.topic)
+    payload = json.loads(message.payload)
+    if "sender" in payload:
+        takePicture(payload["sender"])
     else:
         takePicture()
 
