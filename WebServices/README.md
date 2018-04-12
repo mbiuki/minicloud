@@ -1,5 +1,5 @@
 ## Lambda Functions
-Table below shows what each Lambda function does. The GET functions require DynamoDB read IAM permissions. `SetSensorStatus` and `TakePicture` require AWS IotData publish IAM permissions, as well as setting the Lambda environment variable `AWS_IOT_ENDPOINT` to your AWS IoT Endpoint.
+The table below shows what each Lambda function does. The GET functions require DynamoDB read IAM permissions. `SetSensorStatus` and `TakePicture` require AWS IotData publish IAM permissions, as well as setting the Lambda environment variable `AWS_IOT_ENDPOINT` to your AWS IoT Endpoint.
 
 | Function  | Description | API Gateway Example Usage |
 | ------------- | ------------- | ------------- |
@@ -10,9 +10,9 @@ Table below shows what each Lambda function does. The GET functions require Dyna
 | GetCurrImage | Get url and labels of last picture taken. No parameters. | GET https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/getpicture |
 | PublishImage | Update to the cloud the URL of the last picture taken, as well as the associating computer vision labels. Requires `url` and `labels` parameters in the body. | PUT https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/publishimage |
 | UpdateTemperature | Update to the cloud the temperature and humidity. Requires `temp` and `humidity` parameters in the body. | PUT https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/updatetemperature |
-| CheckGoogleOauth | This Lambda function is automatically invoked prior to each API request to send a command. It checks the provided Google OAuth token in the `authorizationToken` header field to see if it is valid. If so, decrement the number of commands the user has available. Otherwise, reject the call. | Not meant to be used in API Gateway. |
+| CheckGoogleOauth | This Lambda function is automatically invoked prior to each API request to send a command. It checks the provided Google OAuth token in the `authorizationToken` header field to see if it is valid. If so, decrement the number of commands the user has available. Otherwise, reject the call. Set the `CLIENT_ID` environment variable to the client ID from the created Google API Project. | Not meant to be used in API Gateway. |
 | CheckToken | Similar to CheckGoogleOAuth, but checks for an admin password instead | Not meant to be used in API Gateway. |
-| SlackSlashCommand | This is invoked whenever the user uses a Slash Command in Slack. Not meant to be used anywhere other than through Slack (a token is checked when making this call) | POST https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/slackslashcommand |
+| SlackSlashCommand | This is invoked whenever the user uses a Slash Command in Slack. Not meant to be used anywhere other than through Slack (a token is checked when making this call). Set the `SLACK_TOKEN` environment variable to the Verification Token from creating the Slash Command.| POST https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/slackslashcommand |
 | SendSensorDataToSlack | An IoT Rule invokes this Lambda function whenever a sensor publishes updated data to AWS IoT | Not meant to be used in API Gateway. |
 
 
