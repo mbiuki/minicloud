@@ -117,7 +117,7 @@ def emitTemperature():
         Thread(target=publishTemp, args=(temperature, humidity)).start()    
         print("Humidity is: " + humidity + "%")
         print("Temperature is: " + temperature + "C")
-        time.sleep(300)
+        time.sleep(3600)
 
 def setInitLedStatus():
     r = requests.get(url=apiUrl + "/currstatus").json()
