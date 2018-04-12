@@ -10,6 +10,7 @@ var endpoint = mqttClient.config.endpoint;
 var password;
 var timeStartPicker;
 var timeEndPicker;
+var defaultStartTimeDelta = 1000 * 3600 * 24;
 
 // Subscribe to topics
 function mqttClientConnectHandler() {
@@ -108,7 +109,7 @@ window.onload = function() {
 	timeStartPicker = flatpickr("#timeStartPicker", {
 		enableTime: true,
 		dateFormat: "Y-m-d H:i",
-		defaultDate: (new Date().getTime()) - 1000 * 3600,
+		defaultDate: (new Date().getTime()) - defaultStartTimeDelta,
 	});
 	timeEndPicker = flatpickr("#timeEndPicker", {
 		enableTime: true,
@@ -143,7 +144,7 @@ function setupCurrSensorStatus() {
 		var tempUpdated = document.getElementById("tempUpdatedTime");
 		var humidityUpdated = document.getElementById("humidityUpdatedTime");
 
-		var timeStart = (new Date().getTime()) - 1000 * 3600 * 24
+		var timeStart = (new Date().getTime()) - defaultStartTimeDelta;
 
 		// Create the graphs for the sensors
 		for (var i = 0; i < sensorStatus.length; i++) {
