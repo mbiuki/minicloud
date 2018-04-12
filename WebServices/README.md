@@ -10,15 +10,10 @@ The table below shows what each Lambda function does. The GET functions require 
 | GetCurrImage | Get url and labels of last picture taken. No parameters. | GET https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/getpicture |
 | PublishImage | Update to the cloud the URL of the last picture taken, as well as the associating computer vision labels. Requires `url` and `labels` parameters in the body. | PUT https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/publishimage |
 | UpdateTemperature | Update to the cloud the temperature and humidity. Requires `temp` and `humidity` parameters in the body. | PUT https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/updatetemperature |
-| CheckGoogleOauth | This Lambda function is automatically invoked prior to each API request to send a command. It checks the provided Google OAuth token in the `authorizationToken` header field to see if it is valid. If so, decrement the number of commands the user has available. Otherwise, reject the call. Set the `CLIENT_ID` environment variable to the client ID from the created Google API Project. | Not meant to be used in API Gateway. |
-| CheckToken | Similar to CheckGoogleOAuth, but checks for an admin password instead | Not meant to be used in API Gateway. |
+| CheckGoogleOauth | This Lambda function is automatically invoked prior to each API request to send a command. It checks the provided Google OAuth token in the `authorizationToken` header field to see if it is valid. If so, decrement the number of commands the user has available. Otherwise, reject the call. Set the `CLIENT_ID` environment variable to the client ID from the created Google API Project. Set the `PASSWORD` environment variable to the admin password. | Not meant to be used in API Gateway. |
+| CheckToken | Similar to CheckGoogleOAuth, but only allows for admin password instead. Set the `PASSWORD` environment variable to the admin password. | Not meant to be used in API Gateway. |
 | SlackSlashCommand | This is invoked whenever the user uses a Slash Command in Slack. Not meant to be used anywhere other than through Slack (a token is checked when making this call). Set the `SLACK_TOKEN` environment variable to the Verification Token from creating the Slash Command.| POST https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/slackslashcommand |
 | SendSensorDataToSlack | An IoT Rule invokes this Lambda function whenever a sensor publishes updated data to AWS IoT | Not meant to be used in API Gateway. |
-
-
-
-
-
 
 ## API Gateway Setup
 All API Gateway mappings to these Lambda functions need to be a Lambda Proxy Integration. Enable CORS for all PUT/POST methods.
@@ -26,6 +21,8 @@ All API Gateway mappings to these Lambda functions need to be a Lambda Proxy Int
 * `TakePicture` is also setup by creating a new resource called `takepicture` (make sure to enable CORS), but adding a POST method instead. 
 * `GetSensorStatus` is setup by creating a resource called `status`. Then create a new proxy resource under that. Proxy means the string after the resource path. In our case, we want sensor ID in the path, so we use proxy here. Then add a GET method under the proxy resource that maps to the `GetSensorStatus` Lambda function.
 * `SetSensorStatus` is setup by creating a new resource called `setstatus`. Then create a new proxy resource under that (enable CORS), and add a PUT method to the `SetSensorStatus` Lambda Function.
+* `PublishImage` and `UpdateTemperature` is setup by creating a new resource called `publishimage` and `updatetemp` respectively (enable CORS). Then, add a `PUT` method.
+* `SlackSlashCommand` is only meant to be called from Slack. This will be the endpoint that all Slash Sommands will hit. As mentioned, a token is checked to ensure it is called from within Slack. Create a new resource `Slack` and add a `POST` method. 
 
 ## DynamoDB Setup
 `GetSensorCurrStatus`, `GetSensorStatus`, and `GetCurrImage` each query 3 different DynamoDB tables as shown in the code. 
