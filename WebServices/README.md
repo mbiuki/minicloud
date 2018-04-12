@@ -24,9 +24,10 @@ All API Gateway mappings to these Lambda functions need to be a Lambda Proxy Int
 * `PublishImage` and `UpdateTemperature` is setup by creating a new resource called `publishimage` and `updatetemp` respectively (enable CORS). Then, add a `PUT` method.
 * `SlackSlashCommand` is only meant to be called from Slack. This will be the endpoint that all Slash Sommands will hit. As mentioned, a token is checked to ensure it is called from within Slack. Create a new resource `Slack` and add a `POST` method. 
 
-# Secure API Endpoints
-In Api Gateway, create a new Authorizer called `CheckGoogleOAuth`. Select `Lambda` as the type. Choose `CheckGoogleOAuth` as the Lambda Function. Leave `Lambda Invoke Rule` blank. Select `Token` as the `Lambda Event Payload`. Enter `authorizationToken` as the `Token Source`. Ensure caching is disabled, and finish creating the Authorizer. 
-Under the resources tree, select the labels with PUT or POST. Any APIs that manipulate data should have locked down access. Then select `Method Request`. Choose the newly created `CheckGoogleOAuth` authorizer in the `Authorization` dropdown and press the check mark.
+## Secure API Endpoints
+In Api Gateway, create a new Authorizer called `CheckGoogleOAuth`. Select `Lambda` as the type. Choose `CheckGoogleOAuth` as the Lambda Function. Leave `Lambda Invoke Rule` blank. Select `Token` as the `Lambda Event Payload`. Enter `authorizationToken` as the `Token Source`. Ensure caching is disabled, and finish creating the Authorizer. Do the same for `CheckToken`, which simply checks for an admin password instead. `CheckGoogleOAuth` will be used on APIs that users can call, while `CheckToken` are for APIs that are meant to be used internally. 
+
+Under the resources tree, select the labels with PUT or POST. Any APIs that manipulate data should have locked down access. Then select `Method Request`. Choose the newly created `CheckGoogleOAuth` or `CheckToken` authorizer in the `Authorization` dropdown and press the check mark. `SetSensorStatus` and `TakePicture` should use `CheckGoogleOAuth as the authorizer since these APIs map to available commands from the website while `UpdateTemp` and `PublishImage` should use `CheckToken`, since they are used internally within the system.
 
 ## Slack App Setup
 Go to https://api.slack.com/apps and create a new app. Choose a name and select a workspace. We use both Slash Commands and Incoming webhooks. 
