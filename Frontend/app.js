@@ -30,8 +30,8 @@ function mqttClientMessageHandler(topic, payload) {
 	// If new camera image, display it
 	if (topic == "sensor/camera/image") {
 		// Calculate delay and display it
-		var manual = payloadObj["manual"];
-		if (manual) {
+		var sender = payloadObj["sender"];
+		if (sender == getGoogleToken()) {
 			var delay = Date.now() - cameraPublishTime;
 			var cameraDelay = document.getElementById("cameraDelay");
 			cameraDelay.innerHTML = delay + " ms";
@@ -47,17 +47,20 @@ function mqttClientMessageHandler(topic, payload) {
 		ledStatus = payloadObj["status"];
 
 		// Calculate delay and display it
-		var delay = Date.now() - ledPublishTime;
-		var ledDelay = document.getElementById("ledDelay");
-		ledDelay.innerHTML = delay + " ms";
+		var sender = payloadObj["sender"];
+		if (sender == getGoogleToken()) {
+			var delay = Date.now() - ledPublishTime;
+			var ledDelay = document.getElementById("ledDelay");
+			ledDelay.innerHTML = delay + " ms";
+		}
 
 		// Graph the new data point
 		var dataLength = ledChart.chart.data.datasets[0].data.length;
-		if(dataLength>=maxDataPoint){
+		if (dataLength >= maxDataPoint) {
 			ledChart.chart.data.labels.shift();
 			ledChart.chart.data.datasets[0].data.shift();
-			ledChart.chart.data.datasets[0].data[maxDataPoint-1] = payloadObj["status"];
-			ledChart.chart.data.labels[maxDataPoint-1] = date;
+			ledChart.chart.data.datasets[0].data[maxDataPoint - 1] = payloadObj["status"];
+			ledChart.chart.data.labels[maxDataPoint - 1] = date;
 		} else {
 			ledChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
 			ledChart.chart.data.labels[dataLength] = date;
@@ -73,11 +76,11 @@ function mqttClientMessageHandler(topic, payload) {
 	}
 	if (topic == "sensor/motion/payload") {
 		var dataLength = motionChart.chart.data.datasets[0].data.length;
-		if(dataLength>=maxDataPoint){
+		if (dataLength >= maxDataPoint) {
 			motionChart.chart.data.labels.shift();
 			motionChart.chart.data.datasets[0].data.shift();
-			motionChart.chart.data.datasets[0].data[maxDataPoint-1] = payloadObj["status"];
-			motionChart.chart.data.labels[maxDataPoint-1] = date;
+			motionChart.chart.data.datasets[0].data[maxDataPoint - 1] = payloadObj["status"];
+			motionChart.chart.data.labels[maxDataPoint - 1] = date;
 		} else {
 			motionChart.chart.data.datasets[0].data[dataLength] = payloadObj["status"];
 			motionChart.chart.data.labels[dataLength] = date;
@@ -92,15 +95,15 @@ function mqttClientMessageHandler(topic, payload) {
 	// Temperature and humidity data are emitted together
 	if (topic == "sensor/temp/payload") {
 		var dataLength = tempChart.chart.data.datasets[0].data.length;
-		if(dataLength>=maxDataPoint){
+		if (dataLength >= maxDataPoint) {
 			tempChart.chart.data.labels.shift();
 			tempChart.chart.data.datasets[0].data.shift();
-			tempChart.chart.data.datasets[0].data[maxDataPoint-1] = payloadObj["temp"];
-			tempChart.chart.data.labels[maxDataPoint-1] = date;
+			tempChart.chart.data.datasets[0].data[maxDataPoint - 1] = payloadObj["temp"];
+			tempChart.chart.data.labels[maxDataPoint - 1] = date;
 			humChart.chart.data.labels.shift();
 			humChart.chart.data.datasets[0].data.shift();
-			humChart.chart.data.datasets[0].data[maxDataPoint-1] = payloadObj["humidity"];
-			humChart.chart.data.labels[maxDataPoint-1] = date;
+			humChart.chart.data.datasets[0].data[maxDataPoint - 1] = payloadObj["humidity"];
+			humChart.chart.data.labels[maxDataPoint - 1] = date;
 		} else {
 			tempChart.chart.data.datasets[0].data[dataLength] = payloadObj["temp"];
 			humChart.chart.data.datasets[0].data[dataLength] = payloadObj["humidity"];
@@ -262,19 +265,17 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd, ste
 
 function preloadPlot(sensor, sensorCtx, sensorChart, steppedLine) {
 	// Temp and humidity are grouped under temp for API
-	if(sensor == "LED"){
+	if (sensor == "LED") {
 		querySensor = "led"
-	}
-	else if (sensor == "Motion"){
+	} else if (sensor == "Motion") {
 		querySensor = "motion"
-	}
-	else {
+	} else {
 		querySensor = "temp"
 	}
 
 	var xhttp = new XMLHttpRequest();
 	timeStart = (new Date().getTime()) - 1000 * 3600 * 24;
-	xhttp.open("GET", endpoint + "/status/" + querySensor + "?timestart=" + timeStart); 
+	xhttp.open("GET", endpoint + "/status/" + querySensor + "?timestart=" + timeStart);
 	// what is the correct time for tmr for the corresponding format (+ "?timestart=" + timeStart + "&timeEnd=" + timeEnd) ?
 
 	xhttp.onload = function(e) {
@@ -289,7 +290,7 @@ function preloadPlot(sensor, sensorCtx, sensorChart, steppedLine) {
 		var timeStamps = [];
 		var data = [];
 
-		if(responseData.length < 10){
+		if (responseData.length < 10) {
 			startId = 0;
 			endId = responseData.length;
 		} else {
@@ -375,18 +376,18 @@ function createStatusChart(sensor, sensorCtx, sensorChart, data, timeStamps, ste
 				yAxes: [{
 					ticks: {
 						min: 0,
-					    max: 1,
-					    stepSize: 1,
-					    suggestedMin: 0,
-					    suggestedMax: 1,
-					    callback: function(label, index, labels) {
-					        switch (label) {
-					            case 0:
-					                return 'OFF';
-					            case 1:
-					                return 'ON';
-					        }
-					    }
+						max: 1,
+						stepSize: 1,
+						suggestedMin: 0,
+						suggestedMax: 1,
+						callback: function(label, index, labels) {
+							switch (label) {
+								case 0:
+									return 'OFF';
+								case 1:
+									return 'ON';
+							}
+						}
 					}
 				}],
 			}
@@ -441,13 +442,12 @@ function setLedButtonStatus(newStatus) {
 function onLedButtonClick() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("PUT", endpoint + "/setstatus/led");
-	var token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+	var token = getGoogleToken();
 	console.log(token);
 	xhttp.setRequestHeader("authorizationToken", token);
 
 	xhttp.onload = function(e) {
 		console.log(xhttp.response);
-		console.log("boom");
 	}
 
 	xhttp.onerror = function(e) {
@@ -458,13 +458,13 @@ function onLedButtonClick() {
 
 	// Record time published to calculate delay later
 	ledPublishTime = Date.now();
-	xhttp.send(JSON.stringify({ "status": newStatus }));
+	xhttp.send(JSON.stringify({ "status": newStatus, "sender": token}));
 }
 
 function onCameraButtonClick() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("POST", endpoint + "/takepicture");
-	var token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+	var token = getGoogleToken();
 	xhttp.setRequestHeader("authorizationToken", token);
 
 	xhttp.onload = function(e) {
@@ -477,7 +477,7 @@ function onCameraButtonClick() {
 
 	// Record time published to calculate delay later
 	cameraPublishTime = Date.now();
-	xhttp.send();
+	xhttp.send(JSON.stringify({ "sender": token}));
 }
 
 function onGraphButtonClick() {
@@ -526,13 +526,16 @@ function signOut() {
 	showSignInPrompt(true);
 }
 
+function getGoogleToken() {
+	return gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+}
+
 function showSignInPrompt(show) {
 	if (show) {
 		document.getElementById("signInText").style.display = 'block';
 		document.getElementById("buttonDiv").style.display = 'none';
 		document.getElementById("googleSignout").style.display = 'none';
-	}
-	else {
+	} else {
 		document.getElementById("signInText").style.display = 'none';
 		document.getElementById("buttonDiv").style.display = 'block';
 		document.getElementById("googleSignout").style.display = 'block';
