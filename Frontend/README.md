@@ -25,7 +25,7 @@ Browserify is required to use the AWS IoT node libraries in the frontend. If you
 To run the above press shift, click on open power shell in Windows.
 
 ### Google Signin 
-Follow these isntructions https://developers.google.com/identity/sign-in/web/sign-in to set a Google API Project. Add your website to the list of `Authorized Javascript Origins`. After that, get the Google client ID and set it to the content of the meta tag `google-signin-client_id`. The format should be `YOUR_CLIENT_ID.apps.googleusercontent.com`. The Google Signin button should be visible if everything was set up successfully. 
+Follow these instructions https://developers.google.com/identity/sign-in/web/sign-in to set a Google API Project. Add your website to the list of `Authorized Javascript Origins`. After that, get the Google client ID and set it to the content of the meta tag `google-signin-client_id`. The format should be `YOUR_CLIENT_ID.apps.googleusercontent.com`. The Google Signin button should be visible if everything was set up successfully. 
 
 ### Running Locally 
 Since Google Sign in has been implemented (which uses async requests), you need to serve the files here on a server for proper local testing. You can use `http-server` (https://github.com/indexzero/http-server) from Node.js, or `SimpleHTTPServer` (https://developer.mozilla.org/en-US/docs/Learn/Common_questions/set_up_a_local_testing_server#Running_a_simple_local_HTTP_server) from Python to do so. 
