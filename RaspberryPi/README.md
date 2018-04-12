@@ -14,4 +14,4 @@ See https://github.com/aws/aws-iot-device-sdk-python for more
 Follow these instructions https://docs.aws.amazon.com/iot/latest/developerguide/iot-sdk-setup.html to get the root CA, certificate, and public and private keys. 
 
 # Run
-python maindriver.py -e [AWS IoT Endpoint] -r [Root CA] -c [Certificate] -k [Private Key] -s [S3 Bucket Name] -a [API Gateway Endpoint] -p [API Gateway Password]
+`python maindriver.py -e [AWS IoT Endpoint] -r [Root CA] -c [Certificate] -k [Private Key] -s [S3 Bucket Name] -a [API Gateway Endpoint] -p [API Gateway Password]`
