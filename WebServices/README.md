@@ -46,5 +46,5 @@ IoT Rules can be setup to automatically persist IoT publish messages that match 
 * For populating the `CurrImageTable`, create a new IoT rule. Put Attribute as '*'. Put topic filter as `sensor/camera/image` (we expect this to be the topic that new camera images are sent to). Add a new DynamoDB action and choose table `CurrImageTable`. Hash key value is string `${topic(2)}` again.
 * In order for the Slack channel to receive sensor updates in real time, create a new IoT rule. Add an action to `Invoke a Lambda function passing the message data`. Select `SendSensorDataToSlack`. Update IAM role. Finish creating the rule.
 
-# S3 Setup
-Simply create a bucket in S3 with default settings. The name of this bucket will be referenced as a parameter in the Python code. 
+## S3 Setup
+Simply create a bucket in S3 with default settings. The name of this bucket will be referenced as a parameter in the Python code. This bucket will store all images taken by the camera. If desired, a rule can be created to auto-expire images after a given period. See https://aws.amazon.com/blogs/aws/amazon-s3-object-expiration/
