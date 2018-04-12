@@ -13,7 +13,7 @@ The table below shows what each Lambda function does. The GET functions require 
 | CheckGoogleOauth | This Lambda function is automatically invoked prior to each API request to send a command. It checks the provided Google OAuth token in the `authorizationToken` header field to see if it is valid. If so, decrement the number of commands the user has available. Otherwise, reject the call. Set the `CLIENT_ID` environment variable to the client ID from the created Google API Project. Set the `PASSWORD` environment variable to the admin password. | Not meant to be used in API Gateway. |
 | CheckToken | Similar to CheckGoogleOAuth, but only allows for admin password instead. Set the `PASSWORD` environment variable to the admin password. | Not meant to be used in API Gateway. |
 | SlackSlashCommand | This is invoked whenever the user uses a Slash Command in Slack. Not meant to be used anywhere other than through Slack (a token is checked when making this call). Set the `SLACK_TOKEN` environment variable to the Verification Token from creating the Slash Command.| POST https://uniqueid.execute-api.us-west-2.amazonaws.com/prod/slackslashcommand |
-| SendSensorDataToSlack | An IoT Rule invokes this Lambda function whenever a sensor publishes updated data to AWS IoT | Not meant to be used in API Gateway. |
+| SendSensorDataToSlack | An IoT Rule invokes this Lambda function whenever a sensor publishes updated data to AWS IoT. Set the `SLACK_WEBHOOK` environment variable to the webhook URL from creating the Slack incoming webhook. | Not meant to be used in API Gateway. |
 
 ## API Gateway Setup
 All API Gateway mappings to these Lambda functions need to be a Lambda Proxy Integration. Enable CORS for all PUT/POST methods.
@@ -23,6 +23,15 @@ All API Gateway mappings to these Lambda functions need to be a Lambda Proxy Int
 * `SetSensorStatus` is setup by creating a new resource called `setstatus`. Then create a new proxy resource under that (enable CORS), and add a PUT method to the `SetSensorStatus` Lambda Function.
 * `PublishImage` and `UpdateTemperature` is setup by creating a new resource called `publishimage` and `updatetemp` respectively (enable CORS). Then, add a `PUT` method.
 * `SlackSlashCommand` is only meant to be called from Slack. This will be the endpoint that all Slash Sommands will hit. As mentioned, a token is checked to ensure it is called from within Slack. Create a new resource `Slack` and add a `POST` method. 
+
+# Secure API Endpoints
+In Api Gateway, create a new Authorizer called `CheckGoogleOAuth`. Select `Lambda` as the type. Choose `CheckGoogleOAuth` as the Lambda Function. Leave `Lambda Invoke Rule` blank. Select `Token` as the `Lambda Event Payload`. Enter `authorizationToken` as the `Token Source`. Ensure caching is disabled, and finish creating the Authorizer. 
+Under the resources tree, select the labels with PUT or POST. Any APIs that manipulate data should have locked down access. Then select `Method Request`. Choose the newly created `CheckGoogleOAuth` authorizer in the `Authorization` dropdown and press the check mark.
+
+## Slack App Setup
+Go to https://api.slack.com/apps and create a new app. Choose a name and select a workspace. We use both Slash Commands and Incoming webhooks. 
+* To set up Slash Commands, create 3 new commands called `takepicture`, `setsensor`, and `getstatus` respectively. Set the `request URL` to the created API endpoint for `SlackSlashCommand`. As mentioned, the resulting `Verification Token` from creating the app is the `Slack_TOKEN` environment variable used in the Lambda Function `SlackSlashCommand`.
+* To set up Incoming Webhooks, activate incoming webhooks, and add a new webhook to a chosen workspace. As mentioned, the resulting `Webhook URL` is the `SLACK_WEBHOOK` environment variable used in the Lambda Function `SendSensorDataToSlack`.
 
 ## DynamoDB Setup
 `GetSensorCurrStatus`, `GetSensorStatus`, `GetCurrImage`, and `CheckGoogleOAuth` each query 4 different DynamoDB tables as shown in the code. 
