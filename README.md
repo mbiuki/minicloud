@@ -28,3 +28,7 @@ MiniCloud Database for constrained devices
 ### Architecture
 
 <img src="https://github.com/mbiuki/minicloud/blob/master/Architecture/Iot.jpg" alt="Screenshot" border="10"/>
+
+### Query Demo
+
+<img src="https://github.com/mbiuki/minicloud/blob/master/Architecture/template_xml_json.PNG" alt="Screenshot" border="10"/>
