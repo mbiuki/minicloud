@@ -30,5 +30,6 @@ MiniCloud Database for constrained devices
 <img src="https://github.com/mbiuki/minicloud/blob/master/Architecture/Iot.jpg" alt="Screenshot" border="10"/>
 
 ### Query Demo
-
+MiniCloud Server is capable of searching data base and responding to the queries in different template formats (XML and JSON).
+Two instances of the query engine are displayed below:
 <img src="https://github.com/mbiuki/minicloud/blob/master/Architecture/template_xml_json.PNG" alt="Screenshot" border="10"/>
