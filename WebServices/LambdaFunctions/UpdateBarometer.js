@@ -17,8 +17,8 @@ exports.handler = (event, context, callback) => {
 	    if (body.temp) {
 		    event.temp = body.temp;
 	    }
-	    if (body.humidity) {
-		    event.humidity = body.humidity;
+	    if (body.pressure) {
+		    event.pressure = body.pressure;
 	    }
 	}
 
@@ -27,8 +27,8 @@ exports.handler = (event, context, callback) => {
 		return;
 	}
 	
-	if (event.humidity === null || event.humidity === undefined) {
-		returnResult(callback, 400, "Missing Humidity in Body");
+	if (event.pressure === null || event.pressure === undefined) {
+		returnResult(callback, 400, "Missing Pressure in Body");
 		return;
 	}
 
@@ -37,10 +37,10 @@ exports.handler = (event, context, callback) => {
 	payload.timeStampEpoch = date.getTime();
 	payload.timeStampIso = date.toISOString();
 	payload.temp = event.temp;
-	payload.humidity = event.humidity;
+	payload.pressure = event.pressure;
 
 	const params = {
-		topic: 'sensor/temp/payload',
+		topic: 'sensor/barometer/payload',
 		payload: JSON.stringify(payload)
 	};
 

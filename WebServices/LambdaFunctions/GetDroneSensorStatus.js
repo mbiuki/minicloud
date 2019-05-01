@@ -2,8 +2,8 @@
 console.log('Loading function');
 let doc = require('dynamodb-doc');
 let dynamo = new doc.DynamoDB();
-let sensorTable = "SensorTable";
-const acceptedSensors = ["led", "motion", "temp"];
+let sensorTable = "DroneSensorTable";
+const acceptedSensors = ["barometer","gps"];
 
 function returnResult(callback, statusCode, body) {
 	callback(null, {
@@ -14,6 +14,7 @@ function returnResult(callback, statusCode, body) {
 		body: JSON.stringify(body)
 	});
 }
+
 
 exports.handler = (event, context, callback) => {
 	console.log('Received event:', JSON.stringify(event, null, 2));
