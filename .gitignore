@@ -9,3 +9,4 @@ credentials.js
 *.pyc
 runpi.sh
 certs/
+.vscode
