@@ -55,7 +55,7 @@ function mqttClientMessageHandler(topic, payload) {
 		latChart.chart.update();
 		longChart.chart.update();
 		altChart.chart.update();
-		
+
 		var latText = document.getElementById("latitudeStatus");
 		var latUpdated = document.getElementById("latitudeUpdatedTime");
 		var longText = document.getElementById("longitudeStatus");
@@ -76,7 +76,7 @@ function mqttClientMessageHandler(topic, payload) {
 mqttClient.on('connect', mqttClientConnectHandler);
 mqttClient.on('message', mqttClientMessageHandler);
 
-window.onload = function() {
+window.onload = function () {
 	setupCurrSensorStatus();
 	timeStartPicker = flatpickr("#timeStartPicker", {
 		enableTime: true,
@@ -89,8 +89,8 @@ window.onload = function() {
 		defaultDate: new Date(),
 	});
 	plotCustomGraph();
-	var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
-	showSignInPrompt(!isSignedIn)
+	//var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+	//showSignInPrompt(!isSignedIn)
 }
 
 // Get current status of sensors. Display and set up the graphs.
@@ -98,7 +98,7 @@ function setupCurrSensorStatus() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("GET", endpoint + "/GetSensorCurrStatus");
 
-	xhttp.onload = function(e) {
+	xhttp.onload = function (e) {
 		if (this.status != 200) {
 			console.error("Error getting current sensor status");
 			return;
@@ -108,7 +108,7 @@ function setupCurrSensorStatus() {
 
 		var tempText = document.getElementById("tempStatus");
 		var pressureText = document.getElementById("pressureStatus");
-        var tempUpdated = document.getElementById("tempUpdatedTime");
+		var tempUpdated = document.getElementById("tempUpdatedTime");
 		var pressureUpdated = document.getElementById("pressureUpdatedTime");
 		var latText = document.getElementById("latitudeStatus");
 		var latUpdated = document.getElementById("latitudeUpdatedTime");
@@ -147,7 +147,7 @@ function setupCurrSensorStatus() {
 				longUpdated.innerHTML = date;
 				altText.innerHTML = altitude + " m";
 				altUpdated.innerHTML = date;
-				
+
 				setupSensorData("latitude", document.getElementById('latChart').getContext('2d'), latChart, timeStart, null, true);
 				setupSensorData("longitude", document.getElementById('longChart').getContext('2d'), longChart, timeStart, null, true);
 				setupSensorData("altitude", document.getElementById('altChart').getContext('2d'), altChart, timeStart, null, true);
@@ -159,7 +159,7 @@ function setupCurrSensorStatus() {
 }
 
 // Graph data for a given sensor and time range
-function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd, steppedLine) {
+function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd, steppedLine, timeUnit) {
 	var querySensor = sensor;
 	if (sensor == "pressure" || sensor == "temp") {
 		querySensor = "barometer";
@@ -174,7 +174,7 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd, ste
 	}
 	xhttp.open("GET", reqUrl);
 
-	xhttp.onload = function(e) {
+	xhttp.onload = function (e) {
 		if (this.status != 200) {
 			console.error("Error getting sensor data");
 			return;
@@ -213,8 +213,8 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd, ste
 		}
 
 		// createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine);
-		if (sensor == "temp" || sensor == "pressure" || sensor == "longitude" || sensor == "latitude" || sensor == "altitude" ) {
-			createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine);
+		if (sensor == "temp" || sensor == "pressure" || sensor == "longitude" || sensor == "latitude" || sensor == "altitude") {
+			createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine, timeUnit);
 		} else {
 			createStatusChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine);
 		}
@@ -223,13 +223,36 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd, ste
 	xhttp.send();
 }
 
-function createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine) {
+function createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLine, timeUnit) {
+
+	//Choose y axis label based on sensor data
+	var label;
+	switch (sensor) {
+		case "temp":
+			label = '\xB0C'
+			break;
+		case "pressure":
+			label = 'millibar'
+			break;
+		case "longitude":
+			label = '\xB0'
+			break;
+		case "latitude":
+			label = '\xB0'
+			break;
+		case "altitude":
+			label = 'm (above sea level)'
+			break;
+		default:
+			label = ' '
+	}
+
 	sensorChart.chart = new Chart(sensorCtx, {
 		type: 'line',
 		data: {
 			labels: timeStamps,
 			datasets: [{
-				label: sensor + " Status",
+				label: sensor + " status",
 				data: data,
 				steppedLine: steppedLine,
 				backgroundColor: "rgba(153,255,51,0.4)"
@@ -243,11 +266,25 @@ function createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLi
 			},
 			scales: {
 				xAxes: [{
+					display: true,
 					type: 'time',
+					time: {
+						parser: 'DD/MM/YYYY HH:mm:ss',
+						tooltipFormat: 'll HH:mm:ss',
+						unit: timeUnit, //Use days when plotting custom chart
+						displayFormats: {
+							'day': 'DD/MM/YYYY'
+						}
+					}
 				}],
 				yAxes: [{
 					ticks: {
 						suggestedMin: 0
+					},
+					scaleLabel: {
+						display: true,
+						labelString: label,
+						fontColor: "#546372"
 					}
 				}],
 			}
@@ -261,7 +298,7 @@ function createStatusChart(sensor, sensorCtx, sensorChart, data, timeStamps, ste
 		data: {
 			labels: timeStamps,
 			datasets: [{
-				label: sensor + " Status",
+				label: sensor + " status",
 				data: data,
 				steppedLine: steppedLine,
 				backgroundColor: "rgba(153,255,51,0.4)"
@@ -279,7 +316,7 @@ function createStatusChart(sensor, sensorCtx, sensorChart, data, timeStamps, ste
 						stepSize: 1,
 						suggestedMin: 0,
 						suggestedMax: 1,
-						callback: function(label, index, labels) {
+						callback: function (label, index, labels) {
 							switch (label) {
 								case 0:
 									return 'OFF';
@@ -395,10 +432,10 @@ function plotCustomGraph() {
 	}
 
 	var steppedLine = false;
-	setupSensorData(sensorSelect.value, document.getElementById('dataChart').getContext('2d'), dataChart, timeStart, timeEnd, steppedLine);
+	setupSensorData(sensorSelect.value, document.getElementById('dataChart').getContext('2d'), dataChart, timeStart, timeEnd, steppedLine, 'day');
 }
 
-function onSignIn(googleUser) {
+/*function onSignIn(googleUser) {
 	// Useful data for your client-side scripts:
 	var profile = googleUser.getBasicProfile();
 	console.log("ID: " + profile.getId()); // Don't send this directly to your server!
@@ -438,4 +475,4 @@ function showSignInPrompt(show) {
 		document.getElementById("buttonDiv").style.display = 'block';
 		document.getElementById("googleSignout").style.display = 'block';
 	}
-}
+}*/
