@@ -14,14 +14,17 @@
 	<script src="bundle.js"></script>
 	<script src="app.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-	<meta name="google-signin-scope" content="profile email">
-	<meta name="google-signin-client_id" content="757347488313-k4p2mj8pibhguh9buserefs83encejca.apps.googleusercontent.com">
-	<script src="https://apis.google.com/js/platform.js" async defer></script>
+	<!-- <meta name="google-signin-scope" content="profile email">
+	<meta name="google-signin-client_id" content="969820381666-46hvrmiu5ql5n89f38h51q26feg9a8tm.apps.googleusercontent.com">
+	<script src="https://apis.google.com/js/platform.js" async defer></script> -->
 </head>
 
 <body>
 	<div class="container">
-		<h2>Drone IOT</h2>
+		<center>
+			<h1>Drone IOT</h1>
+		</center>
+		<br></br>
 		<h3>Current Sensor Status:</h3>
 		<table id="statusTable">
 			<tr>
@@ -55,21 +58,8 @@
 				<td id="tempUpdatedTime"></td>
 			</tr>
 		</table>
-		<div id="passwordDiv">
-			<p id="signInText">Sign in to send commands</p>
-			<span id="commandsText">You can send up to 3 commands every day.</span>
-			<br/>
-			<br/>
-			<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-			<a id="googleSignout" href="#" onclick="signOut()">Sign out</a>
-		</div>
-		<div id="buttonDiv" style="margin-top: 15px">
-			<button id="cameraButton" onclick="onCameraButtonClick()">Take Picture</button>
-			<span style="margin-left: 5px">Last Delay: </span>
-			<span id="cameraDelay"></span>
-		</div>
 		<div class="graphRow">
-			<div style="display: inline-block; width:100%; margin-top: 70px">
+			<div style="display: inline-block; width:100%; margin-top: 55px">
 				<div style="width: 40%; float:left; margin-left:100px">
 					<center>
 						<h3>Temperature Sensor Status</h3>
@@ -82,19 +72,19 @@
 					</center>
 					<canvas id="pressureChart"></canvas>
 				</div>
-				<div style="width: 40%; float:left; margin-left:100px">
+				<div style="width: 40%; float:left; margin-left:100px; margin-top:20px">
 					<center>
 						<h3>Latitude Status</h3>
 					</center>
 					<canvas id="latChart"></canvas>
 				</div>
-				<div style="width: 40%; float:right; margin-right:100px">
+				<div style="width: 40%; float:right; margin-right:100px; margin-top:20px">
 					<center>
 						<h3>Longitude Status</h3>
 					</center>
 					<canvas id="longChart"></canvas>
 				</div>
-				<div style="width: 40%; float:right; margin-right:325px">
+				<div style="width: 40%; float:right; margin-right:325px; margin-top:20px">
 					<center>
 						<h3>Altitude Status</h3>
 					</center>
@@ -104,9 +94,10 @@
 		</div>
 		<br>
 		<div style="text-align:center">
-			<a href="kinesis.html">Drone IOT Live Stream</a>
+			<br></br>
+			<a href="kinesis.html">Live Video Stream</a>
 		</div>
-		<div class="dataRow" style="margin-top:100px">
+		<div class="dataRow" style="margin-top:50px">
 			<center>
 				<h3>Graph Custom Data</h3>
 				<canvas id="dataChart"></canvas>
