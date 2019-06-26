@@ -25,6 +25,23 @@ def process_frames():
 
     # Read a few seconds
     streamingBody = stream["Payload"]
+
+    # Check if anything was read from the stream
+    if(streamingBody._amount_read <= 0):
+        
+        responsejson = {
+            'Stream-Status': -1,
+            'Message': 'Stream Unavailable'
+        }
+
+        response_str = json.dumps(responsejson)
+
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'application/json'},
+            'body': response_str
+        }
+
     datafeed = streamingBody.read(40000)
 
     # Store the grabbed video in a temporary file
@@ -45,28 +62,26 @@ def process_frames():
     response = client.detect_labels(
         Image={'Bytes': frame_image.tobytes()}, MinConfidence=75)
 
-    #response_str = json.dumps(response)
-
-    # return {
-    #    'statusCode': 200,
-    #    'headers': { 'Content-Type': 'json' },
-    #    'body': response_str
-    # }
-
     # Draw the bounding boxes for the frame and re-encode the image
     rek_frame = bounding_box(response, frame)
-
     rek_frame_image = cv2.imencode('.png', rek_frame)[1]
 
     # Encode the image as a base64 string
     base64_bytes = b64encode(rek_frame_image.tobytes())
     base64_string = base64_bytes.decode()
 
-    # TODO: Have to also return the labels with no instances
+    responsejson = {
+        'Stream-Status': 0,
+        'Image': base64_string,
+        'Message': response
+    }
+
+    response_str = json.dumps(responsejson)
+
     return {
         'statusCode': 200,
-        'headers': {'Content-Type': 'image/png'},
-        'body': base64_string
+        'headers': {'Content-Type': 'application/json'},
+        'body': response_str
     }
 
 
