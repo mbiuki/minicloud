@@ -13,8 +13,8 @@ secret_key = os.environ['SECRET_KEY']
 
 def process_frames():
 
-    video_client = boto3.client('kinesis-video-media', 
-                                endpoint_url='https://s-4010bf70.kinesisvideo.us-west-2.amazonaws.com', 
+    video_client = boto3.client('kinesis-video-media',
+                                endpoint_url='https://s-4010bf70.kinesisvideo.us-west-2.amazonaws.com',
                                 aws_access_key_id=access_key,
                                 aws_secret_access_key=secret_key,
                                 region_name='us-west-2')
@@ -28,9 +28,9 @@ def process_frames():
 
     # Check if anything was read from the stream
     if(streamingBody._amount_read <= 0):
-        
+
         responsejson = {
-            'Stream-Status': -1,
+            'StreamStatus': -1,
             'Message': 'Stream Unavailable'
         }
 
@@ -38,7 +38,10 @@ def process_frames():
 
         return {
             'statusCode': 200,
-            'headers': {'Content-Type': 'application/json'},
+            'headers': {'Content-Type': 'json',
+                        'access-control-allow-headers': 'Content-Type',
+                        'access-control-allow-methods': 'GET',
+                        'access-control-allow-origin': '*'},
             'body': response_str
         }
 
@@ -71,7 +74,7 @@ def process_frames():
     base64_string = base64_bytes.decode()
 
     responsejson = {
-        'Stream-Status': 0,
+        'StreamStatus': 0,
         'Image': base64_string,
         'Message': response
     }
@@ -80,8 +83,12 @@ def process_frames():
 
     return {
         'statusCode': 200,
-        'headers': {'Content-Type': 'application/json'},
-        'body': response_str
+        'headers': {'Content-Type': 'json',
+                    'access-control-allow-headers': 'Content-Type',
+                    'access-control-allow-methods': 'GET',
+                    'access-control-allow-origin': '*'},
+        'body': response_str,
+
     }
 
 
