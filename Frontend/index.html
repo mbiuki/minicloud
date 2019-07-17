@@ -14,6 +14,13 @@
 	<script src="bundle.js"></script>
 	<script src="app.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+	<style>
+		.topCorner {
+			position: absolute;
+			top: 27;
+			right: 50;
+		}
+	</style>
 	<!-- <meta name="google-signin-scope" content="profile email">
 	<meta name="google-signin-client_id" content="969820381666-46hvrmiu5ql5n89f38h51q26feg9a8tm.apps.googleusercontent.com">
 	<script src="https://apis.google.com/js/platform.js" async defer></script> -->
@@ -21,9 +28,17 @@
 
 <body>
 	<div class="container">
+		
 		<center>
-			<h1>Drone IOT</h1>
+			<h1 style="margin: 15px 0;">Drone IOT</h1>
 		</center>
+			
+		<!-- <div class="col-md-16"> -->
+			<div class="topCorner">
+				<button onclick="window.location.href='kinesis.html'" class="btn btn-primary">Demo & Live Stream</button>
+			</div>
+		<!-- </div> -->
+		
 		<br></br>
 		<h3>Current Sensor Status:</h3>
 		<table id="statusTable">
@@ -93,10 +108,6 @@
 			</div>
 		</div>
 		<br>
-		<div style="text-align:center">
-			<br></br>
-			<a href="kinesis.html">Live Video Stream</a>
-		</div>
 		<div class="dataRow" style="margin-top:50px">
 			<center>
 				<h3>Graph Custom Data</h3>
@@ -113,7 +124,7 @@
 				<input id="timeStartPicker" placeholder="Start Date">
 				<label>Time End</label>
 				<input id="timeEndPicker" placeholder="End Date">
-				<button id="graphButton" onclick="onGraphButtonClick()">Graph Data</button>
+				<button id="graphButton" onclick="onGraphButtonClick()" class="btn btn-primary">Graph Data</button>
 			</center>
 			<br/>
 			<br/>
