@@ -21,7 +21,7 @@ function mqttClientMessageHandler(topic, payload) {
 	var message = 'message: ' + topic + ':' + payload.toString();
 	console.log(message);
 	var payloadObj = JSON.parse(payload);
-	var date = new Date(payloadObj["timeStampIso"]).toLocaleString();
+	var date = new Date(payloadObj["timeStampIso"]).toLocaleString('en-CA');
 
 	// Temperature and Pressure data are emitted together
 	if (topic == "sensor/barometer/payload") {
@@ -89,6 +89,7 @@ window.onload = function () {
 		defaultDate: new Date(),
 	});
 	plotCustomGraph();
+
 	//var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
 	//showSignInPrompt(!isSignedIn)
 }
@@ -121,7 +122,7 @@ function setupCurrSensorStatus() {
 
 		// Create the graphs for the sensors
 		for (var i = 0; i < sensorStatus.length; i++) {
-			var date = new Date(sensorStatus[i].payload.timeStampIso).toLocaleString();
+			var date = new Date(sensorStatus[i].payload.timeStampIso).toLocaleString('en-CA');
 			// Temperature and humidity data are emitted together
 			if (sensorStatus[i].sensorId == "barometer") {
 				var temp = sensorStatus[i].payload.temp;
@@ -187,7 +188,7 @@ function setupSensorData(sensor, sensorCtx, sensorChart, timeStart, timeEnd, ste
 		var data = [];
 
 		for (var i = 0; i < responseData.length; i++) {
-			timeStamps.push(new Date(responseData[i].payload["timeStampIso"]).toLocaleString());
+			timeStamps.push(new Date(responseData[i].payload["timeStampIso"]).toLocaleString('en-CA'));
 			var val;
 			if (sensor == "temp") {
 				val = responseData[i].payload["temp"];
@@ -269,7 +270,7 @@ function createChart(sensor, sensorCtx, sensorChart, data, timeStamps, steppedLi
 					display: true,
 					type: 'time',
 					time: {
-						parser: 'DD/MM/YYYY HH:mm:ss',
+						parser: 'YYYY-MM-DD HH:mm:ss',
 						tooltipFormat: 'll HH:mm:ss',
 						unit: timeUnit, //Use days when plotting custom chart
 						displayFormats: {
@@ -330,92 +331,7 @@ function createStatusChart(sensor, sensorCtx, sensorChart, data, timeStamps, ste
 		}
 	});
 }
-/*
-// Get the current camera image and display it
-function getCurrImage() {
-	var xhttp = new XMLHttpRequest();
-	xhttp.open("GET", endpoint + "/getpicture");
 
-	xhttp.onload = function(e) {
-		var response = JSON.parse(xhttp.response)["Items"][0]["payload"];
-		setImage(response);
-	}
-
-	xhttp.send();
-}
-
-// Uses the provided response from IoT and sets the camera image, labels, and human detected text accordingly
-function setImage(response) {
-	var cameraImage = document.getElementById("cameraImage");
-	var rekLabels = document.getElementById("rekLabels");
-	var imageDate = document.getElementById("imageDate");
-	var humanDetected = document.getElementById("humanDetected");
-
-	var src = response["url"];
-	var labels = response["labels"];
-	var imageDateText = response["timeStampIso"];
-
-	cameraImage.src = src;
-	imageDate.innerText = new Date(imageDateText).toLocaleString();
-
-	var isHuman = false;
-	var rekText = "";
-	for (var i = 0; i < labels.length; i++) {
-		isHuman |= labels[i]["Name"] == "Human";
-		rekText += "\n" + labels[i]["Name"] + ": " + labels[i]["Confidence"].toFixed(2);
-	}
-	rekLabels.innerText = rekText;
-
-	humanDetected.innerText = isHuman ? "Human detected" : "No human detected";
-}
-
-function setLedButtonStatus(newStatus) {
-	var ledButton = document.getElementById("ledButton");
-	ledButton.innerHTML = newStatus == "1" ? "Turn LED Off" : "Turn LED On";
-}
-
-
-function onLedButtonClick() {
-	var xhttp = new XMLHttpRequest();
-	xhttp.open("PUT", endpoint + "/setstatus/led");
-	var token = getGoogleToken();
-	console.log(token);
-	xhttp.setRequestHeader("authorizationToken", token);
-
-	xhttp.onload = function(e) {
-		console.log(xhttp.response);
-	}
-
-	xhttp.onerror = function(e) {
-		alert("You can send commands again in 24 hours");
-	}
-
-	var newStatus = ledStatus == "1" ? "0" : "1";
-
-	// Record time published to calculate delay later
-	ledPublishTime = Date.now();
-	xhttp.send(JSON.stringify({ "status": newStatus, "sender": token }));
-}
-
-function onCameraButtonClick() {
-	var xhttp = new XMLHttpRequest();
-	xhttp.open("POST", endpoint + "/takepicture");
-	var token = getGoogleToken();
-	xhttp.setRequestHeader("authorizationToken", token);
-
-	xhttp.onload = function(e) {
-		console.log(xhttp.response);
-	}
-
-	xhttp.onerror = function(e) {
-		alert("You can send commands again in 24 hours");
-	}
-
-	// Record time published to calculate delay later
-	cameraPublishTime = Date.now();
-	xhttp.send(JSON.stringify({ "sender": token }));
-}
-*/
 function onGraphButtonClick() {
 	plotCustomGraph();
 }
@@ -435,7 +351,8 @@ function plotCustomGraph() {
 	setupSensorData(sensorSelect.value, document.getElementById('dataChart').getContext('2d'), dataChart, timeStart, timeEnd, steppedLine, 'day');
 }
 
-/*function onSignIn(googleUser) {
+/*
+function onSignIn(googleUser) {
 	// Useful data for your client-side scripts:
 	var profile = googleUser.getBasicProfile();
 	console.log("ID: " + profile.getId()); // Don't send this directly to your server!
@@ -475,4 +392,5 @@ function showSignInPrompt(show) {
 		document.getElementById("buttonDiv").style.display = 'block';
 		document.getElementById("googleSignout").style.display = 'block';
 	}
-}*/
+}
+*/
