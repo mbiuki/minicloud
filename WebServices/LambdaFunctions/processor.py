@@ -26,6 +26,8 @@ def process_frames():
     # Read a few seconds
     streamingBody = stream["Payload"]
 
+    datafeed = streamingBody.read(40000)
+
     # Check if anything was read from the stream
     if(streamingBody._amount_read <= 0):
 
@@ -44,8 +46,6 @@ def process_frames():
                         'access-control-allow-origin': '*'},
             'body': response_str
         }
-
-    datafeed = streamingBody.read(40000)
 
     # Store the grabbed video in a temporary file
     temp_file, filename = tempfile.mkstemp()
@@ -105,20 +105,20 @@ def bounding_box(response, frame):
             box = instance["BoundingBox"]
 
             # Get bounding box location
-            x1 = box["Left"]
-            y1 = box["Top"]
-            x2 = x1 + box["Width"]
-            y2 = y1 + box["Height"]
+            x1 = width * box["Left"]
+            y1 = height * box["Top"]
+            w = width * box["Width"]
+            h = height * box["Height"]
 
             # Draw the bounding box on the frame
-            cv2.rectangle(frame, (round(x1 * height), round(y1 * width)),
-                          (round(x2 * height), round(y2 * width)), (0, 0, 255), 5)
+            cv2.rectangle(frame, (round(x1), round(y1)),
+                          (round(x1 + w), round(y1 + h)), (0, 0, 255), 5)
 
             (textWidth, textHeight) = cv2.getTextSize(rekObject,
                                                       cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, thickness=2)[0]
 
-            text_offset_x = round(x1 * height)
-            text_offset_y = round(y1 * width)
+            text_offset_x = round(x1)
+            text_offset_y = round(y1)
 
             box_coords = ((text_offset_x, text_offset_y), (text_offset_x +
                                                            textWidth - 2, text_offset_y - textHeight - 2))
