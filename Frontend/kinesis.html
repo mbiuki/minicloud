@@ -1,286 +1,494 @@
 <html>
-    <head>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://vjs.zencdn.net/6.6.3/video-js.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-        <script src="https://sdk.amazonaws.com/js/aws-sdk-2.408.0.min.js"></script>
-        <title>Drone IOT Video Stream Viewer</title>
-    </head>
-    <body>
-        <div class="container">
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://vjs.zencdn.net/6.6.3/video-js.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.408.0.min.js"></script>
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id"
+        content="969820381666-46hvrmiu5ql5n89f38h51q26feg9a8tm.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <title>Drone IOT Video Stream Viewer</title>
+    <style>
+        .topCorner {
+            position: absolute;
+            top: 25;
+            right: 50;
+        }
+
+        .leftCorner {
+            position: absolute;
+            top: 27;
+            left: 78;
+        }
+
+        .vid {
+            width: 100%;
+            height: auto;
+            min-height: 360px
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <center>
             <h1 style="margin: 20px 0;">Drone IOT Video Stream</h1>
-            <br></br>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label>Player</label>
-                        <select id="player" class="form-control form-control-sm">
-                            <option selected>HLS.js</option>
-                            <option>VideoJS</option>
-                            <option>Shaka Player</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Region</label>
-                        <select id="region" class="form-control form-control-sm">
-                            <option>ap-northeast-1</option>
-                            <option>eu-central-1</option>
-                            <option>eu-west-1</option>
-                            <option>us-east-1</option>
-                            <option selected>us-west-2</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>AWS Access Key</label>
-                        <input id="accessKeyId" type="password" class="form-control form-control-sm"/>
-                    </div>
-                    <div class="form-group">
-                        <label>AWS Secret Key</label>
-                        <input id="secretAccessKey" type="password" class="form-control form-control-sm"/>
-                    </div>
-                    <div class="form-group">
-                        <label>AWS Session Token (Optional)</label>
-                        <input id="sessionToken" type="password" class="form-control form-control-sm" />
-                    </div>
-                    <div class="form-group">
-                        <label>Endpoint (Optional)</label>
-                        <input id="endpoint" type="text" class="form-control form-control-sm" />
-                    </div>
-                    <div class="form-group">
-                        <label>Stream name</label>
-                        <input id="streamName" type="text" class="form-control form-control-sm"/>
-                    </div>
-                    <div class="form-group">
-                        <label>Playback Mode</label>
-                        <select id="playbackMode" class="form-control form-control-sm">
-                            <option selected>LIVE</option>
-                            <option>ON_DEMAND</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Start Timestamp</label>
-                        <input id="startTimestamp" type="datetime-local" class="form-control form-control-sm"/>
-                    </div>
-                    <div class="form-group">
-                        <label>End Timestamp</label>
-                        <input id="endTimestamp" type="datetime-local" class="form-control form-control-sm"/>
-                    </div>
-                    <div class="form-group">
-                        <label>Fragment Selector Type</label>
-                        <select id="fragmentSelectorType" class="form-control form-control-sm">
-                            <option selected>SERVER_TIMESTAMP</option>
-                            <option>PRODUCER_TIMESTAMP</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Container Format</label>
-                        <select id="containerFormat" class="form-control form-control-sm">
-                            <option selected="">FRAGMENTED_MP4</option>
-                            <option>MPEG_TS</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Discontinuity Mode</label>
-                        <select id="discontinuityMode" class="form-control form-control-sm">
-                            <option selected>ALWAYS</option>
-                            <option>NEVER</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Display Fragment Timestamp</label>
-                        <select id="displayFragmentTimestamp" class="form-control form-control-sm">
-                            <option>ALWAYS</option>
-                            <option selected>NEVER</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Max Media Playlist Fragment Results</label>
-                        <input id="maxMediaPlaylistFragmentResults" type="text" class="form-control form-control-sm"/>
-                    </div>
-                    <div class="form-group">
-                        <label>Expires (seconds)</label>
-                        <input id="expires" type="text" class="form-control form-control-sm"/>
-                    </div>
-                    <button id="start" type="submit" class="btn btn-primary">Start Playback</button>
+        </center>
+
+        <div class="col-md-16">
+            <div id="passwordDiv" class="topCorner">
+                <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+                <a id="googleSignout" href="#" onclick="signOut()">Sign out</a>
+            </div>
+            <div class="leftCorner">
+                <button onclick="window.location.href='index.html'" class="btn btn-primary">Drone Sensors</button>
+            </div>
+        </div>
+        <br></br>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Player</label>
+                    <select id="player" class="form-control form-control-sm">
+                        <option selected>HLS.js</option>
+                        <option>VideoJS</option>
+                        <option>Shaka Player</option>
+                    </select>
                 </div>
-                <div class="col-md-8">
-                    <div id="playerContainer">
+                <div class="form-group">
+                    <label>Playback Mode</label>
+                    <select id="playbackMode" class="form-control form-control-sm">
+                        <option selected>LIVE</option>
+                        <option>ON_DEMAND</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Start Timestamp</label>
+                    <input id="startTimestamp" type="datetime-local" class="form-control form-control-sm" />
+                </div>
+                <div class="form-group">
+                    <label>End Timestamp</label>
+                    <input id="endTimestamp" type="datetime-local" class="form-control form-control-sm" />
+                </div>
 
-                        <!-- HLS.js elemtns -->
-                        <video id="hlsjs" class="player" controls autoplay></video>
-                        <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+            </div>
 
-                        <!-- VideoJS elements -->
-                        <video id="videojs" class="player video-js vjs-default-skin" controls autoplay></video>
-                        <script src="https://vjs.zencdn.net/6.6.3/video.js"></script>
-                        <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.14.1/videojs-contrib-hls.js"></script>
+            <div class="col-md-8">
+                <div id="playerContainer">
 
-                        <!-- Shaka Player elements -->
-                        <video id="shaka" class="player" controls autoplay></video>
-                        <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/2.4.1/shaka-player.compiled.js"></script>
+                    <!-- HLS.js elemtns -->
+                    <video id="hlsjs" class="player" controls autoplay></video>
+                    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+                    <!-- VideoJS elements -->
+                    <video id="videojs" class="player video-js vjs-default-skin" controls autoplay></video>
+                    <script src="https://vjs.zencdn.net/6.6.3/video.js"></script>
+                    <script
+                        src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.14.1/videojs-contrib-hls.js"></script>
+
+                    <!-- Shaka Player elements -->
+                    <video id="shaka" class="player" controls autoplay></video>
+                    <script
+                        src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/2.4.1/shaka-player.compiled.js"></script>
+                </div>
+                </br>
+                <div class="card bg-light mb-3" id="errorBox">
+                    <p id="errorText">Sign in to view the stream</p>
+                </div>
+
+
+                <div style="width:100px;">
+                    <div style="float: left; width: 25px">
+                        <button id="start" type="submit" class="btn btn-primary">Play</button>
                     </div>
-
-                    <h3 style="margin-top: 20px;">Logs</h3>
-                    <div class="card bg-light mb-3">
-                        <pre id="logs" class="card-body text-monospace" style="font-family: monospace; white-space: pre-wrap;"></pre>
+                    <div style="float: right; width: 25px">
+                        <button id="capture" type="submit" class="btn btn-primary"
+                            onclick="onCaptureButtonClick()">Object Recognition</button>
+                    </div>
+                </div>
+                <br></br>
+                <div>
+                    <div style="float: left">
+                        <image id="streamImage" width=400 height=300></image>
+                    </div>
+                    <div class="card bg-light mb-3" id="responseContainer" style="float: right; width: 300px">
+                        <p id="responseBox"></p>
                     </div>
                 </div>
             </div>
         </div>
-        <script>
-            configureLogging();
-            $('#start').click(function() {
-                var streamName = $('#streamName').val();
-                // Step 1: Configure SDK Clients
-                var options = {
-                    accessKeyId: $('#accessKeyId').val(),
-                    secretAccessKey: $('#secretAccessKey').val(),
-                    sessionToken: $('#sessionToken').val() || undefined,
-                    region: $('#region').val(),
-                    endpoint: $('#endpoint').val() || undefined
+        <br></br>
+        <br></br>
+
+        <center>
+            <h1>Recognition Demo</h1>
+            </br>
+        </center>
+        <div class="row">
+            <div class="col-md-4">
+
+            </div>
+            <div class="col-md-8">
+                <p class="view">Choose a video:</p>
+                <button id="ground" type="submit" class="btn btn-primary" onclick="onGroundButtonClick()">Ground</button>
+                <p class="view"><br></br></p>
+                <button id="aerial" type="submit" class="btn btn-primary" onclick="onAerialButtonClick()">Aerial</button>
+                <br></br>
+                <video id="video" class="vid" controls>
+                    <source src="park_rek.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+
+        <br></br>
+    </div>
+    </div>
+    <script>
+        var id;
+        var secretKey;
+        var accessKey;
+        var token;
+        var idToken;
+
+        configureCredentials();
+
+        //Disable play and recognition buttons until sign in
+        document.getElementById("start").disabled = true;
+        document.getElementById("capture").disabled = true;
+
+        document.getElementById("responseContainer").style.display = "none";
+        document.getElementById("streamImage").style.display = "none";
+
+        showSignInPrompt(true);
+
+        $('#start').click(function () {
+            var streamName = 'droneiot'
+
+            // Step 1: Configure SDK Clients
+            var options = {
+                accessKeyId: accessKey,
+                secretAccessKey: secretKey,
+                sessionToken: token,
+                region: 'us-west-2',
+            }
+            var kinesisVideo = new AWS.KinesisVideo(options);
+            var kinesisVideoArchivedContent = new AWS.KinesisVideoArchivedMedia(options);
+            
+            // Step 2: Get a data endpoint for the stream
+            console.log('Fetching data endpoint');
+            kinesisVideo.getDataEndpoint({
+                StreamName: streamName,
+                APIName: "GET_HLS_STREAMING_SESSION_URL"
+            }, function (err, response) {
+                if (err) {
+                    var paragraph = document.getElementById("errorText");
+                    paragraph.textContent = err.message + " (Drone Offline)";
+                    showErrorBox(true);
+                    return console.error(err);
                 }
-                var kinesisVideo = new AWS.KinesisVideo(options);
-                var kinesisVideoArchivedContent = new AWS.KinesisVideoArchivedMedia(options);
-                // Step 2: Get a data endpoint for the stream
-                console.log('Fetching data endpoint');
-                kinesisVideo.getDataEndpoint({
+                console.log('Data endpoint: ' + response.DataEndpoint);
+                kinesisVideoArchivedContent.endpoint = new AWS.Endpoint(response.DataEndpoint);
+
+                // Step 3: Get an HLS Streaming Session URL
+                console.log('Fetching HLS Streaming Session URL');
+                kinesisVideoArchivedContent.getHLSStreamingSessionURL({
                     StreamName: streamName,
-                    APIName: "GET_HLS_STREAMING_SESSION_URL"
-                }, function(err, response) {
-                    if (err) { return console.error(err); }
-                    console.log('Data endpoint: ' + response.DataEndpoint);
-                    kinesisVideoArchivedContent.endpoint = new AWS.Endpoint(response.DataEndpoint);
-                    // Step 3: Get an HLS Streaming Session URL
-                    console.log('Fetching HLS Streaming Session URL');
-                    kinesisVideoArchivedContent.getHLSStreamingSessionURL({
-                        StreamName: streamName,
-                        PlaybackMode: $('#playbackMode').val(),
-                        HLSFragmentSelector: {
-                            FragmentSelectorType: $('#fragmentSelectorType').val(),
-                            TimestampRange: $('#playbackMode').val() === "LIVE" ? undefined : {
-                                StartTimestamp: new Date($('#startTimestamp').val()),
-                                EndTimestamp: new Date($('#endTimestamp').val())
-                            }
-                        },
-                        ContainerFormat: $('#containerFormat').val(),
-                        DiscontinuityMode: $('#discontinuityMode').val(),
-                        DisplayFragmentTimestamp: $('#displayFragmentTimestamp').val(),
-                        MaxMediaPlaylistFragmentResults: parseInt($('#maxMediaPlaylistFragmentResults').val()),
-                        Expires: parseInt($('#expires').val())
-                    }, function(err, response) {
-                        if (err) { return console.error(err); }
-                        console.log('HLS Streaming Session URL: ' + response.HLSStreamingSessionURL);
-                        // Step 4: Give the URL to the video player.
-                        var playerName = $('#player').val();
-                        if (playerName == 'HLS.js') {
-                            var playerElement = $('#hlsjs');
-                            playerElement.show();
-                            var player = new Hls();
-                            console.log('Created HLS.js Player');
-                            player.loadSource(response.HLSStreamingSessionURL);
-                            player.attachMedia(playerElement[0]);
-                            console.log('Set player source');
-                            player.on(Hls.Events.MANIFEST_PARSED, function() {
-                                video.play();
-                                console.log('Starting playback');
-                            });
-                        } else if (playerName === 'VideoJS') {
-                            var playerElement = $('#videojs');
-                            playerElement.show();
-                            var player = videojs('videojs');
-                            console.log('Created VideoJS Player');
-                            player.src({
-                                src: response.HLSStreamingSessionURL,
-                                type: 'application/x-mpegURL'
-                            });
-                            console.log('Set player source');
-                            player.play();
-                            console.log('Starting playback');
-                        } else if (playerName === 'Shaka Player') {
-                            var playerElement = $('#shaka');
-                            playerElement.show();
-                            var player = new shaka.Player(playerElement[0]);
-                            console.log('Created Shaka Player');
-                            player.load(response.HLSStreamingSessionURL).then(function() {
-                                console.log('Starting playback');
-                            });
-                            console.log('Set player source');
+                    PlaybackMode: $('#playbackMode').val(),
+                    HLSFragmentSelector: {
+                        TimestampRange: $('#playbackMode').val() === "LIVE" ? undefined : {
+                            StartTimestamp: new Date($('#startTimestamp').val()),
+                            EndTimestamp: new Date($('#endTimestamp').val())
                         }
-                    });
-                });
-                $('.player').hide();
-            });
-            // Read/Write all of the fields to/from localStorage so that fields are not lost on refresh.
-            [
-                'player',
-                'region',
-                'accessKeyId',
-                'secretAccessKey',
-                'sessionToken',
-                'endpoint',
-                'streamName',
-                'playbackMode',
-                'startTimestamp',
-                'endTimestamp',
-                'fragmentSelectorType',
-                'containerFormat',
-                'discontinuityMode',
-                'displayFragmentTimestamp',
-                'maxMediaPlaylistFragmentResults',
-                'expires'
-            ].forEach(function(field) {
-                var id = "#" + field;
-                // Read field from localStorage
-                try {
-                    var localStorageValue = localStorage.getItem(field);
-                    if (localStorageValue) { $(id).val(localStorageValue); }
-                } catch (e) { /* Don't use localStorage */ }
-                // Write field to localstorage on change event
-                $(id).change(function() {
-                    try {
-                        localStorage.setItem(field, $(id).val());
-                    } catch (e) { /* Don't use localStorage */ }
-                });
-            });
-            // Setup disabled/enabled state for timestamp fields
-            $('#playbackMode').change(function() {
-                updateTimestampFieldState();
-            });
-            updateTimestampFieldState();
-            // Initially hide the player elements
-            $('.player').hide();
-            function configureLogging() {
-                console._error = console.error;
-                console.error = function(messages) {
-                    log('ERROR', Array.prototype.slice.call(arguments));
-                    console._error.apply(this, arguments);
-                }
-                console._log = console.log;
-                console.log = function(messages) {
-                    log('INFO', Array.prototype.slice.call(arguments));
-                    console._log.apply(this, arguments);
-                }
-                function log(level, messages) {
-                    var text = '';
-                    for (message of messages) {
-                        if (typeof message === 'object') { message = JSON.stringify(message, null, 2); }
-                        text += ' ' + message;
+                    },
+                    ContainerFormat: $('#containerFormat').val(),
+                    Expires: parseInt($('#expires').val())
+                }, function (err, response) {
+                    if (err) {
+                        var paragraph = document.getElementById("errorText");
+                        paragraph.textContent = err.message + " (Drone Offline)";
+                        showErrorBox(true);
+                        return console.error(err);
                     }
-                    $('#logs').append($('<div>').text('[' + level + ']' + text + '\n'));
+                    console.log('HLS Streaming Session URL: ' + response.HLSStreamingSessionURL);
+
+                    // Step 4: Give the URL to the video player.
+                    document.getElementById("capture").disabled = false;
+                    var playerName = $('#player').val();
+                    if (playerName == 'HLS.js') {
+                        var playerElement = $('#hlsjs');
+                        playerElement.show();
+                        var player = new Hls();
+                        console.log('Created HLS.js Player');
+                        player.loadSource(response.HLSStreamingSessionURL);
+                        player.attachMedia(playerElement[0]);
+                        console.log('Set player source');
+                        player.on(Hls.Events.MANIFEST_PARSED, function () {
+                            video.play();
+                            console.log('Starting playback');
+                        });
+                    } else if (playerName === 'VideoJS') {
+                        var playerElement = $('#videojs');
+                        playerElement.show();
+                        var player = videojs('videojs');
+                        console.log('Created VideoJS Player');
+                        player.src({
+                            src: response.HLSStreamingSessionURL,
+                            type: 'application/x-mpegURL'
+                        });
+                        console.log('Set player source');
+                        player.play();
+                        console.log('Starting playback');
+                    } else if (playerName === 'Shaka Player') {
+                        var playerElement = $('#shaka');
+                        playerElement.show();
+                        var player = new shaka.Player(playerElement[0]);
+                        console.log('Created Shaka Player');
+                        player.load(response.HLSStreamingSessionURL).then(function () {
+                            console.log('Starting playback');
+                        });
+                        console.log('Set player source');
+                    }
+                });
+            });
+            $('.player').hide();
+        });
+        // Read/Write all of the fields to/from localStorage so that fields are not lost on refresh.
+        [
+            'player',
+            'playbackMode',
+            'startTimestamp',
+            'endTimestamp',
+            'containerFormat',
+            'expires'
+        ].forEach(function (field) {
+            var id = "#" + field;
+
+            // Read field from localStorage
+            try {
+                var localStorageValue = localStorage.getItem(field);
+                if (localStorageValue) { $(id).val(localStorageValue); }
+            } catch (e) { /* Don't use localStorage */ }
+
+            // Write field to localstorage on change event
+            $(id).change(function () {
+                try {
+                    localStorage.setItem(field, $(id).val());
+                } catch (e) { /* Don't use localStorage */ }
+            });
+        });
+
+        // Setup disabled/enabled state for timestamp fields
+        $('#playbackMode').change(function () {
+            updateTimestampFieldState();
+        });
+
+        // Initially hide the player elements
+        $('.player').hide();
+        updateTimestampFieldState();
+
+        function configureLogging() {
+            console._error = console.error;
+            console.error = function (messages) {
+                //log('ERROR', messages.message);
+                console._error.apply(this, arguments);
+            }
+            console._log = console.log;
+            console.log = function (messages) {
+                //log('INFO', Array.prototype.slice.call(arguments));
+                console._log.apply(this, arguments);
+            }
+            function log(level, messages) {
+                var text = '';
+                for (message of messages) {
+                    if (typeof message === 'object') { message = JSON.stringify(message, null, 2); }
+                    text += ' ' + message;
+                }
+                //$('#logs').append($('<div>').text('[' + level + ']' + text + '\n'));
+            }
+        }
+        function updateTimestampFieldState() {
+            var isLive = $('#playbackMode').val() === 'LIVE';
+            $('#startTimestamp').prop('disabled', isLive);
+            $('#endTimestamp').prop('disabled', isLive);
+        }
+
+        // Initialize the Amazon Cognito credentials provider
+        function configureCredentials() {
+
+            AWS.config.region = 'us-west-2';
+            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                IdentityPoolId: 'us-west-2:d914604f-626e-4568-aa89-c88ad823bcb5',
+                Logins: { 'accounts.google.com': 'GOOGLETOKEN' },
+                region: 'us-west-2'
+            });
+        }
+
+        function onSignIn(googleUser) {
+            var id_token = googleUser.getAuthResponse().id_token;
+            signinCallback(id_token);
+            showSignInPrompt(false);
+            document.getElementById("start").disabled = false;
+        };
+
+        function signinCallback(idToken) {
+
+            // Add the Google access token to the Cognito credentials login map.
+            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                IdentityPoolId: 'us-west-2:d914604f-626e-4568-aa89-c88ad823bcb5',
+                Logins: {
+                    'accounts.google.com': idToken
+                }
+            });
+
+            //Obtain credentials for this user
+            AWS.config.credentials.get(function (err, data) {
+                if (!err) {
+                    id = AWS.config.credentials.identityId;
+                    accessKey = AWS.config.credentials.accessKeyId;
+                    secretKey = AWS.config.credentials.secretAccessKey;
+                    token = AWS.config.credentials.sessionToken;
+                }
+            });
+        }
+
+        function signOut() {
+            var auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function () {
+                console.log('User signed out.');
+            });
+
+            showSignInPrompt(true);
+            document.getElementById("start").disabled = true;
+        }
+
+        function showSignInPrompt(show) {
+            if (show) {
+                document.getElementById("errorText").innerText = "Sign in to view the stream"
+                document.getElementById("googleSignout").style.display = 'none';
+            } else {
+                document.getElementById("errorText").innerText = "You can perform 3 recognition captures a day"
+                document.getElementById("googleSignout").style.display = 'block';
+            }
+        }
+
+        function showErrorBox(show) {
+            if (show) {
+                document.getElementById("errorBox").style.display = "block";
+            }
+            else {
+                document.getElementById("errorBox").style.display = "none";
+            }
+        }
+
+        function onCaptureButtonClick() {
+            var xhttp = new XMLHttpRequest();
+
+            //Get cookie to see how many captures have been performed
+            var nC = getCookie('numCaps');
+            if(nC == null) {
+                setCookie('numCaps', nC, 1);
+            }
+            else if(nC < 3) {
+                setCookie('numCaps', parseInt(nC) + 1, 1);
+            }
+            //Disable the button when limit is reached
+            else {
+                document.getElementById("capture").disabled = true;
+                document.getElementById("errorText").innerText = "Capture limit reached";
+                return;
+            }
+            
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+
+                    var response = JSON.parse(xhttp.response);
+                    if (response.StreamStatus == 0) {
+
+                        //Extract the b64 encoded image and display it
+                        var image = response.Image;
+                        document.getElementById("streamImage").src = 'data:image/png;base64,' + image;
+
+                        //Extract the labels and confidence metrics
+                        var responseBox = document.getElementById("responseBox");
+                        var message = response.Message;
+                        console.log(message);
+                        var labels = message["Labels"];
+                        var rekText = "";
+                        for (var i = 0; i < labels.length; i++) {
+                            rekText += "\n" + labels[i]["Name"] + ": " + labels[i]["Confidence"].toFixed(2)
+                        }
+
+                        responseBox.innerText = rekText;
+                        document.getElementById("responseContainer").style.display = "block";
+                        document.getElementById("streamImage").style.display = "block";
+                        
+                    }
+                    else {
+                        var responseBox = document.getElementById("errorText");
+                        var resText = "Stream Unavailble";
+                        responseBox.innerText = resText;
+                    }
                 }
             }
-            function updateTimestampFieldState() {
-                var isLive = $('#playbackMode').val() === 'LIVE';
-                $('#startTimestamp').prop('disabled', isLive);
-                $('#endTimestamp').prop('disabled', isLive);
+
+            //Call lambda to process current frame
+            xhttp.open("GET", " https://hlabp84zgi.execute-api.us-west-2.amazonaws.com/dev/GetProcessedFrame", true);
+            xhttp.send();
+        }
+
+        function setCookie(name, value, days) {
+                var expires = "";
+                if (days) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
+
+        function getCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
             }
-            console.log("Page loaded")
-        </script>
-        <style>
-            #playerContainer, .player { width: 100%; height: auto; min-height: 400px; background-color: black; }
-            .vjs-big-play-button { display: none !important; }
-        </style>
-    </body>
+            return null;
+        }
+
+        function onGroundButtonClick() {
+            document.getElementById("video").src = "park_rek.mp4";
+        }
+
+        function onAerialButtonClick() {
+            document.getElementById("video").src = "aerial_rek.mp4";
+        }
+        console.log("Page loaded")
+    </script>
+    <style>
+        #playerContainer,
+        .player {
+            width: 100%;
+            height: auto;
+            min-height: 400px;
+            background-color: black;
+        }
+
+        .vjs-big-play-button {
+            display: none !important;
+        }
+
+        .view {
+            display: inline-block;
+            margin: 10;
+        }
+    </style>
+</body>
+
 </html>
